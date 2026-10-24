@@ -1623,7 +1623,7 @@ export const PathologyModule: React.FC = () => {
                       <label className="col-span-4 font-black uppercase text-slate-800 dark:text-slate-200 text-xs tracking-wide pt-1.5">
                         Ref. By :
                       </label>
-                      <div className="col-span-8 space-y-1">
+                      <div className="col-span-8">
                         <div className="flex items-center gap-1.5">
                           <select
                             value={drCode}
@@ -1646,20 +1646,6 @@ export const PathologyModule: React.FC = () => {
                             <UserPlus className="w-3.5 h-3.5" />
                             <span>{lang === 'bn' ? '+ ডাক্তার' : '+ Doc'}</span>
                           </button>
-                        </div>
-                        {/* Displayed Full Doctor Reference String */}
-                        <div className="px-2.5 py-1 bg-slate-100 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-md text-[11px] font-semibold text-slate-900 dark:text-slate-200 truncate">
-                          {matchedDoctor ? (
-                            <span className="font-bold text-purple-950 dark:text-purple-300">
-                              {matchedDoctor.name} ; {matchedDoctor.degree || matchedDoctor.specialty}
-                            </span>
-                          ) : drCode.trim() ? (
-                            <span>Code: {drCode}</span>
-                          ) : (
-                            <span className="text-slate-400 italic">
-                              e.g. Dr. G.M. Anamul Haque ; MBBS(SSMC); BCS (Health)
-                            </span>
-                          )}
                         </div>
                       </div>
                     </div>
@@ -1730,65 +1716,6 @@ export const PathologyModule: React.FC = () => {
                         </select>
                       </div>
                     </div>
-
-                    {/* Compact Secondary / Technical Lab Details (Optional Accordion) */}
-                    <details className="mt-1 pt-1 border-t border-dashed border-slate-300 dark:border-slate-700 text-[11px] text-slate-500">
-                      <summary className="cursor-pointer font-semibold hover:text-purple-700 dark:hover:text-purple-300 select-none">
-                        ⚙️ {lang === 'bn' ? 'অতিরিক্ত টেকনিক্যাল ল্যাব সেটিংস (Accession & Timestamps)' : 'Advanced Lab Details'}
-                      </summary>
-                      <div className="grid grid-cols-2 gap-2 mt-2 pt-1 bg-slate-50 dark:bg-slate-900/60 p-2 rounded-md border border-slate-200 dark:border-slate-700">
-                        <div>
-                          <label className="block text-[10px] font-bold text-slate-600 dark:text-slate-400 mb-0.5">
-                            Accession ID:
-                          </label>
-                          <input
-                            type="text"
-                            value={accessionNo}
-                            onChange={(e) => setAccessionNo(e.target.value)}
-                            className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 px-2 py-0.5 rounded text-[11px] font-mono"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-[10px] font-bold text-slate-600 dark:text-slate-400 mb-0.5">
-                            Pregnancy Status:
-                          </label>
-                          <select
-                            value={pregnancyStatus}
-                            onChange={(e) => setPregnancyStatus(e.target.value as any)}
-                            disabled={sex === 'Male'}
-                            className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 px-2 py-0.5 rounded text-[11px] disabled:opacity-50"
-                          >
-                            <option value="Non-Pregnant">Non-Pregnant</option>
-                            <option value="Pregnant (1st Trimester)">Pregnant (1st Trimester)</option>
-                            <option value="Pregnant (2nd Trimester)">Pregnant (2nd Trimester)</option>
-                            <option value="Pregnant (3rd Trimester)">Pregnant (3rd Trimester)</option>
-                            <option value="Not Applicable">Not Applicable</option>
-                          </select>
-                        </div>
-                        <div>
-                          <label className="block text-[10px] font-bold text-slate-600 dark:text-slate-400 mb-0.5">
-                            Sample Collection:
-                          </label>
-                          <input
-                            type="text"
-                            value={sampleCollectionTime}
-                            onChange={(e) => setSampleCollectionTime(e.target.value)}
-                            className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 px-2 py-0.5 rounded text-[11px] font-mono"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-[10px] font-bold text-slate-600 dark:text-slate-400 mb-0.5">
-                            Sample Received:
-                          </label>
-                          <input
-                            type="text"
-                            value={sampleReceivedTime}
-                            onChange={(e) => setSampleReceivedTime(e.target.value)}
-                            className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 px-2 py-0.5 rounded text-[11px] font-mono"
-                          />
-                        </div>
-                      </div>
-                    </details>
                   </div>
                 </div>
               </div>
