@@ -1,0 +1,2446 @@
+{
+  "scheduleConfig": {
+    "enabled": true,
+    "frequency": "daily",
+    "retentionDays": 30,
+    "maxRetainedBackups": 15,
+    "autoDeleteOld": true,
+    "backupBeforeUpdate": true,
+    "backupBeforeMigration": true,
+    "encryptBackups": true,
+    "passphrase": "AdibaSecurePass#2026",
+    "targetDrivePath": "D:\\HospitalBackup\\",
+    "lastRunAt": "2026-10-24T04:51:03.741Z",
+    "nextRunAt": "2026-10-25T04:51:03.741Z",
+    "customDateTime": "2026-10-25T07:50"
+  },
+  "serverBackups": [],
+  "auditLogs": [
+    {
+      "id": "AUD-UNAUTH-1792844127311-462",
+      "timestamp": "2026-10-24T12:15:27.311Z",
+      "action": "UNAUTHORIZED_DELETE_ATTEMPT",
+      "actor": "Lab Technologist (Lab)",
+      "destination": "Hospital Permanent DB",
+      "status": "Failed",
+      "details": "[SECURITY BLOCK 403] Non-Admin user \"Lab Technologist\" (@lab, Role: Lab) attempted restricted action: Delete Patient Record (Verification Patient)"
+    },
+    {
+      "id": "AUD-UNAUTH-1792844100951-967",
+      "timestamp": "2026-10-24T12:15:00.951Z",
+      "action": "UNAUTHORIZED_DELETE_ATTEMPT",
+      "actor": "Lab Technologist (Lab)",
+      "destination": "Hospital Permanent DB",
+      "status": "Failed",
+      "details": "[SECURITY BLOCK 403] Non-Admin user \"Lab Technologist\" (@lab, Role: Lab) attempted restricted action: Delete Verification Patient ()"
+    },
+    {
+      "id": "aud-init-1",
+      "timestamp": "2026-10-24T06:51:03.741Z",
+      "action": "BACKEND_SCHEDULER_STARTED",
+      "actor": "System Daemon",
+      "destination": "Local Server Vault (/backups)",
+      "status": "Success",
+      "details": "Node.js Backend Automatic Backup Scheduler & Integrity Verifier initialized on port 3000."
+    }
+  ],
+  "errorLogs": [],
+  "latestHospitalData": {
+    "patients": [
+      {
+        "id": "pat-test-999",
+        "pId": "26999999",
+        "patientName": "Verification Patient",
+        "age": "30 Y",
+        "sex": "Male",
+        "drCode": "DR01",
+        "sampleType": "Blood",
+        "labNo": "L-999",
+        "date": "2026-10-24",
+        "tests": []
+      }
+    ],
+    "invoices": [
+      {
+        "id": "inv-1",
+        "invoiceNo": "INV-2026-1001",
+        "pId": "26100294",
+        "patientName": "Titly",
+        "age": "24 Y",
+        "sex": "Female",
+        "phone": "01712000001",
+        "drCode": "DR01",
+        "drName": "Prof. Dr. M. A. Rahman",
+        "date": "13-10-2026",
+        "items": [
+          {
+            "testId": "t-cbc",
+            "testName": "Complete Blood Count (CBC with ESR)",
+            "category": "Hematology",
+            "price": 450
+          },
+          {
+            "testId": "t-creatinine",
+            "testName": "Serum Creatinine",
+            "category": "Biochemistry",
+            "price": 350
+          },
+          {
+            "testId": "t-fbs",
+            "testName": "Fasting Blood Sugar (FBS)",
+            "category": "Biochemistry",
+            "price": 150
+          }
+        ],
+        "subtotal": 950,
+        "discountPercent": 0,
+        "discountAmount": 0,
+        "netTotal": 950,
+        "paidAmount": 950,
+        "dueAmount": 0,
+        "paymentMethod": "Cash",
+        "status": "Paid",
+        "createdAt": "2026-10-13T09:10:00"
+      },
+      {
+        "id": "inv-2",
+        "invoiceNo": "INV-2026-1002",
+        "pId": "26100290",
+        "patientName": "Masud Shikder",
+        "age": "48 Y",
+        "sex": "Male",
+        "phone": "01812000003",
+        "drCode": "DR01",
+        "drName": "Prof. Dr. M. A. Rahman",
+        "date": "13-10-2026",
+        "items": [
+          {
+            "testId": "t-fbs",
+            "testName": "Fasting Blood Sugar (FBS)",
+            "category": "Biochemistry",
+            "price": 150
+          },
+          {
+            "testId": "t-hba1c",
+            "testName": "Glycated Hemoglobin (HbA1c)",
+            "category": "Biochemistry",
+            "price": 800
+          },
+          {
+            "testId": "t-creatinine",
+            "testName": "Serum Creatinine",
+            "category": "Biochemistry",
+            "price": 350
+          }
+        ],
+        "subtotal": 1300,
+        "discountPercent": 0,
+        "discountAmount": 0,
+        "netTotal": 1300,
+        "paidAmount": 1000,
+        "dueAmount": 300,
+        "paymentMethod": "bKash/Nagad",
+        "status": "Partial",
+        "createdAt": "2026-10-13T10:00:00"
+      },
+      {
+        "id": "inv-3",
+        "invoiceNo": "INV-2026-1003",
+        "pId": "26100286",
+        "patientName": "Minara",
+        "age": "29 Y",
+        "sex": "Female",
+        "phone": "01712000005",
+        "drCode": "DR02",
+        "drName": "Dr. Nusrat Jahan",
+        "date": "15-10-2026",
+        "items": [
+          {
+            "testId": "t-rbs",
+            "testName": "Random Blood Sugar (RBS)",
+            "category": "Biochemistry",
+            "price": 150
+          },
+          {
+            "testId": "t-urine-re",
+            "testName": "Urine Routine & Microscopic (R/M/E)",
+            "category": "Microbiology",
+            "price": 200
+          }
+        ],
+        "subtotal": 350,
+        "discountPercent": 0,
+        "discountAmount": 0,
+        "netTotal": 350,
+        "paidAmount": 350,
+        "dueAmount": 0,
+        "paymentMethod": "Cash",
+        "status": "Paid",
+        "createdAt": "2026-10-15T09:30:00"
+      }
+    ],
+    "doctors": [
+      {
+        "id": "doc-1",
+        "code": "DR01",
+        "name": "Prof. Dr. M. A. Rahman",
+        "degree": "MBBS, FCPS (Medicine), MACP (USA)",
+        "specialty": "Internal Medicine & Diabetology",
+        "phone": "+880 1711-112233",
+        "roomNo": "201",
+        "fee": 1000
+      },
+      {
+        "id": "doc-2",
+        "code": "DR02",
+        "name": "Dr. Nusrat Jahan",
+        "degree": "MBBS, DGO, FCPS (Obs & Gynae)",
+        "specialty": "Gynaecology & Obstetrics Specialist",
+        "phone": "+880 1812-334455",
+        "roomNo": "203",
+        "fee": 800
+      },
+      {
+        "id": "doc-3",
+        "code": "DR03",
+        "name": "Dr. Tanvir Hossain",
+        "degree": "MBBS, MD (Cardiology)",
+        "specialty": "Cardiologist & Clinical Specialist",
+        "phone": "+880 1913-556677",
+        "roomNo": "104",
+        "fee": 1200
+      },
+      {
+        "id": "doc-4",
+        "code": "DR04",
+        "name": "Dr. Sabrina Farhana",
+        "degree": "MBBS, D-Card, MD (Radiology)",
+        "specialty": "Consultant Radiologist & Sonologist",
+        "phone": "+880 1714-778899",
+        "roomNo": "108",
+        "fee": 900
+      },
+      {
+        "id": "doc-5",
+        "code": "DR05",
+        "name": "Self / Direct Patient",
+        "degree": "Self Requested Investigation",
+        "specialty": "General Screening",
+        "phone": "+880 1700-000000",
+        "roomNo": "Lab Counter",
+        "fee": 0
+      }
+    ],
+    "labTests": [
+      {
+        "id": "t-cbc",
+        "code": "CBC",
+        "name": "Complete Blood Count (CBC with ESR)",
+        "category": "Hematology",
+        "unit": "Panel",
+        "normalRange": "See sub-tests",
+        "price": 450,
+        "sampleType": "EDTA Whole Blood",
+        "subTests": [
+          {
+            "name": "Hemoglobin (Hb)",
+            "unit": "g/dL",
+            "normalRange": "12.0 - 16.0 (F), 13.5 - 18.0 (M)"
+          },
+          {
+            "name": "ESR (Westergren)",
+            "unit": "mm/1st hr",
+            "normalRange": "0 - 20 (F), 0 - 15 (M)"
+          },
+          {
+            "name": "Total WBC Count",
+            "unit": "/cumm",
+            "normalRange": "4,000 - 11,000"
+          },
+          {
+            "name": "Neutrophils",
+            "unit": "%",
+            "normalRange": "40 - 75"
+          },
+          {
+            "name": "Lymphocytes",
+            "unit": "%",
+            "normalRange": "20 - 45"
+          },
+          {
+            "name": "Monocytes",
+            "unit": "%",
+            "normalRange": "2 - 10"
+          },
+          {
+            "name": "Eosinophils",
+            "unit": "%",
+            "normalRange": "1 - 6"
+          },
+          {
+            "name": "Basophils",
+            "unit": "%",
+            "normalRange": "0 - 1"
+          },
+          {
+            "name": "Total RBC Count",
+            "unit": "mil/cumm",
+            "normalRange": "4.0 - 5.5"
+          },
+          {
+            "name": "Platelet Count",
+            "unit": "lakh/cumm",
+            "normalRange": "1.5 - 4.5"
+          },
+          {
+            "name": "PCV / Hematocrit",
+            "unit": "%",
+            "normalRange": "36 - 48"
+          },
+          {
+            "name": "MCV",
+            "unit": "fL",
+            "normalRange": "80 - 96"
+          },
+          {
+            "name": "MCH",
+            "unit": "pg",
+            "normalRange": "27 - 32"
+          },
+          {
+            "name": "MCHC",
+            "unit": "g/dL",
+            "normalRange": "32 - 36"
+          }
+        ]
+      },
+      {
+        "id": "t-hb",
+        "code": "HB",
+        "name": "Hemoglobin (Hb%)",
+        "category": "Hematology",
+        "unit": "g/dL",
+        "normalRange": "12.0 - 16.0 (Female), 13.5 - 17.5 (Male)",
+        "price": 150,
+        "sampleType": "EDTA Whole Blood"
+      },
+      {
+        "id": "t-esr",
+        "code": "ESR",
+        "name": "Erythrocyte Sedimentation Rate (ESR)",
+        "category": "Hematology",
+        "unit": "mm/1st hr",
+        "normalRange": "0 - 15 (Male), 0 - 20 (Female)",
+        "price": 150,
+        "sampleType": "Sodium Citrate / EDTA Blood"
+      },
+      {
+        "id": "t-platelets",
+        "code": "PLT",
+        "name": "Platelet Count",
+        "category": "Hematology",
+        "unit": "cells/cumm",
+        "normalRange": "150,000 - 450,000 /cumm",
+        "price": 200,
+        "sampleType": "EDTA Whole Blood"
+      },
+      {
+        "id": "t-tcdc",
+        "code": "TC_DC",
+        "name": "Total Count & Differential Count (TC/DC of WBC)",
+        "category": "Hematology",
+        "unit": "/cumm",
+        "normalRange": "TC: 4,000 - 11,000/cumm, N: 40-75%, L: 20-45%",
+        "price": 300,
+        "sampleType": "EDTA Whole Blood"
+      },
+      {
+        "id": "t-pbf",
+        "code": "PBF",
+        "name": "Peripheral Blood Film (PBF)",
+        "category": "Hematology",
+        "unit": "Report",
+        "normalRange": "Normocytic Normochromic RBCs, normal WBC and Platelets",
+        "price": 500,
+        "sampleType": "EDTA Fresh Blood Smear"
+      },
+      {
+        "id": "t-bg-rh",
+        "code": "BG_RH",
+        "name": "Blood Grouping & Rh Typing (ABO & Rh D)",
+        "category": "Hematology",
+        "unit": "Type",
+        "normalRange": "A/B/AB/O, Rh Positive/Negative",
+        "price": 150,
+        "sampleType": "Clotted or EDTA Blood"
+      },
+      {
+        "id": "t-pt-inr",
+        "code": "PT_INR",
+        "name": "Prothrombin Time with INR (PT/INR)",
+        "category": "Hematology",
+        "unit": "Seconds / INR",
+        "normalRange": "Control: 11-14 sec, Patient INR: 0.8 - 1.2",
+        "price": 700,
+        "sampleType": "Sodium Citrate Plasma"
+      },
+      {
+        "id": "t-aptt",
+        "code": "APTT",
+        "name": "Activated Partial Thromboplastin Time (APTT)",
+        "category": "Hematology",
+        "unit": "Seconds",
+        "normalRange": "Control: 25 - 35 seconds",
+        "price": 800,
+        "sampleType": "Citrated Plasma"
+      },
+      {
+        "id": "t-btct",
+        "code": "BT_CT",
+        "name": "Bleeding Time & Clotting Time (BT/CT)",
+        "category": "Hematology",
+        "unit": "Minutes",
+        "normalRange": "BT: 2 - 7 mins (Duke), CT: 4 - 10 mins",
+        "price": 200,
+        "sampleType": "Capillary Blood"
+      },
+      {
+        "id": "t-ferritin",
+        "code": "FERRITIN",
+        "name": "Serum Ferritin (Iron Storage)",
+        "category": "Hematology",
+        "unit": "ng/mL",
+        "normalRange": "30 - 400 ng/mL (Male), 15 - 150 ng/mL (Female)",
+        "price": 1200,
+        "sampleType": "Clotted Serum"
+      },
+      {
+        "id": "t-iron-profile",
+        "code": "IRON_PROF",
+        "name": "Iron Profile (S. Iron, TIBC, UIBC & Saturation)",
+        "category": "Hematology",
+        "unit": "Panel",
+        "normalRange": "Serum Iron: 60 - 170 ug/dL, TIBC: 240 - 450 ug/dL",
+        "price": 2200,
+        "sampleType": "Fasting Serum"
+      },
+      {
+        "id": "t-rbs",
+        "code": "RBS",
+        "name": "Random Blood Sugar (RBS)",
+        "category": "Biochemistry",
+        "unit": "mmol/L",
+        "normalRange": "< 7.8 mmol/L",
+        "price": 150,
+        "sampleType": "Fluoride Plasma"
+      },
+      {
+        "id": "t-fbs",
+        "code": "FBS",
+        "name": "Fasting Blood Sugar (FBS)",
+        "category": "Biochemistry",
+        "unit": "mmol/L",
+        "normalRange": "3.9 - 6.0 mmol/L",
+        "price": 150,
+        "sampleType": "Fluoride Plasma (8-10 hrs fasting)"
+      },
+      {
+        "id": "t-2habf",
+        "code": "2HABF",
+        "name": "Blood Glucose 2 Hours After Breakfast (2HABF / 2HPP)",
+        "category": "Biochemistry",
+        "unit": "mmol/L",
+        "normalRange": "< 7.8 mmol/L (Normal), 7.8 - 11.0 mmol/L (Impaired)",
+        "price": 150,
+        "sampleType": "Fluoride Plasma"
+      },
+      {
+        "id": "t-ogtt",
+        "code": "OGTT",
+        "name": "Oral Glucose Tolerance Test (OGTT - Fasting & 2h)",
+        "category": "Biochemistry",
+        "unit": "mmol/L",
+        "normalRange": "Fasting < 6.1 mmol/L, 2-Hr < 7.8 mmol/L",
+        "price": 400,
+        "sampleType": "Fluoride Plasma (2 Samples)"
+      },
+      {
+        "id": "t-hba1c",
+        "code": "HBA1C",
+        "name": "Glycated Hemoglobin (HbA1c)",
+        "category": "Biochemistry",
+        "unit": "%",
+        "normalRange": "4.5 - 5.7 % (Normal), 5.7 - 6.4 % (Prediabetes), >=6.5% (Diabetes)",
+        "price": 800,
+        "sampleType": "EDTA Whole Blood"
+      },
+      {
+        "id": "t-creatinine",
+        "code": "S_CREAT",
+        "name": "Serum Creatinine",
+        "category": "Biochemistry",
+        "unit": "mg/dL",
+        "normalRange": "0.6 - 1.2 mg/dL (Male), 0.5 - 1.1 mg/dL (Female)",
+        "price": 350,
+        "sampleType": "Clotted Blood (Serum)"
+      },
+      {
+        "id": "t-urea",
+        "code": "B_UREA",
+        "name": "Blood Urea",
+        "category": "Biochemistry",
+        "unit": "mg/dL",
+        "normalRange": "15 - 45 mg/dL",
+        "price": 350,
+        "sampleType": "Serum"
+      },
+      {
+        "id": "t-bun",
+        "code": "BUN",
+        "name": "Blood Urea Nitrogen (BUN)",
+        "category": "Biochemistry",
+        "unit": "mg/dL",
+        "normalRange": "7 - 20 mg/dL",
+        "price": 350,
+        "sampleType": "Serum"
+      },
+      {
+        "id": "t-uric-acid",
+        "code": "URIC",
+        "name": "Serum Uric Acid",
+        "category": "Biochemistry",
+        "unit": "mg/dL",
+        "normalRange": "3.5 - 7.2 mg/dL (Male), 2.6 - 6.0 mg/dL (Female)",
+        "price": 350,
+        "sampleType": "Serum"
+      },
+      {
+        "id": "t-kft",
+        "code": "KFT",
+        "name": "Kidney Function Test (KFT / Renal Panel)",
+        "category": "Biochemistry",
+        "unit": "Panel",
+        "normalRange": "See sub-tests",
+        "price": 950,
+        "sampleType": "Clotted Serum",
+        "subTests": [
+          {
+            "name": "Serum Creatinine",
+            "unit": "mg/dL",
+            "normalRange": "0.6 - 1.2"
+          },
+          {
+            "name": "Blood Urea",
+            "unit": "mg/dL",
+            "normalRange": "15 - 45"
+          },
+          {
+            "name": "Blood Urea Nitrogen (BUN)",
+            "unit": "mg/dL",
+            "normalRange": "7 - 20"
+          },
+          {
+            "name": "Serum Uric Acid",
+            "unit": "mg/dL",
+            "normalRange": "3.5 - 7.2"
+          }
+        ]
+      },
+      {
+        "id": "t-lft",
+        "code": "LFT",
+        "name": "Liver Function Test (LFT Panel)",
+        "category": "Biochemistry",
+        "unit": "Panel",
+        "normalRange": "See sub-tests",
+        "price": 1200,
+        "sampleType": "Clotted Serum",
+        "subTests": [
+          {
+            "name": "Serum Bilirubin (Total)",
+            "unit": "mg/dL",
+            "normalRange": "0.2 - 1.2"
+          },
+          {
+            "name": "Serum Bilirubin (Direct)",
+            "unit": "mg/dL",
+            "normalRange": "0.0 - 0.3"
+          },
+          {
+            "name": "Serum Bilirubin (Indirect)",
+            "unit": "mg/dL",
+            "normalRange": "0.2 - 0.9"
+          },
+          {
+            "name": "SGPT / ALT",
+            "unit": "U/L",
+            "normalRange": "Up to 45 (M), Up to 34 (F)"
+          },
+          {
+            "name": "SGOT / AST",
+            "unit": "U/L",
+            "normalRange": "Up to 38"
+          },
+          {
+            "name": "Alkaline Phosphatase (ALP)",
+            "unit": "U/L",
+            "normalRange": "40 - 130"
+          },
+          {
+            "name": "Total Protein",
+            "unit": "g/dL",
+            "normalRange": "6.0 - 8.3"
+          },
+          {
+            "name": "Serum Albumin",
+            "unit": "g/dL",
+            "normalRange": "3.5 - 5.0"
+          },
+          {
+            "name": "A/G Ratio",
+            "unit": "Ratio",
+            "normalRange": "1.2 - 2.2"
+          }
+        ]
+      },
+      {
+        "id": "t-sgpt",
+        "code": "SGPT",
+        "name": "Serum ALT / SGPT",
+        "category": "Biochemistry",
+        "unit": "U/L",
+        "normalRange": "Up to 45 U/L (Male), Up to 34 U/L (Female)",
+        "price": 350,
+        "sampleType": "Serum"
+      },
+      {
+        "id": "t-sgot",
+        "code": "SGOT",
+        "name": "Serum AST / SGOT",
+        "category": "Biochemistry",
+        "unit": "U/L",
+        "normalRange": "Up to 38 U/L",
+        "price": 350,
+        "sampleType": "Serum"
+      },
+      {
+        "id": "t-bilirubin",
+        "code": "S_BILI",
+        "name": "Serum Bilirubin (Total, Direct & Indirect)",
+        "category": "Biochemistry",
+        "unit": "mg/dL",
+        "normalRange": "Total: 0.2 - 1.2 mg/dL, Direct: < 0.3 mg/dL",
+        "price": 350,
+        "sampleType": "Serum"
+      },
+      {
+        "id": "t-alp",
+        "code": "ALP",
+        "name": "Serum Alkaline Phosphatase (ALP)",
+        "category": "Biochemistry",
+        "unit": "U/L",
+        "normalRange": "40 - 130 U/L",
+        "price": 400,
+        "sampleType": "Serum"
+      },
+      {
+        "id": "t-protein",
+        "code": "TOTAL_PROT",
+        "name": "Serum Total Protein & Albumin / Globulin",
+        "category": "Biochemistry",
+        "unit": "g/dL",
+        "normalRange": "Protein: 6.4 - 8.3 g/dL, Albumin: 3.5 - 5.0 g/dL",
+        "price": 450,
+        "sampleType": "Serum"
+      },
+      {
+        "id": "t-lipid",
+        "code": "LIPID",
+        "name": "Lipid Profile Panel",
+        "category": "Biochemistry",
+        "unit": "Panel",
+        "normalRange": "See sub-tests",
+        "price": 900,
+        "sampleType": "Fasting Serum (12 hrs)",
+        "subTests": [
+          {
+            "name": "S. Cholesterol (Total)",
+            "unit": "mg/dL",
+            "normalRange": "< 200"
+          },
+          {
+            "name": "S. Triglycerides (TG)",
+            "unit": "mg/dL",
+            "normalRange": "< 150"
+          },
+          {
+            "name": "S. HDL Cholesterol",
+            "unit": "mg/dL",
+            "normalRange": "> 40 (M), > 50 (F)"
+          },
+          {
+            "name": "S. LDL Cholesterol",
+            "unit": "mg/dL",
+            "normalRange": "< 100"
+          },
+          {
+            "name": "S. VLDL Cholesterol",
+            "unit": "mg/dL",
+            "normalRange": "10 - 30"
+          }
+        ]
+      },
+      {
+        "id": "t-electrolytes",
+        "code": "ELECTRO",
+        "name": "Serum Electrolytes (Na+, K+, Cl-, HCO3-)",
+        "category": "Biochemistry",
+        "unit": "Panel",
+        "normalRange": "See sub-tests",
+        "price": 900,
+        "sampleType": "Serum (Fresh)",
+        "subTests": [
+          {
+            "name": "Sodium (Na+)",
+            "unit": "mmol/L",
+            "normalRange": "135 - 145"
+          },
+          {
+            "name": "Potassium (K+)",
+            "unit": "mmol/L",
+            "normalRange": "3.5 - 5.1"
+          },
+          {
+            "name": "Chloride (Cl-)",
+            "unit": "mmol/L",
+            "normalRange": "98 - 107"
+          },
+          {
+            "name": "Bicarbonate (HCO3-)",
+            "unit": "mmol/L",
+            "normalRange": "22 - 29"
+          }
+        ]
+      },
+      {
+        "id": "t-calcium",
+        "code": "S_CALCIUM",
+        "name": "Serum Calcium (Total)",
+        "category": "Biochemistry",
+        "unit": "mg/dL",
+        "normalRange": "8.5 - 10.5 mg/dL",
+        "price": 500,
+        "sampleType": "Serum"
+      },
+      {
+        "id": "t-phosphate",
+        "code": "PHOSPHATE",
+        "name": "Serum Inorganic Phosphate",
+        "category": "Biochemistry",
+        "unit": "mg/dL",
+        "normalRange": "2.5 - 4.5 mg/dL",
+        "price": 450,
+        "sampleType": "Serum"
+      },
+      {
+        "id": "t-magnesium",
+        "code": "MAGNESIUM",
+        "name": "Serum Magnesium",
+        "category": "Biochemistry",
+        "unit": "mg/dL",
+        "normalRange": "1.7 - 2.4 mg/dL",
+        "price": 600,
+        "sampleType": "Serum"
+      },
+      {
+        "id": "t-amylase",
+        "code": "S_AMYLASE",
+        "name": "Serum Amylase (Pancreatic Enzyme)",
+        "category": "Biochemistry",
+        "unit": "U/L",
+        "normalRange": "28 - 100 U/L",
+        "price": 700,
+        "sampleType": "Serum"
+      },
+      {
+        "id": "t-lipase",
+        "code": "S_LIPASE",
+        "name": "Serum Lipase (Pancreatitis Marker)",
+        "category": "Biochemistry",
+        "unit": "U/L",
+        "normalRange": "13 - 60 U/L",
+        "price": 900,
+        "sampleType": "Serum"
+      },
+      {
+        "id": "t-tsh",
+        "code": "TSH",
+        "name": "Thyroid Stimulating Hormone (TSH)",
+        "category": "Hormone",
+        "unit": "uIU/mL",
+        "normalRange": "0.35 - 4.94 uIU/mL",
+        "price": 600,
+        "sampleType": "Serum"
+      },
+      {
+        "id": "t-ft3",
+        "code": "FT3",
+        "name": "Free Triiodothyronine (FT3)",
+        "category": "Hormone",
+        "unit": "pg/mL",
+        "normalRange": "1.71 - 3.71 pg/mL",
+        "price": 700,
+        "sampleType": "Serum"
+      },
+      {
+        "id": "t-ft4",
+        "code": "FT4",
+        "name": "Free Thyroxine (FT4)",
+        "category": "Hormone",
+        "unit": "ng/dL",
+        "normalRange": "0.70 - 1.48 ng/dL",
+        "price": 700,
+        "sampleType": "Serum"
+      },
+      {
+        "id": "t-thyroid-panel",
+        "code": "THYROID_PANEL",
+        "name": "Thyroid Profile Panel (FT3, FT4, TSH)",
+        "category": "Hormone",
+        "unit": "Panel",
+        "normalRange": "See sub-tests",
+        "price": 1800,
+        "sampleType": "Serum (Morning)"
+      },
+      {
+        "id": "t-prolactin",
+        "code": "PROLACTIN",
+        "name": "Serum Prolactin",
+        "category": "Hormone",
+        "unit": "ng/mL",
+        "normalRange": "2.8 - 29.2 ng/mL (Non-pregnant Female), 2.1 - 17.7 (Male)",
+        "price": 800,
+        "sampleType": "Serum (Resting 20 mins)"
+      },
+      {
+        "id": "t-testosterone",
+        "code": "TESTOST",
+        "name": "Serum Testosterone (Total)",
+        "category": "Hormone",
+        "unit": "ng/dL",
+        "normalRange": "249 - 836 ng/dL (Male), 8.4 - 48.1 ng/dL (Female)",
+        "price": 1000,
+        "sampleType": "Serum (Morning 8-10 AM)"
+      },
+      {
+        "id": "t-vit-d3",
+        "code": "VIT_D3",
+        "name": "Vitamin D3 (25-OH Cholecalciferol)",
+        "category": "Hormone",
+        "unit": "ng/mL",
+        "normalRange": ">= 30 ng/mL (Sufficient), 20 - 29 (Insufficient), < 20 (Deficient)",
+        "price": 2200,
+        "sampleType": "Serum"
+      },
+      {
+        "id": "t-vit-b12",
+        "code": "VIT_B12",
+        "name": "Vitamin B12 (Cyanocobalamin)",
+        "category": "Hormone",
+        "unit": "pg/mL",
+        "normalRange": "211 - 911 pg/mL",
+        "price": 1800,
+        "sampleType": "Fasting Serum"
+      },
+      {
+        "id": "t-psa",
+        "code": "PSA",
+        "name": "Prostate Specific Antigen (Total PSA)",
+        "category": "Hormone",
+        "unit": "ng/mL",
+        "normalRange": "< 4.0 ng/mL",
+        "price": 1000,
+        "sampleType": "Serum"
+      },
+      {
+        "id": "t-beta-hcg",
+        "code": "BETA_HCG",
+        "name": "Serum Beta hCG (Quantitative Pregnancy)",
+        "category": "Hormone",
+        "unit": "mIU/mL",
+        "normalRange": "< 5.0 mIU/mL (Non-pregnant)",
+        "price": 1000,
+        "sampleType": "Serum"
+      },
+      {
+        "id": "t-hbsag",
+        "code": "HBSAG",
+        "name": "HBsAg (Hepatitis B Surface Antigen)",
+        "category": "Serology",
+        "unit": "Qualitative",
+        "normalRange": "Negative / Non-Reactive",
+        "price": 350,
+        "sampleType": "Serum"
+      },
+      {
+        "id": "t-anti-hcv",
+        "code": "ANTI_HCV",
+        "name": "Anti-HCV (Hepatitis C Antibody)",
+        "category": "Serology",
+        "unit": "Qualitative",
+        "normalRange": "Negative / Non-Reactive",
+        "price": 600,
+        "sampleType": "Serum"
+      },
+      {
+        "id": "t-hiv",
+        "code": "HIV",
+        "name": "HIV 1 & 2 Antibody Screening",
+        "category": "Serology",
+        "unit": "Qualitative",
+        "normalRange": "Negative / Non-Reactive",
+        "price": 500,
+        "sampleType": "Serum"
+      },
+      {
+        "id": "t-vdrl",
+        "code": "VDRL",
+        "name": "VDRL (Syphilis Screening)",
+        "category": "Serology",
+        "unit": "Titre",
+        "normalRange": "Non-Reactive",
+        "price": 250,
+        "sampleType": "Serum"
+      },
+      {
+        "id": "t-widal",
+        "code": "WIDAL",
+        "name": "Widal Test (Enteric / Typhoid Fever)",
+        "category": "Serology",
+        "unit": "Titre",
+        "normalRange": "TO: < 1:80, TH: < 1:80, AH: < 1:80, BH: < 1:80",
+        "price": 300,
+        "sampleType": "Serum"
+      },
+      {
+        "id": "t-dengue-ns1",
+        "code": "DENGUE_NS1",
+        "name": "Dengue NS1 Antigen (Day 1-5 Fever)",
+        "category": "Serology",
+        "unit": "Rapid",
+        "normalRange": "Negative",
+        "price": 400,
+        "sampleType": "Serum / Whole Blood"
+      },
+      {
+        "id": "t-dengue-ab",
+        "code": "DENGUE_AB",
+        "name": "Dengue IgG & IgM Antibodies",
+        "category": "Serology",
+        "unit": "Rapid",
+        "normalRange": "IgM: Negative, IgG: Negative",
+        "price": 600,
+        "sampleType": "Serum"
+      },
+      {
+        "id": "t-dengue-duo",
+        "code": "DENGUE_DUO",
+        "name": "Dengue Duo Combo (NS1 Antigen + IgG/IgM)",
+        "category": "Serology",
+        "unit": "Combo",
+        "normalRange": "NS1: Negative, IgM: Negative, IgG: Negative",
+        "price": 900,
+        "sampleType": "Serum"
+      },
+      {
+        "id": "t-crp",
+        "code": "CRP",
+        "name": "C-Reactive Protein (CRP Quantitative)",
+        "category": "Serology",
+        "unit": "mg/L",
+        "normalRange": "< 6.0 mg/L (Normal)",
+        "price": 500,
+        "sampleType": "Serum"
+      },
+      {
+        "id": "t-trop-i",
+        "code": "TROP_I",
+        "name": "Troponin-I (Cardiac Marker for Acute MI)",
+        "category": "Serology",
+        "unit": "ng/mL",
+        "normalRange": "< 0.04 ng/mL (Normal)",
+        "price": 1000,
+        "sampleType": "Heparin Plasma / Serum"
+      },
+      {
+        "id": "t-ra-factor",
+        "code": "RA_FACTOR",
+        "name": "Rheumatoid Factor (RA Test)",
+        "category": "Serology",
+        "unit": "IU/mL",
+        "normalRange": "< 20 IU/mL (Negative)",
+        "price": 400,
+        "sampleType": "Serum"
+      },
+      {
+        "id": "t-aso",
+        "code": "ASO",
+        "name": "ASO Titre (Anti-Streptolysin O)",
+        "category": "Serology",
+        "unit": "IU/mL",
+        "normalRange": "< 200 IU/mL",
+        "price": 450,
+        "sampleType": "Serum"
+      },
+      {
+        "id": "t-anti-ccp",
+        "code": "ANTI_CCP",
+        "name": "Anti-CCP (Cyclic Citrullinated Peptide)",
+        "category": "Serology",
+        "unit": "U/mL",
+        "normalRange": "< 20 U/mL (Negative)",
+        "price": 1800,
+        "sampleType": "Serum"
+      },
+      {
+        "id": "t-ana",
+        "code": "ANA",
+        "name": "Antinuclear Antibodies (ANA by IFA)",
+        "category": "Serology",
+        "unit": "Titre",
+        "normalRange": "Negative at 1:100 titre",
+        "price": 1500,
+        "sampleType": "Serum"
+      },
+      {
+        "id": "t-urine-re",
+        "code": "U_RE",
+        "name": "Urine Routine & Microscopic (R/M/E)",
+        "category": "Urine",
+        "unit": "Panel",
+        "normalRange": "Pus: 0-2, RBC: Nil, Albumin: Nil, Sugar: Nil",
+        "price": 200,
+        "sampleType": "Clean Catch Midstream Urine",
+        "subTests": [
+          {
+            "name": "Color & Appearance",
+            "unit": "",
+            "normalRange": "Straw / Clear"
+          },
+          {
+            "name": "Specific Gravity",
+            "unit": "",
+            "normalRange": "1.010 - 1.025"
+          },
+          {
+            "name": "pH",
+            "unit": "",
+            "normalRange": "5.0 - 7.0"
+          },
+          {
+            "name": "Albumin / Protein",
+            "unit": "",
+            "normalRange": "Nil"
+          },
+          {
+            "name": "Sugar / Glucose",
+            "unit": "",
+            "normalRange": "Nil"
+          },
+          {
+            "name": "Ketone Bodies",
+            "unit": "",
+            "normalRange": "Negative"
+          },
+          {
+            "name": "Pus Cells",
+            "unit": "/HPF",
+            "normalRange": "0 - 4"
+          },
+          {
+            "name": "R.B.C",
+            "unit": "/HPF",
+            "normalRange": "Nil - 1"
+          },
+          {
+            "name": "Epithelial Cells",
+            "unit": "/HPF",
+            "normalRange": "Occasional (1-2)"
+          },
+          {
+            "name": "Casts",
+            "unit": "/LPF",
+            "normalRange": "Nil"
+          },
+          {
+            "name": "Crystals",
+            "unit": "",
+            "normalRange": "Nil"
+          }
+        ]
+      },
+      {
+        "id": "t-urine-cs",
+        "code": "U_CS",
+        "name": "Urine Culture & Sensitivity (Urine C/S)",
+        "category": "Urine",
+        "unit": "Culture",
+        "normalRange": "No bacterial growth after 48 hours incubation at 37C",
+        "price": 700,
+        "sampleType": "Sterile Clean Catch Midstream Urine"
+      },
+      {
+        "id": "t-urine-hcg",
+        "code": "U_HCG",
+        "name": "Pregnancy Test (Urine hCG Strip)",
+        "category": "Urine",
+        "unit": "Qualitative",
+        "normalRange": "Negative",
+        "price": 150,
+        "sampleType": "First Morning Fresh Urine"
+      },
+      {
+        "id": "t-utp-24",
+        "code": "UTP_24",
+        "name": "24-Hour Urinary Total Protein (UTP)",
+        "category": "Urine",
+        "unit": "mg/24 hrs",
+        "normalRange": "< 150 mg/24 hours",
+        "price": 600,
+        "sampleType": "24-Hour Timed Urine Specimen"
+      },
+      {
+        "id": "t-stool-re",
+        "code": "STOOL_RE",
+        "name": "Stool Routine Examination (Stool R/E)",
+        "category": "Stool",
+        "unit": "Panel",
+        "normalRange": "Parasites: Nil, Ova: Nil, Pus: Occasional, RBC: Nil",
+        "price": 200,
+        "sampleType": "Fresh Stool Specimen",
+        "subTests": [
+          {
+            "name": "Color",
+            "unit": "",
+            "normalRange": "Brownish / Yellowish"
+          },
+          {
+            "name": "Consistency",
+            "unit": "",
+            "normalRange": "Soft & Formed"
+          },
+          {
+            "name": "Mucus",
+            "unit": "",
+            "normalRange": "Absent / Nil"
+          },
+          {
+            "name": "Blood",
+            "unit": "",
+            "normalRange": "Absent / Nil"
+          },
+          {
+            "name": "Protozoa / Cysts",
+            "unit": "",
+            "normalRange": "Not Found / Nil"
+          },
+          {
+            "name": "Helminths / Ova",
+            "unit": "",
+            "normalRange": "Not Found / Nil"
+          },
+          {
+            "name": "Pus Cells",
+            "unit": "/HPF",
+            "normalRange": "0 - 2"
+          },
+          {
+            "name": "R.B.C",
+            "unit": "/HPF",
+            "normalRange": "Nil"
+          }
+        ]
+      },
+      {
+        "id": "t-stool-obt",
+        "code": "STOOL_OBT",
+        "name": "Stool Occult Blood Test (OBT)",
+        "category": "Stool",
+        "unit": "Qualitative",
+        "normalRange": "Negative",
+        "price": 300,
+        "sampleType": "Fresh Stool Specimen"
+      },
+      {
+        "id": "t-stool-red",
+        "code": "STOOL_RED",
+        "name": "Stool Reducing Substance (Lactose Intolerance)",
+        "category": "Stool",
+        "unit": "%",
+        "normalRange": "Negative (< 0.25%)",
+        "price": 250,
+        "sampleType": "Fresh Stool"
+      },
+      {
+        "id": "t-stool-cs",
+        "code": "STOOL_CS",
+        "name": "Stool Culture & Sensitivity (Stool C/S)",
+        "category": "Stool",
+        "unit": "Culture",
+        "normalRange": "No pathogenic enteropathogens isolated",
+        "price": 700,
+        "sampleType": "Fresh Stool in Cary-Blair transport"
+      },
+      {
+        "id": "t-sputum-afb",
+        "code": "SPUTUM_AFB",
+        "name": "Sputum for AFB (Acid-Fast Bacilli - 2 Samples)",
+        "category": "Microbiology",
+        "unit": "Smear",
+        "normalRange": "No Acid Fast Bacilli seen under microscopy",
+        "price": 300,
+        "sampleType": "Early Morning Sputum"
+      },
+      {
+        "id": "t-gram-stain",
+        "code": "GRAM_STAIN",
+        "name": "Gram Stain Examination",
+        "category": "Microbiology",
+        "unit": "Smear",
+        "normalRange": "Normal flora / No pathogenic organisms seen",
+        "price": 250,
+        "sampleType": "Smear / Pus / Exudate"
+      },
+      {
+        "id": "t-pus-cs",
+        "code": "PUS_CS",
+        "name": "Pus Culture & Sensitivity (Pus C/S)",
+        "category": "Microbiology",
+        "unit": "Culture",
+        "normalRange": "No bacterial growth",
+        "price": 700,
+        "sampleType": "Aspirated Pus / Swab"
+      },
+      {
+        "id": "t-blood-cs",
+        "code": "BLOOD_CS",
+        "name": "Blood Culture & Sensitivity (Automated Bactec)",
+        "category": "Microbiology",
+        "unit": "Culture",
+        "normalRange": "Sterile after 5 days automated incubation",
+        "price": 1200,
+        "sampleType": "Sterile Blood (Bactec Vial)"
+      },
+      {
+        "id": "t-semen",
+        "code": "SEMEN_ANALYSIS",
+        "name": "Semen Analysis (Count, Motility & Morphology)",
+        "category": "Microbiology",
+        "unit": "Panel",
+        "normalRange": "Volume >= 1.5 mL, Count >= 15 mil/mL, Total Motility >= 40%",
+        "price": 600,
+        "sampleType": "Fresh Semen (3-5 days abstinence)"
+      },
+      {
+        "id": "t-mt",
+        "code": "MT",
+        "name": "Mantoux Test (Tuberculin Skin Test - 5 TU)",
+        "category": "Microbiology",
+        "unit": "mm induration",
+        "normalRange": "< 10 mm induration after 48-72 hours",
+        "price": 400,
+        "sampleType": "Intradermal PPD Injection"
+      },
+      {
+        "id": "t-xr-chest-pa",
+        "code": "XR_CHEST_PA",
+        "name": "Digital X-Ray Chest PA View",
+        "category": "X-Ray",
+        "unit": "Digital Film",
+        "normalRange": "Clear lung fields, normal cardiothoracic ratio, clear CPA",
+        "price": 600,
+        "sampleType": "Radiology"
+      },
+      {
+        "id": "t-xr-chest-lat",
+        "code": "XR_CHEST_LAT",
+        "name": "Digital X-Ray Chest Lateral View",
+        "category": "X-Ray",
+        "unit": "Digital Film",
+        "normalRange": "Normal retrosternal and retrocardiac spaces",
+        "price": 600,
+        "sampleType": "Radiology"
+      },
+      {
+        "id": "t-xr-cerv-bv",
+        "code": "XR_CERV_BV",
+        "name": "Digital X-Ray Cervical Spine A/P & Lateral (B/V)",
+        "category": "X-Ray",
+        "unit": "Digital Film",
+        "normalRange": "Normal lordosis, vertebral height & disc spaces preserved",
+        "price": 800,
+        "sampleType": "Radiology"
+      },
+      {
+        "id": "t-xr-ls-bv",
+        "code": "XR_LS_BV",
+        "name": "Digital X-Ray Lumbar Spine A/P & Lateral (L/S Spine B/V)",
+        "category": "X-Ray",
+        "unit": "Digital Film",
+        "normalRange": "Normal lumbar lordosis, no osteophytes, normal disc spaces",
+        "price": 900,
+        "sampleType": "Radiology"
+      },
+      {
+        "id": "t-xr-ls-obl",
+        "code": "XR_LS_OBL",
+        "name": "Digital X-Ray Lumbosacral Spine with Oblique Views",
+        "category": "X-Ray",
+        "unit": "Digital Film",
+        "normalRange": "Normal pars interarticularis, no spondylolysis",
+        "price": 1200,
+        "sampleType": "Radiology"
+      },
+      {
+        "id": "t-xr-dorsal-bv",
+        "code": "XR_DORSAL_BV",
+        "name": "Digital X-Ray Thoracic / Dorsal Spine A/P & Lateral",
+        "category": "X-Ray",
+        "unit": "Digital Film",
+        "normalRange": "Normal thoracic kyphosis and vertebral bodies",
+        "price": 800,
+        "sampleType": "Radiology"
+      },
+      {
+        "id": "t-xr-skull-bv",
+        "code": "XR_SKULL_BV",
+        "name": "Digital X-Ray Skull A/P & Lateral (B/V)",
+        "category": "X-Ray",
+        "unit": "Digital Film",
+        "normalRange": "Intact calvarium, normal vascular markings, no fracture",
+        "price": 800,
+        "sampleType": "Radiology"
+      },
+      {
+        "id": "t-xr-pns",
+        "code": "XR_PNS",
+        "name": "Digital X-Ray PNS (Water's View for Paranasal Sinuses)",
+        "category": "X-Ray",
+        "unit": "Digital Film",
+        "normalRange": "Bilateral maxillary and frontal sinuses clear, no mucosal thickening",
+        "price": 600,
+        "sampleType": "Radiology"
+      },
+      {
+        "id": "t-xr-pelvis-ap",
+        "code": "XR_PELVIS_AP",
+        "name": "Digital X-Ray Pelvis A/P View",
+        "category": "X-Ray",
+        "unit": "Digital Film",
+        "normalRange": "Symmetric pelvic ring, intact femoral heads, clear hip joints",
+        "price": 600,
+        "sampleType": "Radiology"
+      },
+      {
+        "id": "t-xr-kub",
+        "code": "XR_KUB",
+        "name": "Digital X-Ray KUB (Kidney, Ureter & Bladder)",
+        "category": "X-Ray",
+        "unit": "Digital Film",
+        "normalRange": "No radio-opaque shadow along the urinary tract, psoas outlines clear",
+        "price": 600,
+        "sampleType": "Radiology"
+      },
+      {
+        "id": "t-xr-abd-erect",
+        "code": "XR_ABD_ERECT",
+        "name": "Digital X-Ray Abdomen Erect View (including domes)",
+        "category": "X-Ray",
+        "unit": "Digital Film",
+        "normalRange": "Normal bowel gas distribution, no free air under diaphragms",
+        "price": 600,
+        "sampleType": "Radiology"
+      },
+      {
+        "id": "t-xr-knee-r",
+        "code": "XR_KNEE_R",
+        "name": "Digital X-Ray Right Knee Joint A/P & Lateral (B/V)",
+        "category": "X-Ray",
+        "unit": "Digital Film",
+        "normalRange": "Adequate joint space, smooth articular margins, no osteophytes",
+        "price": 700,
+        "sampleType": "Radiology"
+      },
+      {
+        "id": "t-xr-knee-l",
+        "code": "XR_KNEE_L",
+        "name": "Digital X-Ray Left Knee Joint A/P & Lateral (B/V)",
+        "category": "X-Ray",
+        "unit": "Digital Film",
+        "normalRange": "Adequate joint space, smooth articular margins, no osteophytes",
+        "price": 700,
+        "sampleType": "Radiology"
+      },
+      {
+        "id": "t-xr-both-knees",
+        "code": "XR_BOTH_KNEES",
+        "name": "Digital X-Ray Both Knee Joints Standing A/P (Bilateral)",
+        "category": "X-Ray",
+        "unit": "Digital Film",
+        "normalRange": "Normal weight-bearing tibiofemoral joint alignment",
+        "price": 1000,
+        "sampleType": "Radiology"
+      },
+      {
+        "id": "t-xr-shoulder-ap",
+        "code": "XR_SHOULDER_AP",
+        "name": "Digital X-Ray Shoulder Joint A/P View",
+        "category": "X-Ray",
+        "unit": "Digital Film",
+        "normalRange": "Normal glenohumeral alignment, intact acromion",
+        "price": 600,
+        "sampleType": "Radiology"
+      },
+      {
+        "id": "t-xr-elbow-bv",
+        "code": "XR_ELBOW_BV",
+        "name": "Digital X-Ray Elbow Joint A/P & Lateral (B/V)",
+        "category": "X-Ray",
+        "unit": "Digital Film",
+        "normalRange": "Normal humeroradial and humeroulnar joint relationships",
+        "price": 600,
+        "sampleType": "Radiology"
+      },
+      {
+        "id": "t-xr-wrist-bv",
+        "code": "XR_WRIST_BV",
+        "name": "Digital X-Ray Wrist Joint A/P & Lateral (B/V)",
+        "category": "X-Ray",
+        "unit": "Digital Film",
+        "normalRange": "Intact carpal bones, normal distal radius and ulna alignment",
+        "price": 600,
+        "sampleType": "Radiology"
+      },
+      {
+        "id": "t-xr-hand-bv",
+        "code": "XR_HAND_BV",
+        "name": "Digital X-Ray Hand A/P & Oblique Views",
+        "category": "X-Ray",
+        "unit": "Digital Film",
+        "normalRange": "Intact metacarpals and phalanges, normal joints",
+        "price": 600,
+        "sampleType": "Radiology"
+      },
+      {
+        "id": "t-xr-hip-ap",
+        "code": "XR_HIP_AP",
+        "name": "Digital X-Ray Hip Joint A/P View",
+        "category": "X-Ray",
+        "unit": "Digital Film",
+        "normalRange": "Intact acetabulum and femoral neck, smooth joint space",
+        "price": 700,
+        "sampleType": "Radiology"
+      },
+      {
+        "id": "t-xr-ankle-bv",
+        "code": "XR_ANKLE_BV",
+        "name": "Digital X-Ray Ankle Joint A/P & Lateral (B/V)",
+        "category": "X-Ray",
+        "unit": "Digital Film",
+        "normalRange": "Intact malleoli, normal mortise joint space",
+        "price": 600,
+        "sampleType": "Radiology"
+      },
+      {
+        "id": "t-xr-foot-bv",
+        "code": "XR_FOOT_BV",
+        "name": "Digital X-Ray Foot A/P & Oblique Views",
+        "category": "X-Ray",
+        "unit": "Digital Film",
+        "normalRange": "Intact tarsals, metatarsals and phalanges, no dislocation",
+        "price": 600,
+        "sampleType": "Radiology"
+      },
+      {
+        "id": "t-xr-mandible",
+        "code": "XR_MANDIBLE",
+        "name": "Digital X-Ray Mandible (PA & Lateral Oblique)",
+        "category": "X-Ray",
+        "unit": "Digital Film",
+        "normalRange": "Intact mandibular body, angle and condyles, no fracture line",
+        "price": 700,
+        "sampleType": "Radiology"
+      },
+      {
+        "id": "t-usg-whole-abd",
+        "code": "USG_WA",
+        "name": "USG of Whole Abdomen (With Pelvic Organs)",
+        "category": "Ultrasound",
+        "unit": "Color Doppler Scan",
+        "normalRange": "Normal parenchymal architecture of liver, GB, pancreas, spleen & kidneys",
+        "price": 1500,
+        "sampleType": "Ultrasound"
+      },
+      {
+        "id": "t-usg-preg",
+        "code": "USG_PREG",
+        "name": "USG of Pregnancy Profile / Fetal Well-being",
+        "category": "Ultrasound",
+        "unit": "Color Doppler Scan",
+        "normalRange": "Single viable intrauterine fetus with good cardiac activity and normal liquor",
+        "price": 1500,
+        "sampleType": "Ultrasound"
+      },
+      {
+        "id": "t-usg-anomaly",
+        "code": "USG_ANOMALY",
+        "name": "USG Fetal Anomaly Scan (Level-II / 2nd Trimester)",
+        "category": "Ultrasound",
+        "unit": "High-Res 3D/4D Scan",
+        "normalRange": "No gross congenital anatomical anomaly detected",
+        "price": 2500,
+        "sampleType": "Ultrasound"
+      },
+      {
+        "id": "t-usg-kub",
+        "code": "USG_KUB",
+        "name": "USG of KUB & Prostate / Urinary Bladder",
+        "category": "Ultrasound",
+        "unit": "Color Doppler Scan",
+        "normalRange": "Normal kidneys, urinary bladder with smooth walls, normal prostate volume",
+        "price": 1200,
+        "sampleType": "Ultrasound"
+      },
+      {
+        "id": "t-usg-pelvis",
+        "code": "USG_PELVIS",
+        "name": "USG of Lower Abdomen / Pelvic Organs (Uterus & Adnexa)",
+        "category": "Ultrasound",
+        "unit": "Color Doppler Scan",
+        "normalRange": "Anteverted normal-sized uterus with regular endometrial stripe, bilateral ovaries normal",
+        "price": 1200,
+        "sampleType": "Ultrasound"
+      },
+      {
+        "id": "t-usg-upper-abd",
+        "code": "USG_UA",
+        "name": "USG of Upper Abdomen (Hepatobiliary System)",
+        "category": "Ultrasound",
+        "unit": "Color Doppler Scan",
+        "normalRange": "Normal liver, gallbladder without calculi, normal CBD and spleen",
+        "price": 1200,
+        "sampleType": "Ultrasound"
+      },
+      {
+        "id": "t-usg-breast",
+        "code": "USG_BREAST",
+        "name": "USG of Breast (Bilateral High-Resolution)",
+        "category": "Ultrasound",
+        "unit": "High Frequency Scan",
+        "normalRange": "Normal fibroglandular parenchyma, no solid or cystic mass (BI-RADS 1)",
+        "price": 2000,
+        "sampleType": "Ultrasound"
+      },
+      {
+        "id": "t-usg-thyroid",
+        "code": "USG_THYROID",
+        "name": "USG of Thyroid Gland & Neck Structures",
+        "category": "Ultrasound",
+        "unit": "High Frequency Scan",
+        "normalRange": "Normal thyroid lobes and isthmus, homogeneous echotexture, no nodules",
+        "price": 1500,
+        "sampleType": "Ultrasound"
+      },
+      {
+        "id": "t-usg-scrotum",
+        "code": "USG_SCROTUM",
+        "name": "USG of Scrotum & Testes with Color Doppler",
+        "category": "Ultrasound",
+        "unit": "Color Doppler Scan",
+        "normalRange": "Bilateral testes normal in size, shape and vascularity, no hydrocele",
+        "price": 2000,
+        "sampleType": "Ultrasound"
+      },
+      {
+        "id": "t-usg-doppler-ll",
+        "code": "USG_DOPPLER_LL",
+        "name": "USG Color Doppler of Lower Limb (Arterial / Venous)",
+        "category": "Ultrasound",
+        "unit": "Color Doppler Scan",
+        "normalRange": "Patent vascular lumens, normal triphasic spectral flow, no thrombus",
+        "price": 3000,
+        "sampleType": "Ultrasound"
+      },
+      {
+        "id": "t-ecg",
+        "code": "ECG_12",
+        "name": "Electrocardiogram (12-Lead Digital ECG)",
+        "category": "ECG",
+        "unit": "Graph Report",
+        "normalRange": "Normal Sinus Rhythm, normal intervals, no acute ischemic ST-T changes",
+        "price": 400,
+        "sampleType": "Cardiology"
+      },
+      {
+        "id": "t-echo-2d",
+        "code": "ECHO_2D",
+        "name": "Echocardiography (2D & Color Doppler Echo)",
+        "category": "ECG",
+        "unit": "Doppler Report",
+        "normalRange": "Normal chamber dimensions, preserved LV systolic function (LVEF >= 60%)",
+        "price": 2500,
+        "sampleType": "Cardiology"
+      },
+      {
+        "id": "t-ett",
+        "code": "ETT_TMT",
+        "name": "Exercise Tolerance Test (ETT / Treadmill Test)",
+        "category": "ECG",
+        "unit": "Stress Test",
+        "normalRange": "Negative for inducible myocardial ischemia at peak Bruce protocol",
+        "price": 3000,
+        "sampleType": "Cardiology"
+      },
+      {
+        "id": "t-holter",
+        "code": "HOLTER_24",
+        "name": "24-Hour Holter ECG Ambulatory Monitoring",
+        "category": "ECG",
+        "unit": "Continuous Recording",
+        "normalRange": "Sinus rhythm throughout, no significant pauses, ventricular or SV ectopics",
+        "price": 4000,
+        "sampleType": "Cardiology"
+      },
+      {
+        "id": "t-endoscopy-ugi",
+        "code": "ENDOSCOPY_UGI",
+        "name": "Upper GI Video Endoscopy (Gastroscopy)",
+        "category": "General",
+        "unit": "HD Video Report",
+        "normalRange": "Normal esophagus, stomach and duodenum, no ulcer or active bleeding",
+        "price": 3500,
+        "sampleType": "Endoscopy"
+      },
+      {
+        "id": "t-colonoscopy",
+        "code": "COLONOSCOPY",
+        "name": "Video Colonoscopy (Full Length with Cecal Intubation)",
+        "category": "General",
+        "unit": "HD Video Report",
+        "normalRange": "Normal colonic mucosa up to cecum, no polyps or mass lesion",
+        "price": 6000,
+        "sampleType": "Endoscopy"
+      },
+      {
+        "id": "t-spirometry",
+        "code": "SPIROMETRY",
+        "name": "Spirometry / Pulmonary Function Test (PFT)",
+        "category": "General",
+        "unit": "Flow-Volume Loop",
+        "normalRange": "Normal lung volumes, FEV1/FVC ratio > 75%, no obstruction",
+        "price": 1500,
+        "sampleType": "Pulmonology"
+      },
+      {
+        "id": "t-pap-smear",
+        "code": "PAP_SMEAR",
+        "name": "Pap's Smear (Cervical Cytology)",
+        "category": "General",
+        "unit": "Cytology Report",
+        "normalRange": "Negative for Intraepithelial Lesion or Malignancy (NILM)",
+        "price": 800,
+        "sampleType": "Cervical Scrape Smear"
+      },
+      {
+        "id": "t-fnac",
+        "code": "FNAC",
+        "name": "Fine Needle Aspiration Cytology (FNAC)",
+        "category": "General",
+        "unit": "Cytology Report",
+        "normalRange": "Benign aspirate, no malignant or atypical cells seen",
+        "price": 1200,
+        "sampleType": "Aspirated Cellular Material"
+      },
+      {
+        "id": "t-histopathology",
+        "code": "HISTO_BIOPSY",
+        "name": "Histopathology Biopsy (Small / Medium Specimen)",
+        "category": "General",
+        "unit": "Histo Report",
+        "normalRange": "Benign tissue morphology, no dysplasia or malignancy",
+        "price": 1800,
+        "sampleType": "Formalin-Fixed Tissue"
+      }
+    ],
+    "medicines": [],
+    "employees": [
+      {
+        "id": "emp-1",
+        "empId": "EMP-101",
+        "name": "মো: আব্দুল্লাহ আল মামুন (Md. Abdullah Al Mamun)",
+        "fatherName": "মো: রফিকুল ইসলাম",
+        "motherName": "মোসা: আমেনা বেগম",
+        "voterId": "19882691234567890",
+        "email": "mamun.lab@medicarediagnostic.com",
+        "phone": "+880 1812-345678",
+        "photoUrl": "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=300&auto=format&fit=crop&q=80",
+        "voterCardFrontPhotoUrl": "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80",
+        "voterCardBackPhotoUrl": "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&auto=format&fit=crop&q=80",
+        "designation": "সিনিয়র মেডিকেল টেকনোলজিস্ট (ল্যাব ইন-চার্জ)",
+        "department": "Pathology",
+        "joiningDate": "2023-01-15",
+        "salary": 35000,
+        "bloodGroup": "B+",
+        "address": "বাড়ি নং-১৪, রোড-০৫, ব্লক-বি, মিরপুর-১০, ঢাকা-১২১৬",
+        "emergencyContact": "+880 1711-223344 (ভাই)",
+        "status": "Active",
+        "notes": "ল্যাব অ্যানালাইজার রক্ষণাবেক্ষণ ও সিবিসি/বায়োকেমিস্ট্রি পরিচালনায় অভিজ্ঞ।",
+        "createdAt": "2023-01-15"
+      },
+      {
+        "id": "emp-2",
+        "empId": "EMP-102",
+        "name": "ফাতেমা তুজ জোহরা (Fatema Tuz Zohra)",
+        "fatherName": "এ কে এম ফজলুল হক",
+        "motherName": "জাহানারা বেগম",
+        "voterId": "19922698765432109",
+        "email": "fatema.reception@medicarediagnostic.com",
+        "phone": "+880 1612-345678",
+        "photoUrl": "https://images.unsplash.com/photo-1594824813686-27d1a29367ca?w=300&auto=format&fit=crop&q=80",
+        "voterCardFrontPhotoUrl": "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80",
+        "voterCardBackPhotoUrl": "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&auto=format&fit=crop&q=80",
+        "designation": "হেড ক্যাশিয়ার ও বিলিং এক্সিকিউটিভ",
+        "department": "Billing & Accounts",
+        "joiningDate": "2023-06-01",
+        "salary": 28000,
+        "bloodGroup": "O+",
+        "address": "সেকশন-১২, ব্লক-ডি, পল্লবী, মিরপুর, ঢাকা",
+        "emergencyContact": "+880 1819-887766 (পিতা)",
+        "status": "Active",
+        "notes": "বিলিং কাউন্টার ও ক্যাশ মেমো হ্যান্ডলিং দায়িত্বে নিয়োজিত।",
+        "createdAt": "2023-06-01"
+      },
+      {
+        "id": "emp-3",
+        "empId": "EMP-103",
+        "name": "মো: আরিফুল ইসলাম (Md. Ariful Islam)",
+        "fatherName": "মো: নজরুল ইসলাম",
+        "motherName": "মোসা: রাবেয়া খাতুন",
+        "voterId": "19952695556667778",
+        "email": "ariful.xray@medicarediagnostic.com",
+        "phone": "+880 1912-345678",
+        "photoUrl": "https://images.unsplash.com/photo-1537368910025-700350fe46c7?w=300&auto=format&fit=crop&q=80",
+        "voterCardFrontPhotoUrl": "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80",
+        "voterCardBackPhotoUrl": "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&auto=format&fit=crop&q=80",
+        "designation": "ডিজিটাল এক্স-রে ও ইমেজিং টেকনিশিয়ান",
+        "department": "Radiology",
+        "joiningDate": "2023-09-10",
+        "salary": 26000,
+        "bloodGroup": "A+",
+        "address": "পশ্চিম কাজীপাড়া, বেগম রোকেয়া সরণি, ঢাকা",
+        "emergencyContact": "+880 1911-334455 (পিতা)",
+        "status": "Active",
+        "notes": "DR X-Ray মেশিন ও রেডিয়েশন সেফটি সার্টিফাইড।",
+        "createdAt": "2023-09-10"
+      },
+      {
+        "id": "emp-4",
+        "empId": "EMP-104",
+        "name": "মোসা: শারমিন সুলতানা (Sharmin Sultana)",
+        "fatherName": "মোঃ গোলাম মোস্তফা",
+        "motherName": "রওশন আরা বেগম",
+        "voterId": "19962691112223334",
+        "email": "sharmin.opd@medicarediagnostic.com",
+        "phone": "+880 1718-990011",
+        "photoUrl": "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=300&auto=format&fit=crop&q=80",
+        "voterCardFrontPhotoUrl": "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80",
+        "voterCardBackPhotoUrl": "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&auto=format&fit=crop&q=80",
+        "designation": "ওপিডি পেশেন্ট কেয়ার ও নার্সিং ইন-চার্জ",
+        "department": "Doctor OPD",
+        "joiningDate": "2024-02-01",
+        "salary": 22000,
+        "bloodGroup": "AB+",
+        "address": "পূর্ব শেওড়াপাড়া, মিরপুর, ঢাকা",
+        "emergencyContact": "+880 1712-445566 (স্বামী)",
+        "status": "Active",
+        "notes": "ডাক্তার ভিজিট টোকেন সিরিয়াল ও রোগী অ্যাসিস্টেন্ট।",
+        "createdAt": "2024-02-01"
+      }
+    ],
+    "expenses": [
+      {
+        "id": "exp-1",
+        "voucherNo": "VCH-2026-001",
+        "title": "ল্যাব সিবিসি ও বায়োকেমিস্ট্রি রিএজেন্ট ক্রয়",
+        "category": "Reagents & Chemicals",
+        "amount": 8500,
+        "date": "2026-10-15",
+        "vouchedBy": "মো: আব্দুল্লাহ আল মামুন",
+        "paymentMethod": "Cash",
+        "note": "Sysmex CBC রিএজেন্ট কিট ও গ্লুকোজ RBS স্ট্রিপ্স স্টক রিসিভ",
+        "createdAt": "2026-10-15"
+      },
+      {
+        "id": "exp-2",
+        "voucherNo": "VCH-2026-002",
+        "title": "ক্লিনিক বিদ্যুৎ বিল ও জেনারেটর ডিজেল ফুয়েল",
+        "category": "Electricity & Utility",
+        "amount": 4200,
+        "date": "2026-10-15",
+        "vouchedBy": "ফাতেমা তুজ জোহরা",
+        "paymentMethod": "Cash",
+        "note": "ডেসকো বিদ্যুৎ বিল অগ্রিম ও জেনারেটরের জন্য ৪০ লিটার ডিজেল",
+        "createdAt": "2026-10-15"
+      },
+      {
+        "id": "exp-3",
+        "voucherNo": "VCH-2026-003",
+        "title": "প্রিন্টার টোনার ৮৮এ ও ল্যাব রিপোর্ট প্যাড পেপার",
+        "category": "Stationery & Printing",
+        "amount": 2600,
+        "date": "2026-10-14",
+        "vouchedBy": "ফাতেমা তুজ জোহরা",
+        "paymentMethod": "Cash",
+        "note": "HP LaserJet টোনার এবং ৫ রিম এ৪ লেটারহেড প্যাড পেপার",
+        "createdAt": "2026-10-14"
+      },
+      {
+        "id": "exp-4",
+        "voucherNo": "VCH-2026-004",
+        "title": "ডাক্তার রেফারেল সম্মানী / ভিজিট শেয়ার (DR01)",
+        "category": "Doctor Commission",
+        "amount": 3500,
+        "date": "2026-10-14",
+        "vouchedBy": "ফাতেমা তুজ জোহরা",
+        "paymentMethod": "Cash",
+        "note": "প্রফেসর ডা: এম. এ. রহমান সাপ্তাহিক রেফারেল ইনভেস্টিগেশন শেয়ার",
+        "createdAt": "2026-10-14"
+      },
+      {
+        "id": "exp-5",
+        "voucherNo": "VCH-2026-005",
+        "title": "অন-ডিউটি ডাক্তার ও স্টাফ সান্ধ্যকালীন রিফ্রেশমেন্ট",
+        "category": "Refreshment",
+        "amount": 750,
+        "date": "2026-10-15",
+        "vouchedBy": "মো: আরিফুল ইসলাম",
+        "paymentMethod": "Cash",
+        "note": "ইভিনিং শিফট ডিউটি ডাক্তার ও ল্যাব টেকনোলজিস্টদের জন্য নাস্তা",
+        "createdAt": "2026-10-15"
+      }
+    ],
+    "users": [
+      {
+        "id": "user-admin",
+        "username": "Adiba",
+        "password": "Adiba512022",
+        "fullName": "আদিবা অ্যাডমিন (Super Admin)",
+        "role": "Admin",
+        "allowedModules": [
+          "pathology",
+          "billing",
+          "doctorVisit",
+          "ecg",
+          "xray",
+          "ultrasound",
+          "doctorPortal",
+          "incomeExpense",
+          "employees",
+          "analytics",
+          "chat",
+          "settings",
+          "lanNetwork"
+        ],
+        "isActive": true,
+        "createdAt": "2025-01-01",
+        "phone": "+880 1712-345678",
+        "avatarColor": "from-purple-600 to-pink-600",
+        "assignedWorkstation": "PC-10",
+        "assignedStaticIp": "192.168.1.100"
+      },
+      {
+        "id": "user-reception",
+        "username": "reception1",
+        "password": "rec123",
+        "fullName": "রিসেপশন ও রেজিস্ট্রেশন ডেস্ক (কাউন্টার ১)",
+        "role": "Billing",
+        "allowedModules": [
+          "billing",
+          "doctorVisit"
+        ],
+        "isActive": true,
+        "createdAt": "2025-01-05",
+        "phone": "+880 1612-112233",
+        "avatarColor": "from-blue-600 to-cyan-600",
+        "assignedWorkstation": "PC-01",
+        "assignedStaticIp": "192.168.1.101"
+      },
+      {
+        "id": "user-billing",
+        "username": "billing1",
+        "password": "bill123",
+        "fullName": "হাসপাতাল ক্যাশ ও বিলিং কাউন্টার (কাউন্টার ২)",
+        "role": "Billing",
+        "allowedModules": [
+          "billing",
+          "doctorVisit",
+          "incomeExpense"
+        ],
+        "isActive": true,
+        "createdAt": "2025-01-22",
+        "phone": "+880 1612-345678",
+        "avatarColor": "from-emerald-600 to-teal-700",
+        "assignedWorkstation": "PC-02",
+        "assignedStaticIp": "192.168.1.102"
+      },
+      {
+        "id": "user-lab",
+        "username": "lab1",
+        "password": "lab123",
+        "fullName": "মেডিকেল টেকনোলজিস্ট (ল্যাব ১ - হেমাটোলজি ও বায়োকেমিস্ট্রি)",
+        "role": "Lab",
+        "allowedModules": [
+          "pathology"
+        ],
+        "isActive": true,
+        "createdAt": "2025-01-10",
+        "phone": "+880 1812-345678",
+        "avatarColor": "from-indigo-600 to-purple-600",
+        "assignedWorkstation": "PC-03",
+        "assignedStaticIp": "192.168.1.103"
+      },
+      {
+        "id": "user-lab2",
+        "username": "lab2",
+        "password": "lab123",
+        "fullName": "মেডিকেল টেকনোলজিস্ট (ল্যাব ২ - ইউরিন, স্টুল ও মাইক্রোবায়োলজি)",
+        "role": "Lab",
+        "allowedModules": [
+          "pathology"
+        ],
+        "isActive": true,
+        "createdAt": "2025-01-12",
+        "phone": "+880 1812-987654",
+        "avatarColor": "from-violet-600 to-indigo-700",
+        "assignedWorkstation": "PC-04",
+        "assignedStaticIp": "192.168.1.104"
+      },
+      {
+        "id": "user-xray",
+        "username": "xray1",
+        "password": "xray123",
+        "fullName": "মো: রফিকুল ইসলাম (ডিজিটাল এক্স-রে টেকনিশিয়ান)",
+        "role": "Xray",
+        "allowedModules": [
+          "xray"
+        ],
+        "isActive": true,
+        "createdAt": "2025-01-15",
+        "phone": "+880 1912-345678",
+        "avatarColor": "from-slate-600 to-zinc-700",
+        "assignedWorkstation": "PC-05",
+        "assignedStaticIp": "192.168.1.105"
+      },
+      {
+        "id": "user-usg",
+        "username": "usg1",
+        "password": "usg123",
+        "fullName": "ডা: সাবরিনা ফারহানা (কনসালট্যান্ট সনোলজিস্ট - USG)",
+        "role": "Ultrasound",
+        "allowedModules": [
+          "ultrasound"
+        ],
+        "isActive": true,
+        "createdAt": "2025-01-18",
+        "phone": "+880 1714-778899",
+        "avatarColor": "from-cyan-600 to-blue-600",
+        "assignedWorkstation": "PC-06",
+        "assignedStaticIp": "192.168.1.106"
+      },
+      {
+        "id": "user-ecg",
+        "username": "ecg1",
+        "password": "ecg123",
+        "fullName": "ইসিজি টেকনোলজিস্ট (কার্ডিওলজি স্টেশন)",
+        "role": "Staff",
+        "allowedModules": [
+          "ecg"
+        ],
+        "isActive": true,
+        "createdAt": "2025-01-19",
+        "phone": "+880 1715-334455",
+        "avatarColor": "from-rose-600 to-red-700",
+        "assignedWorkstation": "PC-07",
+        "assignedStaticIp": "192.168.1.107"
+      },
+      {
+        "id": "user-doctor",
+        "username": "doctor1",
+        "password": "doc123",
+        "fullName": "প্রফেসর ডা: এম. এ. রহমান (চেম্বার ১ - মেডিসিন)",
+        "role": "Doctor",
+        "allowedModules": [
+          "doctorVisit",
+          "doctorPortal"
+        ],
+        "isActive": true,
+        "createdAt": "2025-01-20",
+        "phone": "+880 1711-112233",
+        "avatarColor": "from-violet-600 to-purple-700",
+        "assignedWorkstation": "PC-08",
+        "assignedStaticIp": "192.168.1.108"
+      },
+      {
+        "id": "user-doctor2",
+        "username": "doctor2",
+        "password": "doc123",
+        "fullName": "ডা: নুসরত জাহান (চেম্বার ২ - গাইনি ও প্রসূতি)",
+        "role": "Doctor",
+        "allowedModules": [
+          "doctorVisit",
+          "doctorPortal"
+        ],
+        "isActive": true,
+        "createdAt": "2025-01-21",
+        "phone": "+880 1812-334455",
+        "avatarColor": "from-fuchsia-600 to-pink-700",
+        "assignedWorkstation": "PC-09",
+        "assignedStaticIp": "192.168.1.109"
+      }
+    ],
+    "shiftHandovers": [
+      {
+        "id": "handover-1",
+        "shiftType": "Morning",
+        "shiftDate": "17-10-2026",
+        "shiftTime": "08:00 AM - 02:00 PM",
+        "outgoingDoctorId": "doc-1",
+        "outgoingDoctorName": "Prof. Dr. M. A. Rahman",
+        "incomingDoctorId": "doc-2",
+        "incomingDoctorName": "Dr. Nusrat Jahan",
+        "summary": "Busy morning OPD shift with 28 total consultations. 2 patients currently under active clinical observation in Bay A. Urgent Troponin-I and ECG review required for Titly.",
+        "wardStatus": {
+          "totalPatientsSeen": 28,
+          "observationCount": 2,
+          "criticalCount": 1,
+          "transferredCount": 0
+        },
+        "patientHandovers": [
+          {
+            "id": "pt-ho-1",
+            "pId": "26100294",
+            "patientName": "Titly",
+            "age": "24 Y",
+            "sex": "Female",
+            "bedOrChamber": "Observation Bed 2",
+            "conditionStatus": "Guarded",
+            "criticalChanges": "Admitted from OPD with acute epigastric pain radiating to back & palpitations. BP spiked to 140/92 mmHg, PR 104 bpm. Initial ECG: sinus tachycardia with mild ST flattening in V4-V6.",
+            "urgentFollowUps": "1) Review Repeat Troponin-I stat (sample sent at 01:15 PM). 2) Check Serum Amylase/Lipase result. 3) If pain continues >30 mins after Omeprazole IV, call Cardiology consult.",
+            "pendingInvestigations": [
+              "Troponin-I (Stat)",
+              "Serum Amylase & Lipase",
+              "Repeat 12-lead ECG"
+            ],
+            "priority": "High",
+            "resolved": false
+          },
+          {
+            "id": "pt-ho-2",
+            "pId": "26100290",
+            "patientName": "Masud Shikder",
+            "age": "48 Y",
+            "sex": "Male",
+            "bedOrChamber": "OPD Chamber 201",
+            "conditionStatus": "Stable",
+            "criticalChanges": "Fasting Blood Sugar was 14.8 mmol/L on arrival with HbA1c 9.6%. Mild peripheral burning pain in feet. Given subcutaneous regular insulin 6 units.",
+            "urgentFollowUps": "Check post-insulin 2-hour blood glucose at 03:30 PM. Advise on diabetic meal & insulin pen titration before discharge.",
+            "pendingInvestigations": [
+              "Urine Microalbumin",
+              "Serum Creatinine"
+            ],
+            "priority": "Normal",
+            "resolved": false
+          }
+        ],
+        "acknowledged": false,
+        "createdAt": "2026-10-17T14:05:00.000Z"
+      },
+      {
+        "id": "handover-2",
+        "shiftType": "Night",
+        "shiftDate": "16-10-2026",
+        "shiftTime": "08:00 PM - 08:00 AM",
+        "outgoingDoctorId": "doc-3",
+        "outgoingDoctorName": "Dr. Tanvir Hossain",
+        "incomingDoctorId": "doc-1",
+        "incomingDoctorName": "Prof. Dr. M. A. Rahman",
+        "summary": "Night emergency on-call was largely calm. One patient with acute bronchial asthma nebulized and stabilized; discharged early morning.",
+        "wardStatus": {
+          "totalPatientsSeen": 9,
+          "observationCount": 0,
+          "criticalCount": 0,
+          "transferredCount": 0
+        },
+        "patientHandovers": [
+          {
+            "id": "pt-ho-3",
+            "pId": "26100289",
+            "patientName": "Abul Kalam",
+            "age": "55 Y",
+            "sex": "Male",
+            "bedOrChamber": "Emergency Observation",
+            "conditionStatus": "Stable",
+            "criticalChanges": "Came at 11:30 PM with acute wheezing & SpO2 91%. Nebulized with Salbutamol + Ipratropium twice, IV Hydrocortisone given. SpO2 improved to 97%.",
+            "urgentFollowUps": "Prescribed Budecort MDI inhaler with spacer. Advised OPD pulmonology follow-up in 3 days.",
+            "pendingInvestigations": [
+              "Complete Blood Count (CBC)"
+            ],
+            "priority": "Normal",
+            "resolved": true
+          }
+        ],
+        "acknowledged": true,
+        "acknowledgedBy": "Prof. Dr. M. A. Rahman",
+        "acknowledgedAt": "2026-10-17T08:15:00.000Z",
+        "acknowledgementNotes": "Shift taken over. Patient was ambulatory and discharged with inhaler technique education.",
+        "createdAt": "2026-10-17T08:00:00.000Z"
+      }
+    ],
+    "opdAppointments": [],
+    "workstations": [
+      {
+        "id": "ws-reception",
+        "terminalCode": "PC-01",
+        "name": "Reception & Patient Registration",
+        "nameBn": "রিসেপশন কাউন্টার ও রোগী এন্ট্রি ডেস্ক",
+        "ipAddress": "192.168.1.101",
+        "macAddress": "E4:5F:01:2A:4D:01",
+        "department": "Reception",
+        "assignedUserId": "reception1",
+        "defaultModule": "billing",
+        "status": "Online",
+        "latencyMs": 0.2,
+        "lastHeartbeat": "Just now",
+        "cableType": "Cat 6 UTP High-Speed (1Gbps)",
+        "portNumber": 1,
+        "currentActiveUser": "reception1",
+        "notes": "রোগী এন্ট্রি, নতুন আইডি তৈরি ও স্লিপ প্রিন্ট"
+      },
+      {
+        "id": "ws-billing",
+        "terminalCode": "PC-02",
+        "name": "Cash & Billing Counter",
+        "nameBn": "ক্যাশ কাউন্টার ও বিলিং পেমেন্ট রশিদ",
+        "ipAddress": "192.168.1.102",
+        "macAddress": "E4:5F:01:2A:4D:02",
+        "department": "Billing",
+        "assignedUserId": "billing1",
+        "defaultModule": "billing",
+        "status": "Online",
+        "latencyMs": 0.2,
+        "lastHeartbeat": "Just now",
+        "cableType": "Cat 6 UTP High-Speed (1Gbps)",
+        "portNumber": 2,
+        "currentActiveUser": "billing1",
+        "notes": "টাকা জমা রিসিভ, ইনভয়েস ও ডিসকাউন্ট ভাউচার"
+      },
+      {
+        "id": "ws-lab1",
+        "terminalCode": "PC-03",
+        "name": "Pathology Lab 1 (Hematology / Biochemistry)",
+        "nameBn": "প্যাথলজি ল্যাব ১ (সিবিসি ও বায়োকেমিস্ট্রি)",
+        "ipAddress": "192.168.1.103",
+        "macAddress": "E4:5F:01:2A:4D:03",
+        "department": "Pathology",
+        "assignedUserId": "lab1",
+        "defaultModule": "pathology",
+        "status": "Online",
+        "latencyMs": 0.3,
+        "lastHeartbeat": "Just now",
+        "cableType": "Cat 6 UTP High-Speed (1Gbps)",
+        "portNumber": 3,
+        "currentActiveUser": "lab1",
+        "notes": "রক্ত পরীক্ষা ও বায়োকেমিস্ট্রি রিপোর্ট এন্ট্রি"
+      },
+      {
+        "id": "ws-lab2",
+        "terminalCode": "PC-04",
+        "name": "Pathology Lab 2 (Clinical & Urine/Stool)",
+        "nameBn": "প্যাথলজি ল্যাব ২ (ইউরিন, স্টুল ও সেরোলজি)",
+        "ipAddress": "192.168.1.104",
+        "macAddress": "E4:5F:01:2A:4D:04",
+        "department": "Pathology",
+        "assignedUserId": "lab2",
+        "defaultModule": "pathology",
+        "status": "Online",
+        "latencyMs": 0.3,
+        "lastHeartbeat": "Just now",
+        "cableType": "Cat 6 UTP High-Speed (1Gbps)",
+        "portNumber": 4,
+        "currentActiveUser": "lab2",
+        "notes": "প্রস্রাব, মল ও অন্যান্য প্যাথলজিক্যাল টেস্ট প্রসেসিং"
+      },
+      {
+        "id": "ws-xray",
+        "terminalCode": "PC-05",
+        "name": "Digital X-Ray Console Room",
+        "nameBn": "ডিজিটাল এক্স-রে কনসোল ও ভিউয়িং স্টেশন",
+        "ipAddress": "192.168.1.105",
+        "macAddress": "E4:5F:01:2A:4D:05",
+        "department": "Xray",
+        "assignedUserId": "xray1",
+        "defaultModule": "xray",
+        "status": "Online",
+        "latencyMs": 0.2,
+        "lastHeartbeat": "Just now",
+        "cableType": "Cat 6 UTP High-Speed (1Gbps)",
+        "portNumber": 5,
+        "currentActiveUser": "xray1",
+        "notes": "ডিআর কনসোল থেকে এক্স-রে রিপোর্ট তৈরি ও প্রিন্ট"
+      },
+      {
+        "id": "ws-usg",
+        "terminalCode": "PC-06",
+        "name": "4D Ultrasonography (USG) Room",
+        "nameBn": "আল্ট্রাসনোগ্রাফি চেম্বার ও সনোলজি স্টেশন",
+        "ipAddress": "192.168.1.106",
+        "macAddress": "E4:5F:01:2A:4D:06",
+        "department": "Ultrasound",
+        "assignedUserId": "usg1",
+        "defaultModule": "ultrasound",
+        "status": "Online",
+        "latencyMs": 0.3,
+        "lastHeartbeat": "Just now",
+        "cableType": "Cat 6 UTP High-Speed (1Gbps)",
+        "portNumber": 6,
+        "currentActiveUser": "usg1",
+        "notes": "হোল অ্যাবডোমেন ও প্রেগন্যান্সি ইউএসজি রিপোর্ট"
+      },
+      {
+        "id": "ws-ecg",
+        "terminalCode": "PC-07",
+        "name": "ECG & Cardiology Chamber",
+        "nameBn": "১২-লিড ইসিজি ও কার্ডিওলজি ডেস্ক",
+        "ipAddress": "192.168.1.107",
+        "macAddress": "E4:5F:01:2A:4D:07",
+        "department": "ECG",
+        "assignedUserId": "ecg1",
+        "defaultModule": "ecg",
+        "status": "Online",
+        "latencyMs": 0.2,
+        "lastHeartbeat": "Just now",
+        "cableType": "Cat 6 UTP High-Speed (1Gbps)",
+        "portNumber": 7,
+        "currentActiveUser": "ecg1",
+        "notes": "ইসিজি রিদম পর্যবেক্ষণ ও ইলেক্ট্রোকার্ডিওগ্রাম রিপোর্ট"
+      },
+      {
+        "id": "ws-doc1",
+        "terminalCode": "PC-08",
+        "name": "Doctor OPD Chamber 1 (Medicine)",
+        "nameBn": "কনসালট্যান্ট চেম্বার ০১ (মেডিসিন স্পেশালিস্ট)",
+        "ipAddress": "192.168.1.108",
+        "macAddress": "E4:5F:01:2A:4D:08",
+        "department": "Doctor",
+        "assignedUserId": "doctor1",
+        "defaultModule": "doctorPortal",
+        "status": "Online",
+        "latencyMs": 0.4,
+        "lastHeartbeat": "Just now",
+        "cableType": "Cat 6 UTP High-Speed (1Gbps)",
+        "portNumber": 8,
+        "currentActiveUser": "doctor1",
+        "notes": "রোগী সিরিয়াল দেখা ও ডিজিটাল প্রেসক্রিপশন প্রদান"
+      },
+      {
+        "id": "ws-doc2",
+        "terminalCode": "PC-09",
+        "name": "Doctor OPD Chamber 2 (Gynaecology)",
+        "nameBn": "কনসালট্যান্ট চেম্বার ০২ (গাইনি স্পেশালিস্ট)",
+        "ipAddress": "192.168.1.109",
+        "macAddress": "E4:5F:01:2A:4D:09",
+        "department": "Doctor",
+        "assignedUserId": "doctor2",
+        "defaultModule": "doctorPortal",
+        "status": "Online",
+        "latencyMs": 0.3,
+        "lastHeartbeat": "Just now",
+        "cableType": "Cat 6 UTP High-Speed (1Gbps)",
+        "portNumber": 9,
+        "currentActiveUser": "doctor2",
+        "notes": "প্রেসক্রিপশন ও পূর্ববর্তী ল্যাব রিপোর্ট পর্যবেক্ষণ"
+      },
+      {
+        "id": "ws-server",
+        "terminalCode": "PC-10",
+        "name": "Central Server & Admin Master PC",
+        "nameBn": "সেন্ট্রাল ডাটাবেজ সার্ভার ও প্রধান অ্যাডমিন কনসোল",
+        "ipAddress": "192.168.1.100",
+        "macAddress": "E4:5F:01:2A:4D:10",
+        "department": "Admin",
+        "assignedUserId": "Adiba",
+        "defaultModule": "lanNetwork",
+        "status": "Online",
+        "latencyMs": 0.1,
+        "lastHeartbeat": "Host Server Active (Port 3000)",
+        "cableType": "Cat 6 UTP Gigabit Direct Backbone",
+        "portNumber": 10,
+        "currentActiveUser": "Adiba",
+        "notes": "সেন্ট্রাল ডাটাবেজ হোস্ট, আইপি মনিটরিং ও পূর্ণ নিয়ন্ত্রণ"
+      }
+    ],
+    "institutions": [],
+    "invoicePrintLogs": [],
+    "printRecords": [],
+    "trashRecords": [],
+    "auditLogs": [
+      {
+        "id": "AUD-UNAUTH-1792844127311-462",
+        "timestamp": "2026-10-24 12:15:27",
+        "ipAddress": "127.0.0.1",
+        "workstationCode": "PC-01",
+        "username": "lab",
+        "userFullName": "Lab Technologist",
+        "role": "Lab",
+        "department": "Lab",
+        "actionType": "UNAUTHORIZED_DELETE_ATTEMPT",
+        "details": "[SECURITY BLOCK 403] Non-Admin user \"Lab Technologist\" (@lab, Role: Lab) attempted restricted action: Delete Patient Record (Verification Patient)"
+      },
+      {
+        "id": "AUD-UNAUTH-1792844100951-967",
+        "timestamp": "2026-10-24 12:15:00",
+        "ipAddress": "127.0.0.1",
+        "workstationCode": "PC-01",
+        "username": "lab",
+        "userFullName": "Lab Technologist",
+        "role": "Lab",
+        "department": "Lab",
+        "actionType": "UNAUTHORIZED_DELETE_ATTEMPT",
+        "details": "[SECURITY BLOCK 403] Non-Admin user \"Lab Technologist\" (@lab, Role: Lab) attempted restricted action: Delete Verification Patient ()"
+      },
+      {
+        "id": "audit-1792828220178-152",
+        "timestamp": "01:50:20 PM",
+        "ipAddress": "192.168.1.100",
+        "workstationCode": "PC-10",
+        "username": "Adiba",
+        "userFullName": "আদিবা অ্যাডমিন (Super Admin)",
+        "role": "Admin",
+        "department": "Doctor",
+        "actionType": "LAN_SYNC",
+        "details": "Workstation switched to PC-10 (সেন্ট্রাল ডাটাবেজ সার্ভার ও প্রধান অ্যাডমিন কনসোল) [Static IP: 192.168.1.100]. Cat 6 Gigabit Link Established."
+      },
+      {
+        "id": "audit-1792828216160-194",
+        "timestamp": "01:50:16 PM",
+        "ipAddress": "192.168.1.109",
+        "workstationCode": "PC-09",
+        "username": "Adiba",
+        "userFullName": "আদিবা অ্যাডমিন (Super Admin)",
+        "role": "Admin",
+        "department": "Admin",
+        "actionType": "LAN_SYNC",
+        "details": "Workstation switched to PC-09 (কনসালট্যান্ট চেম্বার ০২ (গাইনি স্পেশালিস্ট)) [Static IP: 192.168.1.109]. Cat 6 Gigabit Link Established."
+      },
+      {
+        "id": "audit-1792824829856-995",
+        "timestamp": "12:53:49 PM",
+        "ipAddress": "192.168.1.101",
+        "workstationCode": "PC-01 (রিসেপশন কাউন্টার ও রোগী এন্ট্রি ডেস্ক)",
+        "username": "Adiba",
+        "userFullName": "আদিবা অ্যাডমিন (Super Admin)",
+        "role": "Admin",
+        "department": "Management",
+        "actionType": "LOGIN",
+        "details": "আদিবা অ্যাডমিন (Super Admin) (@Adiba) সফলভাবে লগইন করেছেন। টার্মিনাল: PC-01 (রিসেপশন কাউন্টার ও রোগী এন্ট্রি ডেস্ক), আইপি: 192.168.1.101"
+      },
+      {
+        "id": "audit-1",
+        "timestamp": "10:55:12 AM",
+        "ipAddress": "192.168.1.101",
+        "workstationCode": "PC-01 (রিসেপশন)",
+        "username": "reception1",
+        "userFullName": "রিসেপশন কাউন্টার ১",
+        "role": "Billing",
+        "department": "Reception",
+        "actionType": "INVOICE_CREATE",
+        "patientId": "26100294",
+        "patientName": "Mrs. Titly Begum",
+        "details": "নতুন রোগী রেজিস্টার্ড ও ইনভয়েস #INV-2026-1001 ইস্যু (৳১,৪৫০)। প্যাথলজি ও এক্স-রে টেস্ট স্বয়ংক্রিয়ভাবে কিউতে প্রেরণ।"
+      },
+      {
+        "id": "audit-2",
+        "timestamp": "10:52:40 AM",
+        "ipAddress": "192.168.1.103",
+        "workstationCode": "PC-03 (প্যাথলজি ল্যাব ১)",
+        "username": "lab1",
+        "userFullName": "মেডিকেল টেকনোলজিস্ট (ল্যাব)",
+        "role": "Lab",
+        "department": "Pathology",
+        "actionType": "PATHOLOGY_REPORT",
+        "patientId": "26100294",
+        "patientName": "Mrs. Titly Begum",
+        "details": "রোগী আইডি 26100294 এর সিবিসি (CBC with ESR) এবং আরবিএস টেস্ট প্যারামিটার যাচাই ও রিপোর্ট সম্পন্ন।"
+      },
+      {
+        "id": "audit-3",
+        "timestamp": "10:48:15 AM",
+        "ipAddress": "192.168.1.105",
+        "workstationCode": "PC-05 (ডিজিটাল এক্স-রে)",
+        "username": "xray1",
+        "userFullName": "মো: রফিকুল ইসলাম",
+        "role": "Xray",
+        "department": "Xray",
+        "actionType": "XRAY_REPORT",
+        "patientId": "26100294",
+        "patientName": "Mrs. Titly Begum",
+        "details": "Chest PA View ডিজিটাল এক্স-রে রিপোর্ট তৈরি ও রেডিওলজিস্ট ভেরিফিকেশন সম্পন্ন।"
+      },
+      {
+        "id": "audit-4",
+        "timestamp": "10:40:02 AM",
+        "ipAddress": "192.168.1.106",
+        "workstationCode": "PC-06 (আল্ট্রাসনোগ্রাফি)",
+        "username": "usg1",
+        "userFullName": "ডা: সাবরিনা ফারহানা",
+        "role": "Ultrasound",
+        "department": "Ultrasound",
+        "actionType": "USG_REPORT",
+        "patientId": "26100294",
+        "patientName": "Mrs. Titly Begum",
+        "details": "Whole Abdomen আল্ট্রাসনোগ্রাফি রিপোর্ট সম্পন্ন ও প্রিন্ট প্রস্তুত।"
+      },
+      {
+        "id": "audit-5",
+        "timestamp": "10:35:10 AM",
+        "ipAddress": "192.168.1.108",
+        "workstationCode": "PC-08 (ডাক্তার চেম্বার ১)",
+        "username": "doctor1",
+        "userFullName": "প্রফেসর ডা: এম. এ. রহমান",
+        "role": "Doctor",
+        "department": "Doctor",
+        "actionType": "PRESCRIPTION_CREATE",
+        "patientId": "26100294",
+        "patientName": "Mrs. Titly Begum",
+        "details": "ডিজিটাল প্রেসক্রিপশন প্রদান (Chief Complaints: Fever 4 days, Tab Paracetamol prescribed)।"
+      },
+      {
+        "id": "audit-6",
+        "timestamp": "10:15:00 AM",
+        "ipAddress": "192.168.1.100",
+        "workstationCode": "PC-10 (সার্ভার অ্যাডমিন)",
+        "username": "Adiba",
+        "userFullName": "আদিবা অ্যাডমিন (Super Admin)",
+        "role": "Admin",
+        "department": "Admin",
+        "actionType": "LOGIN",
+        "details": "সেন্ট্রাল সার্ভার মাস্টার কনসোলে সফলভাবে লগইন সম্পন্ন। সমস্ত ১০টি পিসির সাথে ক্যাট-৬ গিগাবিট লিঙ্ক সক্রিয়।"
+      }
+    ],
+    "backupHistory": [],
+    "clinicSettings": null,
+    "activeDrafts": {},
+    "dbVersion": 2,
+    "lastSavedAt": "2026-10-24T12:15:00.918Z"
+  }
+}

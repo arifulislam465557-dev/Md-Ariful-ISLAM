@@ -1,0 +1,504 @@
+{
+  "systemName": "Bangladesh Hospital & Diagnostic Master Test Catalog",
+  "version": "2.0.0",
+  "country": "Bangladesh",
+  "currency": "BDT (৳)",
+  "categories": [
+    { "id": "hematology", "nameEn": "Hematology & Blood", "nameBn": "হেমাটোলজি ও রক্ত পরীক্ষা" },
+    { "id": "biochemistry", "nameEn": "Clinical Biochemistry & Metabolic", "nameBn": "বায়োকেমিস্ট্রি ও মেটাবলিক পরীক্ষা" },
+    { "id": "hormone", "nameEn": "Hormone & Endocrinology", "nameBn": "হরমোন ও এন্ডোক্রাইনোলজি" },
+    { "id": "serology", "nameEn": "Serology & Immunology", "nameBn": "সেরোলজি ও সংক্রামক রোগ" },
+    { "id": "urine_stool", "nameEn": "Urine & Stool Examination", "nameBn": "প্রস্রাব ও মল পরীক্ষা" },
+    { "id": "microbiology", "nameEn": "Microbiology & Culture", "nameBn": "মাইক্রোবায়োলজি ও কালচার" },
+    { "id": "xray", "nameEn": "Digital X-Ray (Radiology)", "nameBn": "ডিজিটাল এক্স-রে (রেডিওলজি)" },
+    { "id": "ultrasound", "nameEn": "Ultrasonography (USG)", "nameBn": "আল্ট্রাসনোগ্রাফি (ইউএসজি)" },
+    { "id": "cardiology", "nameEn": "ECG & Cardiology", "nameBn": "ইসিজি ও কার্ডিওলজি" }
+  ],
+  "pathologyTests": [
+    {
+      "code": "CBC",
+      "nameEn": "Complete Blood Count (CBC with ESR)",
+      "nameBn": "সিবিসি উইথ ইএসআর",
+      "category": "Hematology",
+      "priceBDT": 450,
+      "sampleType": "EDTA Whole Blood (2-3 mL)",
+      "parameters": [
+        { "name": "Hemoglobin (Hb)", "unit": "g/dL", "male": "13.5 - 17.5", "female": "12.0 - 15.5", "child": "11.0 - 14.0" },
+        { "name": "ESR (Westergren)", "unit": "mm in 1st hr", "male": "0 - 10 (Age <50), 0 - 15 (Age >50)", "female": "0 - 15 (Age <50), 0 - 20 (Age >50)", "child": "0 - 10" },
+        { "name": "Total WBC Count", "unit": "/cumm", "male": "4,000 - 11,000", "female": "4,000 - 11,000", "child": "5,000 - 14,000" },
+        { "name": "Neutrophils", "unit": "%", "general": "40 - 75" },
+        { "name": "Lymphocytes", "unit": "%", "general": "20 - 45 (Children: 40 - 60)" },
+        { "name": "Monocytes", "unit": "%", "general": "2 - 10" },
+        { "name": "Eosinophils", "unit": "%", "general": "1 - 6" },
+        { "name": "Basophils", "unit": "%", "general": "0 - 1" },
+        { "name": "Total RBC Count", "unit": "mil/cumm", "male": "4.5 - 5.9", "female": "4.0 - 5.2", "child": "3.8 - 5.0" },
+        { "name": "Platelet Count", "unit": "lakh/cumm", "general": "1.5 - 4.5 (150,000 - 450,000 /cumm)" },
+        { "name": "PCV / Hematocrit", "unit": "%", "male": "40 - 52", "female": "36 - 48", "child": "34 - 42" },
+        { "name": "MCV", "unit": "fL", "general": "80 - 96" },
+        { "name": "MCH", "unit": "pg", "general": "27 - 32" },
+        { "name": "MCHC", "unit": "g/dL", "general": "32 - 36" },
+        { "name": "RDW-CV", "unit": "%", "general": "11.5 - 14.5" }
+      ]
+    },
+    {
+      "code": "FBS",
+      "nameEn": "Fasting Blood Sugar (FBS)",
+      "nameBn": "ফাস্টিং ব্লাড সুগার (খালি পেটে রক্তে শর্করা)",
+      "category": "Biochemistry",
+      "priceBDT": 150,
+      "sampleType": "Fluoride Plasma / Serum (8-10 hrs fasting)",
+      "parameters": [
+        {
+          "name": "Fasting Glucose",
+          "unit": "mmol/L",
+          "general": "Normal: 3.9 - 6.0 mmol/L (70 - 100 mg/dL), Impaired: 6.1 - 6.9, Diabetic: >= 7.0 mmol/L"
+        }
+      ]
+    },
+    {
+      "code": "2HABF",
+      "nameEn": "Blood Sugar 2 Hours After Breakfast (2HABF / 2HPP)",
+      "nameBn": "নাস্তার ২ ঘণ্টা পর রক্তে শর্করা",
+      "category": "Biochemistry",
+      "priceBDT": 150,
+      "sampleType": "Fluoride Plasma",
+      "parameters": [
+        {
+          "name": "Post-Prandial Glucose",
+          "unit": "mmol/L",
+          "general": "Normal: < 7.8 mmol/L (< 140 mg/dL), Impaired (IGT): 7.8 - 11.0, Diabetic: >= 11.1 mmol/L"
+        }
+      ]
+    },
+    {
+      "code": "RBS",
+      "nameEn": "Random Blood Sugar (RBS)",
+      "nameBn": "র‌্যান্ডম ব্লাড সুগার",
+      "category": "Biochemistry",
+      "priceBDT": 150,
+      "sampleType": "Fluoride Plasma",
+      "parameters": [
+        { "name": "Random Glucose", "unit": "mmol/L", "general": "< 7.8 mmol/L (Diabetes suspected if >= 11.1 with symptoms)" }
+      ]
+    },
+    {
+      "code": "HBA1C",
+      "nameEn": "Glycated Hemoglobin (HbA1c)",
+      "nameBn": "এইচবিএ১সি (গত ৩ মাসের গড় শর্করা)",
+      "category": "Biochemistry",
+      "priceBDT": 800,
+      "sampleType": "EDTA Whole Blood",
+      "parameters": [
+        { "name": "HbA1c Concentration", "unit": "%", "general": "Normal: 4.5 - 5.6 %, Prediabetes: 5.7 - 6.4 %, Diabetic: >= 6.5 %" },
+        { "name": "Estimated Average Glucose (eAG)", "unit": "mg/dL", "general": "97 - 126 mg/dL" }
+      ]
+    },
+    {
+      "code": "LIPID",
+      "nameEn": "Lipid Profile Panel (Complete)",
+      "nameBn": "লিপিড প্রোফাইল প্যানেল (রক্তে চর্বির মাত্রা)",
+      "category": "Biochemistry",
+      "priceBDT": 900,
+      "sampleType": "Fasting Serum (12 hours fasting)",
+      "parameters": [
+        { "name": "Total Cholesterol", "unit": "mg/dL", "general": "Desirable: < 200, Borderline: 200 - 239, High: >= 240" },
+        { "name": "Serum Triglycerides (TG)", "unit": "mg/dL", "general": "Normal: < 150, Borderline: 150 - 199, High: 200 - 499, Very High: >= 500" },
+        { "name": "HDL Cholesterol (Good)", "unit": "mg/dL", "male": "> 40 mg/dL", "female": "> 50 mg/dL", "child": "> 45 mg/dL" },
+        { "name": "LDL Cholesterol (Bad)", "unit": "mg/dL", "general": "Optimal: < 100, Near Optimal: 100 - 129, Borderline: 130 - 159, High: >= 160" },
+        { "name": "VLDL Cholesterol", "unit": "mg/dL", "general": "10 - 30 mg/dL" },
+        { "name": "Total Cholesterol / HDL Ratio", "unit": "Ratio", "general": "< 4.5 (Low risk)" }
+      ]
+    },
+    {
+      "code": "LFT",
+      "nameEn": "Liver Function Test (LFT Panel)",
+      "nameBn": "লিভার ফাংশন টেস্ট (যকৃৎ কার্যকারিতা পরীক্ষা)",
+      "category": "Biochemistry",
+      "priceBDT": 1200,
+      "sampleType": "Clotted Blood (Serum)",
+      "parameters": [
+        { "name": "Serum Bilirubin (Total)", "unit": "mg/dL", "general": "0.2 - 1.2 (Neonate: < 12.0)" },
+        { "name": "Serum Bilirubin (Direct / Conjugated)", "unit": "mg/dL", "general": "0.0 - 0.3" },
+        { "name": "Serum Bilirubin (Indirect / Unconjugated)", "unit": "mg/dL", "general": "0.2 - 0.9" },
+        { "name": "SGPT / ALT", "unit": "U/L", "male": "Up to 45 U/L", "female": "Up to 34 U/L", "child": "Up to 35 U/L" },
+        { "name": "SGOT / AST", "unit": "U/L", "male": "Up to 38 U/L", "female": "Up to 32 U/L", "child": "Up to 40 U/L" },
+        { "name": "Alkaline Phosphatase (ALP)", "unit": "U/L", "male": "40 - 130 U/L", "female": "35 - 105 U/L", "child": "100 - 350 U/L (Growing bone)" },
+        { "name": "Serum Total Protein", "unit": "g/dL", "general": "6.4 - 8.3 g/dL" },
+        { "name": "Serum Albumin", "unit": "g/dL", "general": "3.5 - 5.0 g/dL" },
+        { "name": "Serum Globulin", "unit": "g/dL", "general": "2.3 - 3.4 g/dL" },
+        { "name": "Albumin/Globulin (A/G) Ratio", "unit": "Ratio", "general": "1.2 - 2.2" }
+      ]
+    },
+    {
+      "code": "S_CREAT",
+      "nameEn": "Serum Creatinine",
+      "nameBn": "সিরাম ক্রিয়েটিনিন (কিডনি ফাংশন)",
+      "category": "Biochemistry",
+      "priceBDT": 350,
+      "sampleType": "Serum",
+      "parameters": [
+        { "name": "Serum Creatinine", "unit": "mg/dL", "male": "0.7 - 1.2", "female": "0.5 - 1.0", "child": "0.3 - 0.7" },
+        { "name": "eGFR (CKD-EPI)", "unit": "mL/min/1.73m2", "general": ">= 90 (Normal), 60-89 (Mild decrease)" }
+      ]
+    },
+    {
+      "code": "B_UREA",
+      "nameEn": "Blood Urea & BUN",
+      "nameBn": "ব্লাড ইউরিয়া ও বিইউএন",
+      "category": "Biochemistry",
+      "priceBDT": 350,
+      "sampleType": "Serum",
+      "parameters": [
+        { "name": "Blood Urea", "unit": "mg/dL", "general": "15 - 45 mg/dL" },
+        { "name": "Blood Urea Nitrogen (BUN)", "unit": "mg/dL", "general": "7 - 20 mg/dL" }
+      ]
+    },
+    {
+      "code": "ELECTRO",
+      "nameEn": "Serum Electrolytes (Na+, K+, Cl-, HCO3-)",
+      "nameBn": "সিরাম ইলেক্ট্রোলাইটস (লবণ ও মিনারেল প্যানেল)",
+      "category": "Biochemistry",
+      "priceBDT": 900,
+      "sampleType": "Non-hemolyzed Serum (Fresh)",
+      "parameters": [
+        { "name": "Sodium (Na+)", "unit": "mmol/L", "general": "135 - 145" },
+        { "name": "Potassium (K+)", "unit": "mmol/L", "general": "3.5 - 5.1" },
+        { "name": "Chloride (Cl-)", "unit": "mmol/L", "general": "98 - 107" },
+        { "name": "Bicarbonate / CO2 (HCO3-)", "unit": "mmol/L", "general": "22 - 29" }
+      ]
+    },
+    {
+      "code": "URIC",
+      "nameEn": "Serum Uric Acid",
+      "nameBn": "সিরাম ইউরিক এসিড (গেঁটে বাত মার্কার)",
+      "category": "Biochemistry",
+      "priceBDT": 350,
+      "sampleType": "Serum",
+      "parameters": [
+        { "name": "Uric Acid", "unit": "mg/dL", "male": "3.5 - 7.2", "female": "2.6 - 6.0", "child": "2.0 - 5.5" }
+      ]
+    },
+    {
+      "code": "THYROID_PANEL",
+      "nameEn": "Thyroid Profile Panel (TSH, FT3, FT4)",
+      "nameBn": "থাইরয়েড প্রোফাইল প্যানেল (টিএসএইচ, এফটি৩, এফটি৪)",
+      "category": "Hormone",
+      "priceBDT": 1800,
+      "sampleType": "Fasting Morning Serum",
+      "parameters": [
+        { "name": "Thyroid Stimulating Hormone (TSH)", "unit": "uIU/mL", "general": "0.35 - 4.94 (Pregnancy 1st Trimester: 0.1 - 2.5)" },
+        { "name": "Free Triiodothyronine (FT3)", "unit": "pg/mL", "general": "1.71 - 3.71" },
+        { "name": "Free Thyroxine (FT4)", "unit": "ng/dL", "general": "0.70 - 1.48" },
+        { "name": "Total T3", "unit": "ng/mL", "general": "0.80 - 2.00" },
+        { "name": "Total T4", "unit": "ug/dL", "general": "5.1 - 14.1" }
+      ]
+    },
+    {
+      "code": "BETA_HCG",
+      "nameEn": "Beta-hCG (Quantitative Serum Pregnancy)",
+      "nameBn": "সিরাম বিটা-এইচসিজি (প্রেগন্যান্সি নিশ্চিতকরণ ও মান)",
+      "category": "Hormone",
+      "priceBDT": 1000,
+      "sampleType": "Serum",
+      "parameters": [
+        {
+          "name": "Total Beta hCG",
+          "unit": "mIU/mL",
+          "general": "Non-pregnant Female / Male: < 5.0; 3-4 Weeks: 9 - 130; 4-5 Weeks: 75 - 2,600; 5-6 Weeks: 850 - 20,800; 6-7 Weeks: 4,000 - 100,200"
+        }
+      ]
+    },
+    {
+      "code": "PROLACTIN",
+      "nameEn": "Serum Prolactin",
+      "nameBn": "সিরাম প্রোল্যাকটিন",
+      "category": "Hormone",
+      "priceBDT": 800,
+      "sampleType": "Serum (Resting 20 mins before venipuncture)",
+      "parameters": [
+        { "name": "Prolactin", "unit": "ng/mL", "male": "2.1 - 17.7", "female": "2.8 - 29.2 (Post-menopausal: 1.8 - 20.3, Pregnant: 10 - 209)" }
+      ]
+    },
+    {
+      "code": "VIT_D3",
+      "nameEn": "Vitamin D (25-OH Cholecalciferol)",
+      "nameBn": "ভিটামিন ডি৩ পরীক্ষা",
+      "category": "Hormone",
+      "priceBDT": 2200,
+      "sampleType": "Serum (Protected from direct light)",
+      "parameters": [
+        { "name": "25-OH Vitamin D Total", "unit": "ng/mL", "general": "Deficient: < 20, Insufficient: 20 - 29, Sufficient / Optimal: 30 - 100, Toxicity: > 100" }
+      ]
+    },
+    {
+      "code": "VIT_B12",
+      "nameEn": "Vitamin B12 (Cyanocobalamin)",
+      "nameBn": "ভিটামিন বি১২ পরীক্ষা",
+      "category": "Hormone",
+      "priceBDT": 1800,
+      "sampleType": "Fasting Serum",
+      "parameters": [
+        { "name": "Vitamin B12", "unit": "pg/mL", "general": "Normal: 211 - 911 pg/mL, Borderline: 150 - 210, Deficient: < 150" }
+      ]
+    },
+    {
+      "code": "TESTOST",
+      "nameEn": "Serum Testosterone (Total)",
+      "nameBn": "সিরাম টেস্টোস্টেরন (পুরুষ হরমোন)",
+      "category": "Hormone",
+      "priceBDT": 1000,
+      "sampleType": "Morning Serum (8:00 AM - 10:00 AM)",
+      "parameters": [
+        { "name": "Total Testosterone", "unit": "ng/dL", "male": "249 - 836 ng/dL", "female": "8.4 - 48.1 ng/dL" }
+      ]
+    },
+    {
+      "code": "U_RME",
+      "nameEn": "Urine Routine & Microscopic Examination (Urine R/M/E)",
+      "nameBn": "ইউরিন রুটিন ও মাইক্রোস্কোপিক পরীক্ষা (আর/এম/ই)",
+      "category": "Urine",
+      "priceBDT": 200,
+      "sampleType": "Clean Catch Midstream Fresh Morning Urine",
+      "parameters": [
+        { "name": "Color", "unit": "", "general": "Pale Yellow / Straw" },
+        { "name": "Appearance", "unit": "", "general": "Clear / Translucent" },
+        { "name": "Specific Gravity", "unit": "", "general": "1.010 - 1.025" },
+        { "name": "pH", "unit": "", "general": "5.0 - 7.0 (Slightly Acidic)" },
+        { "name": "Albumin / Protein", "unit": "", "general": "Nil / Negative" },
+        { "name": "Sugar / Glucose", "unit": "", "general": "Nil / Negative" },
+        { "name": "Ketone Bodies", "unit": "", "general": "Negative" },
+        { "name": "Bile Salt & Bile Pigment", "unit": "", "general": "Negative" },
+        { "name": "Pus Cells (Leukocytes)", "unit": "/HPF", "general": "0 - 4 / HPF" },
+        { "name": "RBC (Red Blood Cells)", "unit": "/HPF", "general": "Nil - 1 / HPF" },
+        { "name": "Epithelial Cells", "unit": "/HPF", "general": "Occasional (1 - 3 / HPF)" },
+        { "name": "Casts (Hyaline/Granular)", "unit": "/LPF", "general": "Nil" },
+        { "name": "Crystals (Ca-oxalate/Urate)", "unit": "", "general": "Nil / None" }
+      ]
+    },
+    {
+      "code": "U_CS",
+      "nameEn": "Urine Culture & Sensitivity (Urine C/S)",
+      "nameBn": "ইউরিন কালচার ও সেনসিটিভিটি",
+      "category": "Urine",
+      "priceBDT": 700,
+      "sampleType": "Sterile Container Midstream Catch Urine",
+      "parameters": [
+        { "name": "Organism Isolated", "unit": "", "general": "No significant bacterial growth after 48 hours incubation at 37°C" },
+        { "name": "Colony Count", "unit": "CFU/mL", "general": "< 10^4 CFU/mL (Insignificant)" },
+        { "name": "Antibiotic Sensitivity", "unit": "Panel", "general": "Reported as Sensitive (S), Intermediate (I), Resistant (R)" }
+      ]
+    },
+    {
+      "code": "STOOL_RME",
+      "nameEn": "Stool Routine & Microscopic Examination (Stool R/M/E)",
+      "nameBn": "মল রুটিন ও মাইক্রোস্কোপিক পরীক্ষা",
+      "category": "Stool",
+      "priceBDT": 200,
+      "sampleType": "Fresh Stool Specimen in clean container",
+      "parameters": [
+        { "name": "Color & Consistency", "unit": "", "general": "Brownish / Yellowish, Soft Formed" },
+        { "name": "Mucus", "unit": "", "general": "Absent" },
+        { "name": "Blood", "unit": "", "general": "Absent" },
+        { "name": "Reaction (pH)", "unit": "", "general": "Neutral to slightly alkaline" },
+        { "name": "Reducing Substance", "unit": "%", "general": "Negative (< 0.25%)" },
+        { "name": "Protozoa (Entamoeba/Giardia)", "unit": "", "general": "Not Found / Nil" },
+        { "name": "Cysts & Trophozoites", "unit": "", "general": "Not Found / Nil" },
+        { "name": "Helminths / Ova", "unit": "", "general": "Not Found / Nil" },
+        { "name": "Pus Cells", "unit": "/HPF", "general": "0 - 2 / HPF" },
+        { "name": "RBC", "unit": "/HPF", "general": "Nil" },
+        { "name": "Macrophages", "unit": "", "general": "Nil" }
+      ]
+    },
+    {
+      "code": "STOOL_OBT",
+      "nameEn": "Stool for Occult Blood Test (OBT)",
+      "nameBn": "স্টুল অকাল্ট ব্লাড টেস্ট (মলে লুকায়িত রক্ত)",
+      "category": "Stool",
+      "priceBDT": 300,
+      "sampleType": "Fresh Stool (Meat-free diet 3 days prior)",
+      "parameters": [
+        { "name": "Occult Blood", "unit": "Qualitative", "general": "Negative (No gastrointestinal micro-bleeding detected)" }
+      ]
+    }
+  ],
+  "radiologyTemplates": {
+    "ultrasound": [
+      {
+        "id": "usg-whole-abdomen",
+        "nameEn": "USG of Whole Abdomen (With Pelvic Organs)",
+        "nameBn": "হোল অ্যাবডোমেন আল্ট্রাসনোগ্রাফি",
+        "priceBDT": 1500,
+        "findings": {
+          "liver": "Normal in size (approx. 13.5 cm), regular contour and homogeneous parenchymal echotexture. No focal lesion, cyst, or IHBR dilatation noted. Portal vein caliber is normal (10 mm).",
+          "gallBladder": "Well distended, wall thickness is within normal physiological limits (< 3 mm). Lumen is clear without calculus, sludge, or polyps.",
+          "biliaryTree": "Common Bile Duct (CBD) is normal in caliber (4.2 mm). No luminal mass or calculus detected.",
+          "pancreas": "Normal in size, outline, and homogeneous echotexture. Main pancreatic duct is not dilated.",
+          "spleen": "Normal in size (measuring 9.6 cm), uniform echotexture. Splenic vein is normal at hilum.",
+          "kidneys": "Both kidneys are normal in size, shape, and anatomical position. Right kidney measures ~10.2 cm, Left kidney measures ~10.6 cm. Corticomedullary differentiation is well-preserved. No calculus, hydronephrosis, or space-occupying lesion is seen on either side.",
+          "urinaryBladder": "Adequately distended with physiological urine. Bladder walls are smooth and regular in contour (< 3 mm). Lumen is free from stone, mass, or intravesical diverticulum.",
+          "prostateOrUterus": "For Males: Prostate gland is normal in size and homogeneous in echogenicity (~18 cc), normal capsule. Post-void residue (PVR) is insignificant (< 15 mL).\nFor Females: Uterus is anteverted, measuring 7.5 x 4.2 x 3.6 cm. Regular myometrial echotexture, clear regular endometrial stripe (7 mm). Bilateral ovaries are normal with normal follicles. No mass in POD.",
+          "peritonealCavity": "No free fluid (ascites) or significant lymphadenopathy in peritoneal or pelvic cavity."
+        },
+        "impression": "ULTRASONOGRAPHY OF WHOLE ABDOMEN REVEALS NORMAL SCAN. No sonologically detectable organomegaly, calculus, mass, or free fluid detected in abdominal and pelvic cavities.",
+        "recommendation": "Clinical correlation recommended. Repeat scan if symptoms evolve."
+      },
+      {
+        "id": "usg-pregnancy-routine",
+        "nameEn": "USG of Pregnancy Profile (Obstetric / Fetal Well-being)",
+        "nameBn": "প্রেগন্যান্সি প্রোফাইল ও গর্ভস্থ শিশুর স্বাস্থ্য পরীক্ষা",
+        "priceBDT": 1500,
+        "findings": {
+          "presentation": "Single live intrauterine pregnancy in Cephalic / Longitudinal presentation.",
+          "cardiacActivity": "Active fetal cardiac pulsation noted with regular rhythm. Fetal Heart Rate (FHR): 146 beats per minute (Normal: 120-160 bpm).",
+          "fetalMovement": "Good active fetal somatic and limb movements appreciated during the scan.",
+          "biometry": "Biparietal Diameter (BPD): ~56 mm\nHead Circumference (HC): ~205 mm\nAbdominal Circumference (AC): ~194 mm\nFemur Length (FL): ~42 mm\nEstimated Fetal Weight (EFW): ~620 ± 80 grams.",
+          "gestationalAge": "Composite sonographic gestational age corresponds to ~23 Weeks 4 Days ± 1 Week.",
+          "placenta": "Placenta is situated anteriorly / fundal, Grade-I maturity. Clear of internal os (No placenta previa).",
+          "amnioticFluid": "Amniotic fluid volume is adequate. Single deepest vertical pocket (DVP) is 4.8 cm. Amniotic Fluid Index (AFI) is ~13.5 cm (Normal range: 8-18 cm).",
+          "cervix": "Internal os is closed. Cervical canal length is adequate (~36 mm). No funneling."
+        },
+        "impression": "SINGLE LIVE INTRAUTERINE PREGNANCY OF APPROXIMATELY 23-24 WEEKS GESTATION. Normal fetal growth parameters, satisfactory liquor volume, and normal anterior placenta.",
+        "recommendation": "Routine antenatal follow-up and clinical correlation with Last Menstrual Period (LMP)."
+      },
+      {
+        "id": "usg-kub-prostate",
+        "nameEn": "USG of KUB & Prostate Region",
+        "nameBn": "কেইউবি ও প্রোস্টেট আল্ট্রাসনোগ্রাফি",
+        "priceBDT": 1200,
+        "findings": {
+          "kidneys": "Both kidneys are normal in size, shape, and cortical thickness. Right kidney: 10.4 cm, Left kidney: 10.8 cm. Clear central echo complex with intact corticomedullary boundary. No calculus, hydronephrosis, or cyst noted.",
+          "ureters": "Visualized proximal and distal ureters are not dilated.",
+          "urinaryBladder": "Well-distended with anechoic urine. Normal smooth bladder wall thickness (~2.5 mm). No radiopaque shadow or intraluminal growth.",
+          "prostate": "Prostate gland is symmetrically enlarged / normal, measuring approx. 4.2 x 3.6 x 3.2 cm with calculated weight of ~24 grams. Parenchymal echotexture is homogeneous.",
+          "postVoidResidue": "Post-voiding residual urine volume is approx. 18 mL (Within normal physiological limits)."
+        },
+        "impression": "NORMAL SONOLOGICAL STUDY OF KUB AND PROSTATE. No obstructive uropathy, nephrolithiasis, or significant post-void urine retention.",
+        "recommendation": "Correlation with Serum Creatinine and Urine R/M/E."
+      },
+      {
+        "id": "usg-pelvis-gynae",
+        "nameEn": "USG of Lower Abdomen / Female Pelvic Organs",
+        "nameBn": "পেলভিস ও জরায়ু আল্ট্রাসনোগ্রাফি",
+        "priceBDT": 1200,
+        "findings": {
+          "uterus": "Uterus is anteverted, normal in size, measuring 7.8 x 4.4 x 3.8 cm. Myometrium demonstrates uniform homogeneous echotexture without leiomyoma (fibroid) or adenomyosis.",
+          "endometrium": "Endometrial stripe is central, distinct, and regular, measuring approx. 8.2 mm in thickness. No intracavitary polyp or collection.",
+          "cervix": "Cervix appears normal in length and echo pattern. No Nabothian cyst or mass.",
+          "ovaries": "Right Ovary measures 3.1 x 2.0 cm. Left Ovary measures 3.0 x 1.9 cm. Both ovaries exhibit normal physiological stroma and follicular development. No solid or cystic mass detected.",
+          "pod": "Pouch of Douglas (cul-de-sac) is free from fluid collection or mass."
+        },
+        "impression": "NORMAL PELVIC ULTRASONOGRAM. Normal anteverted uterus and bilateral ovaries without focal lesion.",
+        "recommendation": "Clinical correlation with phase of menstrual cycle."
+      },
+      {
+        "id": "usg-breast-bilateral",
+        "nameEn": "High-Resolution Bilateral Breast Ultrasonography",
+        "nameBn": "উভয় স্তনের হাই-রেজোলিউশন আল্ট্রাসনোগ্রাফি",
+        "priceBDT": 2000,
+        "findings": {
+          "breastTissue": "Bilateral breasts demonstrate normal fibro-fatty and glandular parenchymal distribution for age. Cooper's ligaments are intact.",
+          "ductalSystem": "Major subareolar lactiferous ducts are non-dilated with normal branching architecture.",
+          "focalLesions": "No discrete solid mass, cystic lesion, ductal ectasia, or architectural distortion seen in either breast.",
+          "skinAndNipple": "Skin thickness is normal, nipple-areolar complexes are symmetric without retraction or retro-areolar thickening.",
+          "axilla": "Bilateral axillary regions show no suspicious lymphadenopathy (Morphologically normal fatty hilum preserved)."
+        },
+        "impression": "NORMAL BILATERAL BREAST ULTRASONOGRAPHY. BI-RADS Category 1 (Negative / Normal).",
+        "recommendation": "Routine clinical breast self-examination and periodic screening."
+      },
+      {
+        "id": "usg-thyroid-neck",
+        "nameEn": "USG of Thyroid Gland & Soft Tissues of Neck",
+        "nameBn": "থাইরয়েড গ্রন্থি ও গলার আল্ট্রাসনোগ্রাফি",
+        "priceBDT": 1500,
+        "findings": {
+          "rightLobe": "Right lobe measures approx. 4.3 x 1.6 x 1.4 cm. Normal homogeneous echotexture.",
+          "leftLobe": "Left lobe measures approx. 4.1 x 1.5 x 1.3 cm. Uniform parenchymal echotexture.",
+          "isthmus": "Isthmus is midline, measuring approx. 2.8 mm in anteroposterior diameter.",
+          "nodules": "No solid, cystic, or mixed nodule, calcification, or hypervascularity noted on Color Doppler interrogation.",
+          "cervicalNodes": "No pathological cervical lymphadenopathy along the internal jugular chain."
+        },
+        "impression": "NORMAL SONOGRAPHIC APPEARANCE OF THYROID GLAND. EU-TIRADS 1 (Normal Thyroid).",
+        "recommendation": "Correlate with Thyroid Profile (TSH, FT4)."
+      }
+    ],
+    "xray": [
+      {
+        "id": "xray-chest-pa",
+        "nameEn": "Digital X-Ray Chest PA View",
+        "nameBn": "ডিজিটাল এক্স-রে চেস্ট (বুকের এক্স-রে পি/এ ভিউ)",
+        "priceBDT": 600,
+        "findings": {
+          "lungFields": "Both lung fields are clear. No evidence of active pulmonary parenchymal infiltration, consolidation, collapse, cavitation, or nodular opacity.",
+          "cardiothoracicRatio": "Cardiothoracic (CTR) ratio is within normal physiological limits (< 50%). Normal cardiac contour and aortic knuckle.",
+          "costophrenicAngles": "Bilateral costophrenic and cardiophrenic angles are sharp, deep, and clear. No pleural effusion or thickening.",
+          "hilarShadows": "Both hilar vascular shadows are normal in size, density, and position.",
+          "mediastinumAndTrachea": "Mediastinum is central and within normal limits. Trachea is central with normal caliber.",
+          "diaphragms": "Both diaphragmatic domes are smooth, convex, and normal in position. Subdiaphragmatic regions are clear (No free gas under diaphragm).",
+          "bonyThorax": "Ribs, clavicles, sternum, and visible dorsal spine appear structurally intact with normal bone mineralization."
+        },
+        "impression": "NORMAL DIGITAL CHEST PA RADIOGRAPH. No active cardiopulmonary pathology detected.",
+        "recommendation": "Clinical correlation advised."
+      },
+      {
+        "id": "xray-ls-spine-bv",
+        "nameEn": "Digital X-Ray Lumbar / Lumbosacral Spine (A/P & Lateral B/V)",
+        "nameBn": "কোমর ও লাম্বার স্পাইন ডিজিটাল এক্স-রে",
+        "priceBDT": 900,
+        "findings": {
+          "curvature": "Normal physiological lumbar lordosis is well-maintained.",
+          "vertebralBodies": "Vertebral body heights, alignment, and cortical margins of L1 through L5 and S1 are intact. No compression fracture or bone destruction.",
+          "discSpaces": "Intervertebral disc spaces (including L4-L5 and L5-S1) appear well-preserved.",
+          "pedicles": "Pedicles, transverse processes, and spinous processes appear intact without lysis.",
+          "alignment": "No spondylolisthesis (anterior or posterior displacement) or step deformity.",
+          "sacroiliacJoints": "Visualized bilateral sacroiliac joints are clear and symmetric."
+        },
+        "impression": "NORMAL RADIOLOGICAL STUDY OF LUMBOSACRAL SPINE. No evidence of spondylolisthesis, significant spondylosis, or acute bony injury.",
+        "recommendation": "Correlate with clinical lower back examination."
+      },
+      {
+        "id": "xray-cervical-spine-bv",
+        "nameEn": "Digital X-Ray Cervical Spine (A/P & Lateral Views)",
+        "nameBn": "ঘাড় ও সার্ভাইকাল স্পাইন এক্স-রে",
+        "priceBDT": 800,
+        "findings": {
+          "lordosis": "Normal gentle cervical lordosis is preserved without spasm-induced straightening.",
+          "vertebrae": "Vertebral bodies from C1 to C7 are intact with normal height, contours, and bone density.",
+          "intervertebralDiscs": "Intervertebral disc spaces are adequate throughout the cervical spine.",
+          "neuralForamina": "Visualized neural exit foramina and facet joints are unremarkable.",
+          "prevertebralSoftTissue": "Prevertebral soft tissue shadow is within normal physiological limits."
+        },
+        "impression": "NORMAL CERVICAL SPINE RADIOGRAPH. No evidence of cervical spondylosis, disc space narrowing, or fracture.",
+        "recommendation": "Physiotherapy and clinical correlation if radiculopathy symptoms persist."
+      },
+      {
+        "id": "xray-abdomen-erect",
+        "nameEn": "Digital X-Ray Abdomen Erect View (Including Domes)",
+        "nameBn": "পেটের এক্স-রে ইরেক্ট ভিউ (দাঁড়ানো)",
+        "priceBDT": 600,
+        "findings": {
+          "gasPattern": "Normal distribution of bowel gas within stomach, small and large intestine. No abnormal bowel dilatation.",
+          "fluidLevels": "No multiple or stepped air-fluid levels identified.",
+          "freeAir": "No evidence of free air / gas under bilateral diaphragmatic domes (Pneumoperitoneum excluded).",
+          "calcifications": "No pathological radio-opaque calculus or abnormal calcification noted.",
+          "psoasShadows": "Psoas muscle margins are symmetric and clearly delineated."
+        },
+        "impression": "NORMAL ERECT ABDOMINAL RADIOGRAPH. No radiological evidence of bowel obstruction, perforation, or acute surgical abdomen.",
+        "recommendation": "Correlate clinically and follow up with abdominal ultrasound if pain continues."
+      },
+      {
+        "id": "xray-knee-both",
+        "nameEn": "Digital X-Ray Both Knee Joints Standing A/P & Lateral",
+        "nameBn": "উভয় হাঁটুর জয়েন্ট এক্স-রে (স্ট্যান্ডিং)",
+        "priceBDT": 1000,
+        "findings": {
+          "jointSpace": "Medial and lateral tibiofemoral joint spaces are symmetric and well-preserved bilaterally under weight-bearing view.",
+          "patellofemoral": "Patellofemoral articulation is normal without lateral subluxation.",
+          "articularMargins": "Smooth articular cortical surfaces. No subchondral sclerosis, subchondral cysts, or osteophytes.",
+          "softTissues": "Periarticular soft tissues are unremarkable without joint effusion or calcification."
+        },
+        "impression": "NORMAL BILATERAL KNEE JOINT RADIOGRAPH. No signs of osteoarthritis or acute traumatic osseous injury.",
+        "recommendation": "Clinical correlation recommended."
+      }
+    ]
+  }
+}

@@ -1,0 +1,326 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Plus Jakarta Sans', 'Hind Siliguri', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+}
+
+/* Theme helper classes */
+.theme-classic {
+  --theme-bg: #e4d3e8;
+  --theme-border: #9f81a7;
+}
+
+/* ==========================================================================
+   EXACT A4 PRINT SYSTEM - 100% PREVIEW FIDELITY
+   Enforces exact A4 page size, explicit 10mm margins, color fidelity,
+   flexbox/grid layout preservation, and eliminates unwanted page overflows.
+   ========================================================================== */
+@page {
+  size: A4 portrait;
+  margin: 10mm; /* Explicit 10mm margin */
+}
+
+@page :first {
+  margin: 10mm;
+}
+
+@page :left {
+  margin: 10mm;
+}
+
+@page :right {
+  margin: 10mm;
+}
+
+@media print {
+  /* 1. Universal Color Fidelity */
+  *,
+  *::before,
+  *::after {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+    box-sizing: border-box !important;
+  }
+
+  /* 2. Page & Root Setup */
+  html,
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    font-family: 'Plus Jakarta Sans', 'Hind Siliguri', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+    overflow: visible !important;
+    width: 100% !important;
+    height: auto !important;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* 3. Hide all Non-Print UI Controls */
+  header,
+  nav,
+  aside,
+  button,
+  input,
+  select,
+  textarea,
+  .no-print,
+  .print\:hidden,
+  [role="dialog"] > div > div:first-child:has(button) {
+    display: none !important;
+  }
+
+  /* When printing any modal document, isolate the document and hide the background app */
+  body:has(#printable-receipt) > #root > div > main,
+  body:has(#printable-receipt) > #root > div > header,
+  body:has(#printable-receipt) > #root > div > nav,
+  body:has(#printable-report) > #root > div > main,
+  body:has(#printable-report) > #root > div > header,
+  body:has(#printable-report) > #root > div > nav,
+  body:has(#printable-rx) > #root > div > main,
+  body:has(#printable-rx) > #root > div > header,
+  body:has(#printable-rx) > #root > div > nav,
+  body:has(#printable-ecg) > #root > div > main,
+  body:has(#printable-ecg) > #root > div > header,
+  body:has(#printable-ecg) > #root > div > nav,
+  body:has(#printable-xray) > #root > div > main,
+  body:has(#printable-xray) > #root > div > header,
+  body:has(#printable-xray) > #root > div > nav,
+  body:has(#printable-usg) > #root > div > main,
+  body:has(#printable-usg) > #root > div > header,
+  body:has(#printable-usg) > #root > div > nav,
+  body:has(#financial-printable) > #root > div > main,
+  body:has(#financial-printable) > #root > div > header,
+  body:has(#financial-printable) > #root > div > nav {
+    display: none !important;
+  }
+
+  /* 4. Modal Overlays & Backdrop Unfurling */
+  .fixed.inset-0 {
+    position: static !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    max-height: none !important;
+    width: 100% !important;
+    height: auto !important;
+    display: block !important;
+  }
+
+  .fixed.inset-0 > div {
+    max-height: none !important;
+    overflow: visible !important;
+    box-shadow: none !important;
+    border: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+  }
+
+  /* 5. Flexbox & Grid Preservation */
+  .flex,
+  [class*="flex"] {
+    display: flex !important;
+  }
+  .inline-flex {
+    display: inline-flex !important;
+  }
+  .grid,
+  [class*="grid"] {
+    display: grid !important;
+  }
+  .block {
+    display: block !important;
+  }
+  .inline-block {
+    display: inline-block !important;
+  }
+
+  .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)) !important; }
+  .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+  .grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
+  .grid-cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)) !important; }
+  .grid-cols-6 { grid-template-columns: repeat(6, minmax(0, 1fr)) !important; }
+  .grid-cols-12 { grid-template-columns: repeat(12, minmax(0, 1fr)) !important; }
+
+  .col-span-1 { grid-column: span 1 / span 1 !important; }
+  .col-span-2 { grid-column: span 2 / span 2 !important; }
+  .col-span-3 { grid-column: span 3 / span 3 !important; }
+  .col-span-4 { grid-column: span 4 / span 4 !important; }
+  .col-span-5 { grid-column: span 5 / span 5 !important; }
+  .col-span-6 { grid-column: span 6 / span 6 !important; }
+  .col-span-8 { grid-column: span 8 / span 8 !important; }
+  .col-span-12 { grid-column: span 12 / span 12 !important; }
+
+  .justify-between { justify-content: space-between !important; }
+  .justify-center { justify-content: center !important; }
+  .justify-end { justify-content: flex-end !important; }
+  .items-center { align-items: center !important; }
+  .items-end { align-items: flex-end !important; }
+  .items-start { align-items: flex-start !important; }
+
+  /* 6. Table Layout & Repeating Headers */
+  table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+  }
+  thead {
+    display: table-header-group !important;
+  }
+  tfoot {
+    display: table-footer-group !important;
+  }
+  tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+  th,
+  td {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* 7. Document Containers Layout */
+  #printable-receipt {
+    width: 100% !important;
+    max-width: 210mm !important;
+    margin: 0 auto !important;
+    padding: 6mm 8mm !important;
+    display: block !important;
+    position: relative !important;
+    overflow: visible !important;
+    background: #ffffff !important;
+    box-sizing: border-box !important;
+  }
+
+  #printable-rx {
+    width: 100% !important;
+    max-width: 210mm !important;
+    min-height: 290mm !important;
+    margin: 0 auto !important;
+    padding: 8mm 10mm !important;
+    display: block !important;
+    position: relative !important;
+    background: #ffffff !important;
+    box-sizing: border-box !important;
+  }
+
+  #printable-ecg,
+  #printable-xray,
+  #printable-usg,
+  #financial-printable {
+    width: 100% !important;
+    max-width: 210mm !important;
+    margin: 0 auto !important;
+    padding: 8mm 10mm !important;
+    display: block !important;
+    position: relative !important;
+    background: #ffffff !important;
+    box-sizing: border-box !important;
+  }
+
+  #printable-report {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: block !important;
+    position: static !important;
+    overflow: visible !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  /* 8. Multi-page Pathology Report Sheets - Exact A4 fit (297mm - 20mm margin) */
+  .report-page-sheet {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: calc(297mm - 20mm) !important;
+    box-sizing: border-box !important;
+    page-break-after: always !important;
+    break-after: page !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #ffffff !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+  }
+
+  .report-page-sheet:last-child {
+    page-break-after: auto !important;
+    break-after: auto !important;
+  }
+
+  /* Prevent unwanted page cuts on sub-sections */
+  .report-header-section,
+  .patient-details-box,
+  .department-banner,
+  .results-table-container,
+  .comments-box,
+  .signatures-section,
+  .report-footer-section {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .patient-details-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+
+  .signatures-row {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: flex-end !important;
+    margin-top: auto !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* 9. Master Report Table: Fixed thead (Header) & Fixed tfoot (Signatures & Footer on Every Page) */
+  .report-master-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    border-spacing: 0 !important;
+    table-layout: fixed !important;
+  }
+
+  .report-master-table > thead {
+    display: table-header-group !important;
+  }
+
+  .report-master-table > tfoot {
+    display: table-footer-group !important;
+  }
+
+  .report-master-table > tbody {
+    display: table-row-group !important;
+  }
+
+  .report-master-table tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .report-master-table th,
+  .report-master-table td {
+    padding: 0 !important;
+    border: none !important;
+  }
+}
