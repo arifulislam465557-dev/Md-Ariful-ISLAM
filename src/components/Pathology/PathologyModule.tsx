@@ -97,21 +97,23 @@ export const PathologyModule: React.FC = () => {
   // Top-level view mode: Lab Worklist & Report Entry vs Admin Test Master & Template Designer
   const [moduleMode, setModuleMode] = useState<'worklist' | 'testMaster'>('worklist');
 
+  const savedDraft = activeDrafts?.pathologyFormDraft;
+
   // Active patient record tracking (supports multiple reports/accessions per PID)
-  const [activeRecordId, setActiveRecordId] = useState<string | null>(null);
-  const [accessionNo, setAccessionNo] = useState<string>(() => `ACC-${Date.now().toString().slice(-6)}`);
-  const [invoiceNo, setInvoiceNo] = useState<string>('');
-  const [billDate, setBillDate] = useState<string>(() => getTodayDateStr(false));
-  const [patientId, setPatientId] = useState('');
-  const [patientName, setPatientName] = useState('');
-  const [age, setAge] = useState('');
-  const [dob, setDob] = useState('');
-  const [sex, setSex] = useState<'Male' | 'Female' | 'Other' | ''>('');
+  const [activeRecordId, setActiveRecordId] = useState<string | null>(() => savedDraft?.activeRecordId || null);
+  const [accessionNo, setAccessionNo] = useState<string>(() => savedDraft?.accessionNo || `ACC-${Date.now().toString().slice(-6)}`);
+  const [invoiceNo, setInvoiceNo] = useState<string>(() => savedDraft?.invoiceNo || '');
+  const [billDate, setBillDate] = useState<string>(() => savedDraft?.billDate || getTodayDateStr(false));
+  const [patientId, setPatientId] = useState(() => savedDraft?.patientId || '');
+  const [patientName, setPatientName] = useState(() => savedDraft?.patientName || '');
+  const [age, setAge] = useState(() => savedDraft?.age || '');
+  const [dob, setDob] = useState(() => savedDraft?.dob || '');
+  const [sex, setSex] = useState<'Male' | 'Female' | 'Other' | ''>(() => savedDraft?.sex || '');
   const [pregnancyStatus, setPregnancyStatus] = useState<
     'Not Applicable' | 'Non-Pregnant' | 'Pregnant (1st Trimester)' | 'Pregnant (2nd Trimester)' | 'Pregnant (3rd Trimester)'
-  >('Non-Pregnant');
-  const [drCode, setDrCode] = useState('');
-  const [drCodeInput, setDrCodeInput] = useState<string>('');
+  >(() => savedDraft?.pregnancyStatus || 'Non-Pregnant');
+  const [drCode, setDrCode] = useState(() => savedDraft?.drCode || '');
+  const [drCodeInput, setDrCodeInput] = useState<string>(() => savedDraft?.drCode || '');
 
   // Keep drCodeInput synced whenever drCode changes (e.g. loaded from patient/invoice or reset)
   useEffect(() => {
@@ -187,9 +189,9 @@ export const PathologyModule: React.FC = () => {
 
   const [releasedBy, setReleasedBy] = useState<string>('');
   const [labDisclaimer, setLabDisclaimer] = useState<string>(DEFAULT_DISCLAIMER);
-  const [comments, setComments] = useState('');
+  const [comments, setComments] = useState(() => savedDraft?.comments || '');
   const [autoPrint, setAutoPrint] = useState(true);
-  const [testResults, setTestResults] = useState<TestResultItem[]>([]);
+  const [testResults, setTestResults] = useState<TestResultItem[]>(() => savedDraft?.testResults || []);
 
   // Clinical Safety & Audit Trail state
   const [correctionReason, setCorrectionReason] = useState('');
@@ -459,41 +461,6 @@ export const PathologyModule: React.FC = () => {
           comments,
           testResults,
         });
-      } else if (patientName.trim().length >= 2) {
-        // Automatically create permanent patient record so it immediately appears in the recent list and is permanently saved!
-        if (!patientId.trim()) {
-          setPatientId(effectivePid);
-        }
-        const created = addPatient({
-          pId: effectivePid,
-          accessionNo: accessionNo || `ACC-${Date.now().toString().slice(-6)}`,
-          invoiceNo: invoiceNo || undefined,
-          invDate: billDate || getTodayDateStr(false),
-          billDate: billDate || getTodayDateStr(false),
-          patientName: effectiveName,
-          age: age || 'N/A',
-          dob: dob || undefined,
-          sex: safeSex,
-          pregnancyStatus,
-          drCode: drCode || 'N/A',
-          drName: matchedDoctor?.name || drCode || 'N/A',
-          status: 'Pending',
-          workflowStatus: workflowStatus || 'Sample Collected',
-          department: 'Pathology',
-          sampleType,
-          sampleCollectionTime: sampleCollectionTime || `${billDate || getTodayDateStr(false)} 09:00 AM`,
-          sampleReceivedTime: sampleReceivedTime || `${billDate || getTodayDateStr(false)} 09:30 AM`,
-          reportDateTime: reportDateTime || nowStr,
-          technicallyValidatedBy: technicallyValidatedBy || clinicConfig.labInCharge,
-          verifiedBy: verifiedBy || undefined,
-          releasedBy: releasedBy || undefined,
-          labDisclaimer,
-          hasCriticalResult: criticalItems.length > 0,
-          comments,
-          autoPrint,
-          testResults,
-        });
-        setActiveRecordId(created.id);
       }
     }, 500);
 
@@ -568,27 +535,51 @@ export const PathologyModule: React.FC = () => {
   };
 
   /**
-   * Lookup by Patient ID, Invoice No, or Accession No.
+   * Lookup by Patient ID, Patient Name, Invoice No, or Accession No.
    */
   const lookupAndFillPatient = (targetQuery: string, silent: boolean = false, targetInvoiceNo?: string) => {
     const cleanQuery = targetQuery.trim();
     if (!cleanQuery) return false;
 
+    const lowerQuery = cleanQuery.toLowerCase();
+    const cleanDigits = cleanQuery.replace(/\D/g, '');
+
     const foundInvoice = targetInvoiceNo
       ? invoices.find((i) => i.invoiceNo.toLowerCase() === targetInvoiceNo.toLowerCase())
-      : invoices.find(
-          (i) =>
-            i.pId.toLowerCase() === cleanQuery.toLowerCase() ||
-            i.invoiceNo.toLowerCase() === cleanQuery.toLowerCase()
-        );
+      : invoices.find((i) => {
+          const invClean = (i.invoiceNo || '').toLowerCase();
+          const pIdClean = (i.pId || '').toLowerCase();
+          const nameClean = (i.patientName || '').toLowerCase();
+          const phoneClean = (i.phone || '').replace(/\D/g, '');
+          return (
+            invClean === lowerQuery ||
+            invClean.replace(/^inv-/, '') === lowerQuery ||
+            pIdClean === lowerQuery ||
+            nameClean === lowerQuery ||
+            (lowerQuery.length >= 2 && nameClean.includes(lowerQuery)) ||
+            (cleanDigits.length >= 4 && (pIdClean.includes(cleanDigits) || phoneClean.includes(cleanDigits)))
+          );
+        });
 
     const foundPatient = targetInvoiceNo
       ? patients.find((p) => p.invoiceNo?.toLowerCase() === targetInvoiceNo.toLowerCase())
-      : patients.find(
-          (p) =>
-            p.pId.toLowerCase() === cleanQuery.toLowerCase() ||
-            (p.accessionNo && p.accessionNo.toLowerCase() === cleanQuery.toLowerCase())
-        );
+      : patients.find((p) => {
+          const pIdClean = (p.pId || '').toLowerCase();
+          const accClean = (p.accessionNo || '').toLowerCase();
+          const invClean = (p.invoiceNo || '').toLowerCase();
+          const nameClean = (p.patientName || '').toLowerCase();
+          const phoneClean = (p.phone || '').replace(/\D/g, '');
+          return (
+            pIdClean === lowerQuery ||
+            accClean === lowerQuery ||
+            accClean.replace(/^acc-/, '') === lowerQuery ||
+            invClean === lowerQuery ||
+            invClean.replace(/^inv-/, '') === lowerQuery ||
+            nameClean === lowerQuery ||
+            (lowerQuery.length >= 2 && nameClean.includes(lowerQuery)) ||
+            (cleanDigits.length >= 4 && (pIdClean.includes(cleanDigits) || phoneClean.includes(cleanDigits)))
+          );
+        });
 
     if (foundInvoice) {
       const nowTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -652,11 +643,11 @@ export const PathologyModule: React.FC = () => {
   const handlePatientIdChange = (val: string) => {
     setPatientId(val);
     const trimmed = val.trim();
-    if (trimmed.length >= 3) {
+    if (trimmed.length >= 4 && !patientName.trim()) {
       const matchP = patients.find((p) => p.pId.toLowerCase() === trimmed.toLowerCase());
       const matchI = invoices.find((i) => i.pId.toLowerCase() === trimmed.toLowerCase());
       if (matchP || matchI) {
-        lookupAndFillPatient(trimmed, false);
+        lookupAndFillPatient(trimmed, true);
       }
     }
   };
@@ -698,6 +689,7 @@ export const PathologyModule: React.FC = () => {
     setCriticalNotifiedTo('');
     setTestResults([]);
     setTestSearchInput('');
+    updateModuleDraft('pathologyFormDraft', null);
     showToast(
       lang === 'bn'
         ? `ফর্ম ক্লিয়ার হয়েছে এবং নতুন অ্যাকসেশন নম্বর সেট হয়েছে`

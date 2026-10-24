@@ -48,16 +48,19 @@ export const BillingModule: React.FC = () => {
     printLogs,
     addNotification,
     openPatientOverviewModal,
+    activeDrafts,
     updateModuleDraft,
   } = useApp();
 
-  const [pId, setPId] = useState(`26100${Math.floor(100 + Math.random() * 900)}`);
-  const [billDate, setBillDate] = useState<string>(() => getTodayDateStr(true));
-  const [patientName, setPatientName] = useState('');
-  const [age, setAge] = useState('');
-  const [sex, setSex] = useState<'Male' | 'Female' | 'Other'>('Female');
-  const [phone, setPhone] = useState('+880 17');
-  const [drCode, setDrCode] = useState('DR01');
+  const savedDraft = activeDrafts?.billingFormDraft;
+
+  const [pId, setPId] = useState(() => savedDraft?.pId || `26100${Math.floor(100 + Math.random() * 900)}`);
+  const [billDate, setBillDate] = useState<string>(() => savedDraft?.billDate || getTodayDateStr(true));
+  const [patientName, setPatientName] = useState(() => savedDraft?.patientName || '');
+  const [age, setAge] = useState(() => savedDraft?.age || '');
+  const [sex, setSex] = useState<'Male' | 'Female' | 'Other'>(() => savedDraft?.sex || 'Female');
+  const [phone, setPhone] = useState(() => savedDraft?.phone || '+880 17');
+  const [drCode, setDrCode] = useState(() => savedDraft?.drCode || 'DR01');
 
   // Doctor search & registration state
   const [showDoctorModal, setShowDoctorModal] = useState(false);
@@ -410,6 +413,7 @@ export const BillingModule: React.FC = () => {
     setDiscountFlat(0);
     setDiscountBy('');
     setPaidAmount(0);
+    updateModuleDraft('billingFormDraft', null);
   };
 
   const filteredInvoices = invoices.filter(
@@ -513,7 +517,7 @@ export const BillingModule: React.FC = () => {
                   type="text"
                   value={patientName}
                   onChange={(e) => setPatientName(e.target.value)}
-                  placeholder="e.g. Titly"
+                  placeholder={lang === 'bn' ? 'যেমন: রোগীর নাম (Ex: Patient Name)' : 'Ex: Patient Name'}
                   className="w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 p-2 rounded text-xs font-semibold focus:outline-none"
                 />
               </div>
@@ -536,7 +540,7 @@ export const BillingModule: React.FC = () => {
                   type="text"
                   value={age}
                   onChange={(e) => setAge(e.target.value)}
-                  placeholder="24 Y"
+                  placeholder="Ex: 24 Y"
                   className="w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 p-2 rounded text-xs focus:outline-none"
                 />
               </div>

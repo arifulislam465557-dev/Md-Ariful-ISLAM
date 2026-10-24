@@ -1760,63 +1760,82 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const formattedTests = convertInvoiceItemsToTestResults(newInv.items, labTests, newInv.sex, newInv.age);
     const accessionNo = `ACC-${newInv.invoiceNo ? newInv.invoiceNo.replace(/^INV-/i, '') : Date.now().toString().slice(-6)}`;
 
-    if (formattedTests.length > 0) {
-      setPatients((prev) => {
-        // Match only if there is an uncompleted Pending order without another invoiceNo
-        const existingPendingIdx = prev.findIndex(
-          (p) =>
-            p.pId === newInv.pId &&
-            p.status === 'Pending' &&
-            (!p.invoiceNo || p.invoiceNo === newInv.invoiceNo) &&
-            (!p.workflowStatus || p.workflowStatus === 'Pending')
-        );
-        if (existingPendingIdx >= 0) {
-          const existing = prev[existingPendingIdx];
-          const updated = [...prev];
-          updated[existingPendingIdx] = {
-            ...existing,
-            accessionNo: existing.accessionNo || accessionNo,
-            invoiceNo: newInv.invoiceNo,
-            patientName: newInv.patientName || existing.patientName,
-            age: newInv.age || existing.age,
-            sex: newInv.sex || existing.sex,
-            drCode: newInv.drCode || existing.drCode,
-            drName: newInv.drName || existing.drName,
-            billDate: newInv.date || existing.billDate,
-            phone: newInv.phone || existing.phone,
-            workflowStatus: existing.workflowStatus || 'Pending',
-            testResults:
-              existing.testResults && existing.testResults.length > 0 && existing.testResults.some((r) => r.result.trim())
-                ? existing.testResults
-                : formattedTests,
-          };
-          return updated;
-        } else {
-          // Separate Accession / Order record (supports repeat orders for same patient or same test)
-          const newPat: Patient = {
-            id: `pat-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-            pId: newInv.pId,
-            accessionNo,
-            invoiceNo: newInv.invoiceNo,
-            invDate: newInv.date,
-            billDate: newInv.date,
-            patientName: newInv.patientName,
-            age: newInv.age,
-            sex: newInv.sex,
-            phone: newInv.phone,
-            drCode: newInv.drCode,
-            drName: newInv.drName,
-            status: 'Pending',
-            workflowStatus: 'Pending',
-            department: 'Pathology',
-            testResults: formattedTests,
-            autoPrint: true,
-            createdAt: new Date().toISOString(),
-          };
-          return [newPat, ...prev];
-        }
-      });
-    }
+    const fallbackTests: TestResultItem[] =
+      newInv.items && newInv.items.length > 0
+        ? newInv.items.map((it) => ({
+            testName: it.testName || (it as any).name || 'Lab Investigation',
+            result: '',
+            unit: '',
+            normalRange: '',
+            status: 'Normal' as const,
+            inputType: 'text' as const,
+          }))
+        : [
+            {
+              testName: 'General Investigation',
+              result: '',
+              unit: '',
+              normalRange: '',
+              status: 'Normal' as const,
+              inputType: 'text' as const,
+            },
+          ];
+
+    const effectiveTests = formattedTests.length > 0 ? formattedTests : fallbackTests;
+
+    setPatients((prev) => {
+      // Match only if there is an uncompleted Pending order with same PID or invoiceNo
+      const existingPendingIdx = prev.findIndex(
+        (p) =>
+          (p.pId === newInv.pId && (!p.invoiceNo || p.invoiceNo === newInv.invoiceNo)) ||
+          (p.invoiceNo && p.invoiceNo === newInv.invoiceNo)
+      );
+      if (existingPendingIdx >= 0) {
+        const existing = prev[existingPendingIdx];
+        const updated = [...prev];
+        updated[existingPendingIdx] = {
+          ...existing,
+          accessionNo: existing.accessionNo || accessionNo,
+          invoiceNo: newInv.invoiceNo,
+          patientName: newInv.patientName || existing.patientName,
+          age: newInv.age || existing.age,
+          sex: newInv.sex || existing.sex,
+          drCode: newInv.drCode || existing.drCode,
+          drName: newInv.drName || existing.drName,
+          billDate: newInv.date || existing.billDate,
+          phone: newInv.phone || existing.phone,
+          workflowStatus: existing.workflowStatus || 'Pending',
+          testResults:
+            existing.testResults && existing.testResults.length > 0 && existing.testResults.some((r) => r.result.trim())
+              ? existing.testResults
+              : effectiveTests,
+        };
+        return updated;
+      } else {
+        // Unconditionally create separate Accession / Order record for Lab Worklist & Pathology
+        const newPat: Patient = {
+          id: `pat-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+          pId: newInv.pId,
+          accessionNo,
+          invoiceNo: newInv.invoiceNo,
+          invDate: newInv.date,
+          billDate: newInv.date,
+          patientName: newInv.patientName,
+          age: newInv.age,
+          sex: newInv.sex,
+          phone: newInv.phone,
+          drCode: newInv.drCode,
+          drName: newInv.drName,
+          status: 'Pending',
+          workflowStatus: 'Pending',
+          department: 'Pathology',
+          testResults: effectiveTests,
+          autoPrint: true,
+          createdAt: new Date().toISOString(),
+        };
+        return [newPat, ...prev];
+      }
+    });
 
     addNotification('Payment Recorded', `Invoice ${newInv.invoiceNo} issued for ৳${newInv.paidAmount}. Tests sent to Pathology.`, 'success');
     addLog('info', `Invoice ${newInv.invoiceNo} created for ${newInv.patientName}. Formatted tests queued for Pathology.`, 'Billing');
@@ -2656,11 +2675,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const getActorHeaders = useCallback(
     (overrideRole?: string): Record<string, string> => {
       const activeWs = workstations.find((w) => w.id === currentWorkstationId) || workstations[0];
+      const rawFullName = currentUser?.fullName || 'Hospital Staff';
+      const safeFullName = encodeURIComponent(rawFullName);
+      const safeUsername = encodeURIComponent(currentUser?.username || 'guest');
       return {
         'Content-Type': 'application/json',
         'x-actor-id': currentUser?.id || 'usr-guest',
-        'x-actor-username': currentUser?.username || 'guest',
-        'x-actor-fullname': currentUser?.fullName || 'Hospital Staff',
+        'x-actor-username': safeUsername,
+        'x-actor-fullname': safeFullName,
         'x-actor-role': overrideRole || currentUser?.role || 'Staff',
         'x-workstation-code': activeWs?.terminalCode || 'PC-01',
       };
@@ -2722,10 +2744,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         autoSaveTimerRef.current = null;
       }
 
+      const activeWs = workstations.find((w) => w.id === currentWorkstationId) || workstations[0];
       const mutationPayload = {
         mutationId: `mut-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
         clientVersion: dbVersion,
         reason,
+        actor: {
+          id: currentUser?.id || 'usr-guest',
+          username: currentUser?.username || 'guest',
+          fullName: currentUser?.fullName || 'Hospital Staff',
+          role: currentUser?.role || 'Staff',
+          workstationCode: activeWs?.terminalCode || 'PC-01',
+        },
         collections: buildPermanentCollectionsPayload(),
         activeDrafts,
       };

@@ -773,11 +773,23 @@ interface ActorIdentity {
   ipAddress: string;
 }
 
+function safeDecodeHeader(val: string | string[] | undefined): string | undefined {
+  if (!val) return undefined;
+  const str = Array.isArray(val) ? val[0] : val;
+  try {
+    return decodeURIComponent(str);
+  } catch {
+    return str;
+  }
+}
+
 function extractActorFromRequest(req: express.Request): ActorIdentity {
   const bodyActor = req.body?.actor || {};
   const id = String(req.headers['x-actor-id'] || bodyActor.id || 'unknown');
-  const username = String(req.headers['x-actor-username'] || bodyActor.username || 'unknown');
-  const fullName = String(req.headers['x-actor-fullname'] || bodyActor.fullName || username || 'Unknown User');
+  const decodedUser = safeDecodeHeader(req.headers['x-actor-username']);
+  const username = String(bodyActor.username || decodedUser || 'unknown');
+  const decodedFull = safeDecodeHeader(req.headers['x-actor-fullname']);
+  const fullName = String(bodyActor.fullName || decodedFull || username || 'Unknown User');
   const role = String(req.headers['x-actor-role'] || bodyActor.role || 'Staff');
   const workstationCode = String(req.headers['x-workstation-code'] || bodyActor.workstationCode || 'PC-01');
   const ipAddress = String(req.headers['x-forwarded-for'] || req.socket.remoteAddress || '192.168.1.101');
