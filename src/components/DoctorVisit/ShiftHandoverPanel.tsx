@@ -58,6 +58,7 @@ export const ShiftHandoverPanel: React.FC<ShiftHandoverPanelProps> = ({
     openPatientOverviewModal,
     currentUser,
     patients,
+    addNotification,
   } = useApp();
 
   // Filters & Search

@@ -1,6 +1,6 @@
 {
-  "name": "Remix Adiba-Manajment-Apps",
-  "description": "Imported from GitHub: arifulislam465557-dev/Adiba-Manajment-Apps",
+  "name": "Adiba Hospital Management Software - PC & Mobile App",
+  "description": "Comprehensive clinical management system with Pathology reporting, Billing, Doctor OPD, ECG, X-Ray, Ultrasound, customizable Settings, and Doctor Web Portal in Bengali & English.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

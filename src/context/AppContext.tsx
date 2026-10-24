@@ -2450,7 +2450,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       entityLabel: 'ডাক্তার শিফট হ্যান্ডওভার (Shift Handover)',
       recordId: target.id,
       recordTitle: `${target.shiftType} Shift — Dr. ${target.outgoingDoctorName}`,
-      recordSubtitle: `Date: ${target.date} · Patients: ${target.patientHandovers?.length || 0}`,
+      recordSubtitle: `Date: ${target.shiftDate || target.date || ''} · Patients: ${target.patientHandovers?.length || 0}`,
       originalData: target,
     });
   };
@@ -2918,11 +2918,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const updateModuleDraft = useCallback(
     (moduleKey: keyof ActiveModuleDrafts, draftData: Record<string, any> | null) => {
       setActiveDrafts((prev) => {
-        const next = { ...prev };
+        const next: ActiveModuleDrafts = { ...prev };
         if (draftData === null) {
-          delete next[moduleKey];
+          delete (next as any)[moduleKey];
         } else {
-          next[moduleKey] = {
+          (next as any)[moduleKey] = {
             ...draftData,
             isDraft: true,
             savedAt: new Date().toISOString(),

@@ -333,6 +333,7 @@ export interface ShiftHandoverNote {
   acknowledgementNotes?: string;
   createdAt: string;
   updatedAt?: string;
+  date?: string;
 }
 
 export interface EcgReport {
@@ -837,10 +838,29 @@ export interface ActiveModuleDrafts {
   ecgFormDraft?: Record<string, any>;
   xrayFormDraft?: Record<string, any>;
   usgFormDraft?: Record<string, any>;
+  ecgDraft?: Record<string, any>;
+  xrayDraft?: Record<string, any>;
+  usgDraft?: Record<string, any>;
   employeeFormDraft?: Record<string, any>;
   expenseFormDraft?: Record<string, any>;
   settingsFormDraft?: Record<string, any>;
   updatedAt?: string;
   updatedBy?: string;
 }
+
+export type DraftModuleKey =
+  | 'pathologyFormDraft'
+  | 'billingFormDraft'
+  | 'doctorVisitDraft'
+  | 'doctorPortalDraft'
+  | 'ecgFormDraft'
+  | 'xrayFormDraft'
+  | 'usgFormDraft'
+  | 'ecgDraft'
+  | 'xrayDraft'
+  | 'usgDraft'
+  | 'employeeFormDraft'
+  | 'expenseFormDraft'
+  | 'settingsFormDraft';
+
 

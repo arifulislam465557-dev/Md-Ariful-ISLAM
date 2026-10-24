@@ -824,7 +824,7 @@ function verifyAdminActor(
       action: 'UNAUTHORIZED_DELETE_ATTEMPT',
       actor: `${actor.fullName} (${effectiveRole})`,
       destination: 'Hospital Permanent DB',
-      status: 'Failed',
+      status: 'Warning',
       details: unauthorizedAudit.details,
     });
     savePermanentDb();
