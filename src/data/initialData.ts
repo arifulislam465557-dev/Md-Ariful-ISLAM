@@ -68,6 +68,16 @@ export const initialDoctors = [
     "phone": "+880 1700-000000",
     "roomNo": "Lab Counter",
     "fee": 0
+  },
+  {
+    "id": "doc-6",
+    "code": "DR06",
+    "name": "Dr. G.M. Anamul Haque",
+    "degree": "MBBS(SSMC); BCS (Health)",
+    "specialty": "Medical Officer",
+    "phone": "+880 1715-998877",
+    "roomNo": "105",
+    "fee": 600
   }
 ];
 

@@ -2618,6 +2618,30 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
+    localStorage.setItem(`${PREFIX}patients`, JSON.stringify(patients));
+  }, [patients]);
+
+  useEffect(() => {
+    localStorage.setItem(`${PREFIX}invoices`, JSON.stringify(invoices));
+  }, [invoices]);
+
+  useEffect(() => {
+    localStorage.setItem(`${PREFIX}doctors`, JSON.stringify(doctors));
+  }, [doctors]);
+
+  useEffect(() => {
+    localStorage.setItem(`${PREFIX}tests`, JSON.stringify(labTests));
+  }, [labTests]);
+
+  useEffect(() => {
+    localStorage.setItem(`${PREFIX}rx`, JSON.stringify(prescriptions));
+  }, [prescriptions]);
+
+  useEffect(() => {
+    localStorage.setItem(`${PREFIX}config`, JSON.stringify(clinicConfig));
+  }, [clinicConfig]);
+
+  useEffect(() => {
     localStorage.setItem(`${PREFIX}trash_records`, JSON.stringify(trashRecords));
   }, [trashRecords]);
 

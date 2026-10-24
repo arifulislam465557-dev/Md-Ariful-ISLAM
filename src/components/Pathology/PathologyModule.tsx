@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useApp } from '../../context/AppContext';
 import {
   Patient,
@@ -38,6 +38,7 @@ import {
   Sparkles,
   FileCheck2,
   Activity,
+  ChevronDown,
 } from 'lucide-react';
 import {
   classifyTestItem,
@@ -110,7 +111,7 @@ export const PathologyModule: React.FC = () => {
     'Not Applicable' | 'Non-Pregnant' | 'Pregnant (1st Trimester)' | 'Pregnant (2nd Trimester)' | 'Pregnant (3rd Trimester)'
   >('Non-Pregnant');
   const [drCode, setDrCode] = useState('');
-  const [sampleType, setSampleType] = useState('EDTA Whole Blood / Serum');
+  const [sampleType, setSampleType] = useState('Whole Blood');
   const [sampleCollectionTime, setSampleCollectionTime] = useState<string>('');
   const [sampleReceivedTime, setSampleReceivedTime] = useState<string>('');
   const [reportDateTime, setReportDateTime] = useState<string>('');
@@ -160,6 +161,114 @@ export const PathologyModule: React.FC = () => {
 
   // Sidebar tab
   const [sidebarTab, setSidebarTab] = useState<'receptionQueue' | 'savedReports'>('receptionQueue');
+
+  // Quick Select & Saved Patients Live Unified Queue state
+  const [recentFilter, setRecentFilter] = useState<'all' | 'pathology' | 'billing'>('all');
+  const [recentSearch, setRecentSearch] = useState<string>('');
+  const [isBilledDropdownOpen, setIsBilledDropdownOpen] = useState(false);
+  const billedDropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (billedDropdownRef.current && !billedDropdownRef.current.contains(event.target as Node)) {
+        setIsBilledDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // Unified list of all Pathology saved/auto-saved patients + Billing invoices
+  const unifiedRecentPatients = useMemo(() => {
+    type RecentEntry = {
+      id: string;
+      pId: string;
+      patientName: string;
+      age?: string;
+      sex?: string;
+      invoiceNo?: string;
+      accessionNo?: string;
+      source: 'pathology' | 'billing';
+      testsCount: number;
+      workflowStatus: string;
+      date: string;
+      rawPatient?: Patient;
+      rawInvoice?: (typeof invoices)[0];
+    };
+
+    const list: RecentEntry[] = [];
+    const seenInvs = new Set<string>();
+
+    // 1. All saved patients in Pathology (sorted newest first)
+    patients.forEach((p) => {
+      const invKey = (p.invoiceNo || '').trim().toLowerCase();
+      if (invKey) seenInvs.add(invKey);
+
+      list.push({
+        id: `pat-${p.id}`,
+        pId: p.pId,
+        patientName: p.patientName,
+        age: p.age,
+        sex: p.sex,
+        invoiceNo: p.invoiceNo,
+        accessionNo: p.accessionNo,
+        source: 'pathology',
+        testsCount: p.testResults ? p.testResults.length : 0,
+        workflowStatus:
+          p.workflowStatus ||
+          (p.status === 'Printed' ? 'Released' : p.status === 'Completed' ? 'Verified' : 'Pending'),
+        date: p.billDate || p.invDate || '',
+        rawPatient: p,
+      });
+    });
+
+    // 2. All billing invoices not already represented as pathology patients
+    invoices.forEach((inv) => {
+      const invKey = (inv.invoiceNo || '').trim().toLowerCase();
+      const alreadyIncluded = invKey && seenInvs.has(invKey);
+
+      if (!alreadyIncluded) {
+        list.push({
+          id: `inv-${inv.id}`,
+          pId: inv.pId,
+          patientName: inv.patientName,
+          age: inv.age,
+          sex: inv.sex,
+          invoiceNo: inv.invoiceNo,
+          source: 'billing',
+          testsCount: inv.items ? inv.items.length : 0,
+          workflowStatus: 'Billing Counter',
+          date: inv.date || '',
+          rawInvoice: inv,
+        });
+      }
+    });
+
+    return list;
+  }, [patients, invoices]);
+
+  const filteredRecentPatients = useMemo(() => {
+    let result = unifiedRecentPatients;
+    if (recentFilter === 'pathology') {
+      result = result.filter((r) => r.source === 'pathology');
+    } else if (recentFilter === 'billing') {
+      result = result.filter((r) => r.source === 'billing');
+    }
+
+    if (recentSearch.trim()) {
+      const q = recentSearch.trim().toLowerCase();
+      result = result.filter(
+        (r) =>
+          r.patientName.toLowerCase().includes(q) ||
+          r.pId.toLowerCase().includes(q) ||
+          (r.invoiceNo && r.invoiceNo.toLowerCase().includes(q)) ||
+          (r.accessionNo && r.accessionNo.toLowerCase().includes(q))
+      );
+    }
+    return result;
+  }, [unifiedRecentPatients, recentFilter, recentSearch]);
 
   // New Doctor form state for modal
   const [newDocCode, setNewDocCode] = useState(`DR0${doctors.length + 1}`);
@@ -274,15 +383,19 @@ export const PathologyModule: React.FC = () => {
         testResults,
       });
 
+      const effectivePid = patientId.trim() || `P${Date.now().toString().slice(-6)}`;
+      const effectiveName = patientName.trim();
+      const safeSex: 'Male' | 'Female' | 'Other' = (sex as any) || 'Other';
+      const nowStr = `${billDate || getTodayDateStr(false)} ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+
       // If an existing patient record is loaded, auto-save changes directly into permanent patient record
       if (activeRecordId) {
-        const safeSex: 'Male' | 'Female' | 'Other' = (sex as any) || 'Other';
         updatePatient(activeRecordId, {
-          pId: patientId.trim() || 'N/A',
+          pId: patientId.trim() || effectivePid,
           accessionNo,
           invoiceNo: invoiceNo || undefined,
           billDate,
-          patientName: patientName.trim() || 'Patient',
+          patientName: effectiveName || 'Patient',
           age: age || 'N/A',
           dob: dob || undefined,
           sex: safeSex,
@@ -298,6 +411,41 @@ export const PathologyModule: React.FC = () => {
           comments,
           testResults,
         });
+      } else if (patientName.trim().length >= 2) {
+        // Automatically create permanent patient record so it immediately appears in the recent list and is permanently saved!
+        if (!patientId.trim()) {
+          setPatientId(effectivePid);
+        }
+        const created = addPatient({
+          pId: effectivePid,
+          accessionNo: accessionNo || `ACC-${Date.now().toString().slice(-6)}`,
+          invoiceNo: invoiceNo || undefined,
+          invDate: billDate || getTodayDateStr(false),
+          billDate: billDate || getTodayDateStr(false),
+          patientName: effectiveName,
+          age: age || 'N/A',
+          dob: dob || undefined,
+          sex: safeSex,
+          pregnancyStatus,
+          drCode: drCode || 'N/A',
+          drName: matchedDoctor?.name || drCode || 'N/A',
+          status: 'Pending',
+          workflowStatus: workflowStatus || 'Sample Collected',
+          department: 'Pathology',
+          sampleType,
+          sampleCollectionTime: sampleCollectionTime || `${billDate || getTodayDateStr(false)} 09:00 AM`,
+          sampleReceivedTime: sampleReceivedTime || `${billDate || getTodayDateStr(false)} 09:30 AM`,
+          reportDateTime: reportDateTime || nowStr,
+          technicallyValidatedBy: technicallyValidatedBy || clinicConfig.labInCharge,
+          verifiedBy: verifiedBy || undefined,
+          releasedBy: releasedBy || undefined,
+          labDisclaimer,
+          hasCriticalResult: criticalItems.length > 0,
+          comments,
+          autoPrint,
+          testResults,
+        });
+        setActiveRecordId(created.id);
       }
     }, 500);
 
@@ -322,6 +470,16 @@ export const PathologyModule: React.FC = () => {
     labDisclaimer,
     comments,
     testResults,
+    matchedDoctor,
+    clinicConfig.labInCharge,
+    criticalItems.length,
+    autoPrint,
+    sampleCollectionTime,
+    sampleReceivedTime,
+    reportDateTime,
+    addPatient,
+    updatePatient,
+    updateModuleDraft,
   ]);
 
   /**
@@ -397,6 +555,7 @@ export const PathologyModule: React.FC = () => {
       setSex(nextSex);
       setDrCode(foundInvoice.drCode || foundPatient?.drCode || '');
       setBillDate(foundInvoice.date || foundPatient?.billDate || getTodayDateStr(false));
+      setSampleType(foundPatient?.sampleType || 'Whole Blood');
       setSampleCollectionTime(foundPatient?.sampleCollectionTime || `${getTodayDateStr(false)} ${nowTime}`);
       setSampleReceivedTime(foundPatient?.sampleReceivedTime || `${getTodayDateStr(false)} ${nowTime}`);
       setReportDateTime(foundPatient?.reportDateTime || `${getTodayDateStr(false)} ${nowTime}`);
@@ -476,6 +635,7 @@ export const PathologyModule: React.FC = () => {
     setSex('');
     setPregnancyStatus('Non-Pregnant');
     setDrCode('');
+    setSampleType('Whole Blood');
     setComments('');
     setBillDate(today);
     setSampleCollectionTime(`${today} ${nowTime}`);
@@ -511,7 +671,7 @@ export const PathologyModule: React.FC = () => {
     setPregnancyStatus(pat.pregnancyStatus || 'Non-Pregnant');
     setDrCode(pat.drCode);
     setBillDate(pat.billDate || pat.invDate || today);
-    setSampleType(pat.sampleType || 'EDTA Whole Blood / Serum');
+    setSampleType(pat.sampleType || 'Whole Blood');
     setSampleCollectionTime(pat.sampleCollectionTime || `${pat.billDate || today} 09:00 AM`);
     setSampleReceivedTime(pat.sampleReceivedTime || `${pat.billDate || today} 09:30 AM`);
     setReportDateTime(pat.reportDateTime || `${today} ${nowTime}`);
@@ -919,28 +1079,30 @@ export const PathologyModule: React.FC = () => {
     const effectivePid = patientId.trim() || `P${Date.now().toString().slice(-6)}`;
     const name =
       patientName.trim() || (lang === 'bn' ? `রোগী-${effectivePid}` : `Patient-${effectivePid}`);
+    if (!patientName.trim()) setPatientName(name);
+    if (!patientId.trim()) setPatientId(effectivePid);
+
     const safeSex: 'Male' | 'Female' | 'Other' = (sex as any) || 'Other';
     const nowStr = `${getTodayDateStr(false)} ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-    const previewData: Patient = {
-      id: activeRecordId || `preview-${Date.now()}`,
+    const payload: Omit<Patient, 'id'> = {
       pId: effectivePid,
-      accessionNo,
-      invoiceNo,
+      accessionNo: accessionNo || `ACC-${Date.now().toString().slice(-6)}`,
+      invoiceNo: invoiceNo || undefined,
       invDate: billDate || getTodayDateStr(false),
       billDate: billDate || getTodayDateStr(false),
       patientName: name,
       age: age || 'N/A',
-      dob,
+      dob: dob || undefined,
       sex: safeSex,
       pregnancyStatus,
       drCode: drCode || 'N/A',
       drName: matchedDoctor?.name || drCode || 'N/A',
       status: workflowStatus === 'Released' ? 'Printed' : 'Completed',
-      workflowStatus,
+      workflowStatus: workflowStatus === 'Pending' ? 'Result Entered' : workflowStatus,
       department: 'Pathology',
       sampleType,
-      sampleCollectionTime: sampleCollectionTime || `${billDate} 09:00 AM`,
-      sampleReceivedTime: sampleReceivedTime || `${billDate} 09:30 AM`,
+      sampleCollectionTime: sampleCollectionTime || `${billDate || getTodayDateStr(false)} 09:00 AM`,
+      sampleReceivedTime: sampleReceivedTime || `${billDate || getTodayDateStr(false)} 09:30 AM`,
       reportDateTime: reportDateTime || nowStr,
       technicallyValidatedBy: technicallyValidatedBy || clinicConfig.labInCharge,
       verifiedBy: verifiedBy || clinicConfig.pathologistName,
@@ -950,7 +1112,25 @@ export const PathologyModule: React.FC = () => {
       autoPrint,
       testResults,
     };
-    setSelectedPatientForReport(previewData);
+
+    let targetPatient: Patient;
+    const existingIndex = patients.findIndex(
+      (p) =>
+        (activeRecordId && p.id === activeRecordId) ||
+        (accessionNo && p.accessionNo === accessionNo) ||
+        (!activeRecordId && !p.accessionNo && p.pId === effectivePid)
+    );
+
+    if (existingIndex >= 0) {
+      updatePatient(patients[existingIndex].id, payload);
+      targetPatient = { ...patients[existingIndex], ...payload };
+      setActiveRecordId(targetPatient.id);
+    } else {
+      targetPatient = addPatient(payload);
+      setActiveRecordId(targetPatient.id);
+    }
+
+    setSelectedPatientForReport(targetPatient);
   };
 
   const filteredPatients = patients.filter(
@@ -1169,269 +1349,446 @@ export const PathologyModule: React.FC = () => {
                     : 'bg-white border-slate-300 text-slate-900 shadow-2xs'
                 }`}
               >
-                <div className="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center mb-2">
-                  <div className="sm:col-span-2 font-bold text-xs uppercase tracking-wide text-slate-800 dark:text-slate-200">
-                    {t.billDate}
-                  </div>
-                  <div className="sm:col-span-3">
-                    <div className="relative">
-                      <input
-                        type="text"
-                        value={billDate}
-                        onChange={(e) => setBillDate(e.target.value)}
-                        placeholder="DD-MM-YYYY"
-                        className="w-full bg-white dark:bg-slate-800 border-2 border-slate-400 dark:border-slate-600 pl-3 pr-8 py-1.5 rounded-md text-xs font-bold text-slate-950 dark:text-slate-100 focus:ring-2 focus:ring-purple-600 focus:outline-none"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setBillDate(getTodayDateStr(false));
-                          showToast(lang === 'bn' ? 'বিল তারিখ আজকের লাইভ তারিখে আপডেট হয়েছে' : 'Updated to today date');
-                        }}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 text-pink-600 hover:text-purple-800 cursor-pointer"
-                      >
-                        <Clock className="w-3.5 h-3.5" />
-                      </button>
+                {/* Slim Billed / Received Patients Dropdown Selector (Placed directly ABOVE Bill Date) */}
+                <div className="mb-2 pb-2 border-b border-purple-200/80 dark:border-purple-800/60">
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1 shrink-0 text-slate-800 dark:text-slate-200 font-extrabold text-xs uppercase tracking-wide">
+                      <FileText className="w-3.5 h-3.5 text-pink-600" />
+                      <span>{lang === 'bn' ? 'রিসিভ কাটা রোগী:' : 'Billed Patient:'}</span>
+                    </div>
+
+                    <div className="relative flex-1" ref={billedDropdownRef}>
+                      <div className="relative flex items-center">
+                        <input
+                          type="text"
+                          value={
+                            isBilledDropdownOpen
+                              ? recentSearch
+                              : patientName
+                              ? `${patientName} (${invoiceNo ? `রসিদ: #${invoiceNo}` : `ID: #${patientId}`})`
+                              : ''
+                          }
+                          onChange={(e) => {
+                            setRecentSearch(e.target.value);
+                            if (!isBilledDropdownOpen) setIsBilledDropdownOpen(true);
+                          }}
+                          onFocus={() => {
+                            setIsBilledDropdownOpen(true);
+                          }}
+                          onClick={() => {
+                            setIsBilledDropdownOpen(true);
+                          }}
+                          placeholder={
+                            lang === 'bn'
+                              ? `▼ চাপ দিয়ে রিসিভ কাটা রোগী সিলেক্ট করুন (${unifiedRecentPatients.length} জন)...`
+                              : `▼ Click to select billed patient (${unifiedRecentPatients.length})...`
+                          }
+                          className="w-full bg-white dark:bg-slate-800 border-2 border-purple-400 dark:border-purple-600 pl-3 pr-16 py-1 rounded-md text-xs font-bold text-slate-950 dark:text-slate-100 placeholder:text-slate-400 placeholder:font-normal focus:ring-2 focus:ring-purple-600 focus:outline-none cursor-pointer shadow-2xs"
+                        />
+
+                        <div className="absolute right-1.5 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                          {(patientName || recentSearch) && (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setRecentSearch('');
+                                if (patientName) {
+                                  generateNewPatient();
+                                }
+                              }}
+                              className="text-slate-400 hover:text-red-500 text-xs px-1 font-bold cursor-pointer"
+                              title="Clear / Reset"
+                            >
+                              ×
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setIsBilledDropdownOpen((prev) => !prev);
+                            }}
+                            className="p-1 text-purple-700 dark:text-purple-300 hover:text-purple-900 cursor-pointer"
+                          >
+                            <ChevronDown
+                              className={`w-4 h-4 transition-transform duration-150 ${
+                                isBilledDropdownOpen ? 'rotate-180' : ''
+                              }`}
+                            />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Dropdown Menu */}
+                      {isBilledDropdownOpen && (
+                        <div className="absolute left-0 right-0 top-full mt-1 z-50 bg-white dark:bg-slate-900 border-2 border-purple-500 dark:border-purple-600 rounded-lg shadow-xl overflow-hidden max-h-64 overflow-y-auto">
+                          <div className="px-3 py-1 bg-purple-100/80 dark:bg-purple-950/60 border-b border-purple-200 dark:border-purple-800 text-[11px] font-bold text-purple-950 dark:text-purple-200 flex items-center justify-between">
+                            <span>
+                              {lang === 'bn'
+                                ? `রিসিভ কাটা ও সংরক্ষিত মোট: ${unifiedRecentPatients.length} জন`
+                                : `Total Billed & Saved: ${unifiedRecentPatients.length}`}
+                            </span>
+                            <span className="text-[10px] text-slate-500 dark:text-slate-400 font-normal">
+                              {lang === 'bn' ? 'যেকোনো নামের উপর ক্লিক করে লোড করুন' : 'Click any name to load'}
+                            </span>
+                          </div>
+
+                          <div className="divide-y divide-purple-100 dark:divide-slate-800">
+                            {filteredRecentPatients.length === 0 ? (
+                              <div className="p-3 text-center text-xs text-slate-500 dark:text-slate-400 italic">
+                                {lang === 'bn'
+                                  ? 'কোনো রিসিভ কাটা রোগী পাওয়া যায়নি।'
+                                  : 'No matching billed patients found.'}
+                              </div>
+                            ) : (
+                              filteredRecentPatients.map((item) => {
+                                const isSelected =
+                                  (activeRecordId && item.rawPatient && item.rawPatient.id === activeRecordId) ||
+                                  (invoiceNo && item.invoiceNo && item.invoiceNo === invoiceNo) ||
+                                  (patientId && item.pId && item.pId === patientId);
+
+                                return (
+                                  <button
+                                    key={item.id}
+                                    type="button"
+                                    onClick={() => {
+                                      if (item.rawPatient) {
+                                        loadPatient(item.rawPatient);
+                                      } else if (item.rawInvoice) {
+                                        lookupAndFillPatient(item.rawInvoice.pId, false, item.rawInvoice.invoiceNo);
+                                      } else {
+                                        lookupAndFillPatient(item.pId, false, item.invoiceNo);
+                                      }
+                                      setIsBilledDropdownOpen(false);
+                                      setRecentSearch('');
+                                    }}
+                                    className={`w-full text-left px-3 py-1.5 text-xs transition cursor-pointer flex items-center justify-between gap-2 ${
+                                      isSelected
+                                        ? 'bg-purple-100 dark:bg-purple-950/70 text-purple-950 dark:text-purple-100 font-bold'
+                                        : 'hover:bg-purple-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200'
+                                    }`}
+                                  >
+                                    <div className="flex items-center gap-2 truncate">
+                                      <span
+                                        className={`px-1.5 py-0.2 rounded text-[10px] font-mono font-bold shrink-0 ${
+                                          item.source === 'pathology'
+                                            ? 'bg-pink-100 text-pink-800 dark:bg-pink-950 dark:text-pink-300'
+                                            : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+                                        }`}
+                                      >
+                                        {item.source === 'pathology' ? 'প্যাথলজি' : 'রসিদ'}
+                                      </span>
+                                      <span className="font-mono text-[11px] text-purple-800 dark:text-purple-300 shrink-0 font-bold">
+                                        #{item.pId}
+                                      </span>
+                                      <span className="font-black text-slate-950 dark:text-slate-100 truncate">
+                                        {item.patientName}
+                                      </span>
+                                      {item.age && <span className="text-[10px] opacity-75 font-normal">({item.age})</span>}
+                                    </div>
+
+                                    <div className="flex items-center gap-2 shrink-0 text-[10px] text-slate-500 dark:text-slate-400">
+                                      {item.invoiceNo && (
+                                        <span className="font-mono font-semibold text-purple-700 dark:text-purple-300">
+                                          INV-{item.invoiceNo}
+                                        </span>
+                                      )}
+                                      {item.testsCount > 0 && (
+                                        <span className="bg-slate-200 dark:bg-slate-700 px-1.5 py-0.2 rounded font-semibold text-slate-800 dark:text-slate-200">
+                                          {item.testsCount} টেস্ট
+                                        </span>
+                                      )}
+                                      {item.date && <span>{item.date}</span>}
+                                      {isSelected && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />}
+                                    </div>
+                                  </button>
+                                );
+                              })
+                            )}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
-                  <div className="sm:col-span-2 font-bold text-xs uppercase tracking-wide text-slate-800 dark:text-slate-200 flex items-center justify-between">
-                    <span>{t.patientId} *</span>
-                  </div>
-                  <div className="sm:col-span-3">
-                    <div className="relative">
-                      <input
-                        type="text"
-                        value={patientId}
-                        onChange={(e) => handlePatientIdChange(e.target.value)}
-                        onBlur={() => {
-                          if (patientId.trim()) {
-                            lookupAndFillPatient(patientId, true);
-                          }
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            e.preventDefault();
+                </div>
+
+                {/* Main Patient Info Form Grid matching uploaded Reference Image */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2.5 text-xs pt-1">
+                  {/* LEFT COLUMN: ID No, Patient's Name, Specimen, Ref. By */}
+                  <div className="space-y-2.5">
+                    {/* 1. ID No */}
+                    <div className="grid grid-cols-12 gap-2 items-center">
+                      <label className="col-span-4 font-black uppercase text-slate-800 dark:text-slate-200 text-xs tracking-wide">
+                        ID No :
+                      </label>
+                      <div className="col-span-8 flex items-center gap-1.5">
+                        <div className="relative flex-1">
+                          <input
+                            type="text"
+                            value={patientId}
+                            onChange={(e) => handlePatientIdChange(e.target.value)}
+                            onBlur={() => {
+                              if (patientId.trim()) {
+                                lookupAndFillPatient(patientId, true);
+                              }
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                if (patientId.trim()) {
+                                  lookupAndFillPatient(patientId, false);
+                                }
+                              }
+                            }}
+                            placeholder="e.g. 26100489"
+                            className="w-full bg-yellow-100/90 dark:bg-yellow-400/20 border-2 border-slate-400 dark:border-slate-600 px-2.5 py-1.5 rounded-md font-mono font-black text-slate-950 dark:text-slate-100 text-xs focus:ring-2 focus:ring-purple-600 focus:outline-none"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
                             if (patientId.trim()) {
                               lookupAndFillPatient(patientId, false);
+                            } else {
+                              showToast(lang === 'bn' ? 'অনুসন্ধান করতে রোগী আইডি লিখুন' : 'Enter Patient ID to search');
                             }
-                          }
-                        }}
-                        placeholder={lang === 'bn' ? 'রোগী আইডি (যেমন: P2601)' : 'e.g. P2601'}
-                        className="w-full bg-yellow-100 dark:bg-yellow-400/20 text-slate-950 dark:text-slate-100 font-black text-center text-sm tracking-wider border-2 border-slate-500 pl-3 pr-14 py-1.5 rounded-md shadow-inner focus:ring-2 focus:ring-purple-600 focus:outline-none placeholder:text-slate-400 placeholder:text-xs placeholder:font-normal"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (patientId.trim()) {
-                            lookupAndFillPatient(patientId, false);
-                          } else {
-                            showToast(lang === 'bn' ? 'অনুসন্ধান করতে রোগী আইডি লিখুন' : 'Enter Patient ID to search');
-                          }
-                        }}
-                        className="absolute right-1 top-1/2 -translate-y-1/2 px-2 py-0.5 bg-purple-900 hover:bg-purple-800 text-white rounded text-[10px] font-bold transition cursor-pointer shadow-2xs"
-                      >
-                        {lang === 'bn' ? 'খুঁজুন' : 'Load'}
-                      </button>
-                    </div>
-                  </div>
-                  <div className="sm:col-span-2 flex justify-end">
-                    <button
-                      type="button"
-                      onClick={generateNewPatient}
-                      className="w-full px-3 py-2 bg-[#b50f75] hover:bg-[#970c62] text-white font-black rounded-md shadow-md text-xs flex items-center justify-center gap-1.5 transition cursor-pointer active:scale-95"
-                    >
-                      <RotateCcw className="w-3.5 h-3.5" />
-                      <span>{t.refresh}</span>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Quick Select from Billing Invoices */}
-                {invoices.length > 0 && (
-                  <div className="mb-2.5 px-2.5 py-1.5 bg-purple-100/70 dark:bg-purple-950/40 rounded-md border border-purple-300 dark:border-purple-800 flex items-center justify-between gap-2 flex-wrap text-xs">
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="font-bold text-purple-950 dark:text-purple-300 text-[11px] flex items-center gap-1 shrink-0">
-                        <ArrowDownToLine className="w-3.5 h-3.5 text-pink-600" />
-                        <span>{lang === 'bn' ? 'বিলিং থেকে সরাসরি লোড:' : 'Quick Load from Billing:'}</span>
-                      </span>
-                      {invoices.slice(0, 5).map((inv) => (
-                        <button
-                          key={inv.id}
-                          type="button"
-                          onClick={() => lookupAndFillPatient(inv.pId, false, inv.invoiceNo)}
-                          className={`px-2 py-0.5 rounded text-[10px] font-bold border transition cursor-pointer flex items-center gap-1 ${
-                            invoiceNo === inv.invoiceNo || (patientId === inv.pId && !invoiceNo)
-                              ? 'bg-purple-900 text-white border-purple-950 shadow-xs'
-                              : 'bg-white dark:bg-slate-800 text-purple-950 dark:text-purple-200 border-purple-300 hover:bg-purple-200/80'
-                          }`}
-                          title={`${inv.patientName} (${inv.items.map((i) => i.testName).join(', ')})`}
+                          }}
+                          className="px-2.5 py-1.5 bg-purple-900 hover:bg-purple-800 text-white rounded-md text-[11px] font-bold transition cursor-pointer shrink-0 shadow-2xs"
+                          title="Search by ID"
                         >
-                          <span className="font-mono">#{inv.pId}</span>
-                          <span>{inv.patientName}</span>
-                          <span className="text-[9px] opacity-75">({inv.items.length} টেস্ট)</span>
+                          {lang === 'bn' ? 'খুঁজুন' : 'Load'}
                         </button>
-                      ))}
+                        <button
+                          type="button"
+                          onClick={generateNewPatient}
+                          className="p-1.5 bg-[#b50f75] hover:bg-[#970c62] text-white rounded-md text-xs transition cursor-pointer shrink-0 shadow-2xs"
+                          title={lang === 'bn' ? 'নতুন ফর্ম / রিসিভ ক্লিয়ার' : 'New Form / Reset'}
+                        >
+                          <RotateCcw className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
-                    {patientName && (
-                      <span className="text-[10px] text-emerald-800 dark:text-emerald-300 font-bold flex items-center gap-1">
-                        <CheckCheck className="w-3 h-3 text-emerald-600" />
-                        <span>
-                          {lang === 'bn'
-                            ? `রোগী: ${patientName} (${testResults.length}টি প্যারামিটার)`
-                            : `Loaded: ${patientName} (${testResults.length} params)`}
-                        </span>
-                      </span>
-                    )}
-                  </div>
-                )}
 
-                {/* Row 2: Patient Name, Age, Sex, Pregnancy Status */}
-                <div className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center mb-2.5">
-                  <div className="sm:col-span-2 font-bold text-xs uppercase tracking-wide text-slate-800 dark:text-slate-200">
-                    {t.ptName} *
-                  </div>
-                  <div className="sm:col-span-4">
-                    <input
-                      type="text"
-                      value={patientName}
-                      onChange={(e) => handlePatientNameChange(e.target.value)}
-                      placeholder={lang === 'bn' ? 'রোগীর নাম লিখুন...' : 'Enter Patient Name...'}
-                      className="w-full bg-white dark:bg-slate-800 border-2 border-slate-400 dark:border-slate-600 px-3 py-1.5 rounded-md text-xs font-black text-slate-950 dark:text-slate-100 placeholder-slate-400 focus:ring-2 focus:ring-purple-600 focus:outline-none"
-                    />
-                  </div>
-                  <div className="sm:col-span-2">
-                    <input
-                      type="text"
-                      value={age}
-                      onChange={(e) => setAge(e.target.value)}
-                      placeholder={lang === 'bn' ? 'বয়স (যেমন: 28 Y / 6 M)' : 'Age (e.g. 28 Y / 6 M)'}
-                      title="Patient Age (auto-selects Adult or Pediatric reference range)"
-                      className="w-full bg-white dark:bg-slate-800 border-2 border-slate-400 dark:border-slate-600 px-2.5 py-1.5 rounded-md text-xs font-bold text-slate-950 dark:text-slate-100 placeholder-slate-400 focus:ring-2 focus:ring-purple-600 focus:outline-none"
-                    />
-                  </div>
-                  <div className="sm:col-span-2">
-                    <select
-                      value={sex}
-                      onChange={(e) => setSex(e.target.value as any)}
-                      title="Patient Sex (auto-selects Male/Female reference range)"
-                      className="w-full bg-white dark:bg-slate-800 border-2 border-slate-400 dark:border-slate-600 px-2 py-1.5 rounded-md text-xs font-bold text-slate-950 dark:text-slate-100 focus:ring-2 focus:ring-purple-600 focus:outline-none cursor-pointer"
-                    >
-                      <option value="">{lang === 'bn' ? '-- লিঙ্গ --' : '-- Sex --'}</option>
-                      <option value="Female">{lang === 'bn' ? 'মহিলা (Female)' : 'Female'}</option>
-                      <option value="Male">{lang === 'bn' ? 'পুরুষ (Male)' : 'Male'}</option>
-                      <option value="Other">{lang === 'bn' ? 'অন্যান্য' : 'Other'}</option>
-                    </select>
-                  </div>
-                  <div className="sm:col-span-2">
-                    <select
-                      value={pregnancyStatus}
-                      onChange={(e) => setPregnancyStatus(e.target.value as any)}
-                      disabled={sex === 'Male'}
-                      title="Pregnancy Status (adjusts hormone/thyroid/Hb reference ranges)"
-                      className="w-full bg-white dark:bg-slate-800 border-2 border-slate-400 dark:border-slate-600 px-2 py-1.5 rounded-md text-[11px] font-bold text-slate-950 dark:text-slate-100 focus:ring-2 focus:ring-purple-600 focus:outline-none cursor-pointer disabled:opacity-50"
-                    >
-                      <option value="Non-Pregnant">{lang === 'bn' ? 'গর্ভবতী নয়' : 'Non-Pregnant'}</option>
-                      <option value="Pregnant (1st Trimester)">Pregnant (1st Trimester)</option>
-                      <option value="Pregnant (2nd Trimester)">Pregnant (2nd Trimester)</option>
-                      <option value="Pregnant (3rd Trimester)">Pregnant (3rd Trimester)</option>
-                      <option value="Not Applicable">Not Applicable</option>
-                    </select>
-                  </div>
-                </div>
+                    {/* 2. Patient's Name */}
+                    <div className="grid grid-cols-12 gap-2 items-center">
+                      <label className="col-span-4 font-black uppercase text-slate-800 dark:text-slate-200 text-xs tracking-wide">
+                        Patient's Name :
+                      </label>
+                      <div className="col-span-8">
+                        <input
+                          type="text"
+                          value={patientName}
+                          onChange={(e) => handlePatientNameChange(e.target.value)}
+                          placeholder="e.g. Parul"
+                          className="w-full bg-white dark:bg-slate-800 border-2 border-slate-400 dark:border-slate-600 px-3 py-1.5 rounded-md font-black text-slate-950 dark:text-slate-100 text-xs focus:ring-2 focus:ring-purple-600 focus:outline-none"
+                        />
+                      </div>
+                    </div>
 
-                {/* Row 3: Sample Type, Collection Time, Received Time, Accession No */}
-                <div className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center mb-2.5 text-xs">
-                  <div className="sm:col-span-3">
-                    <label className="block text-[10px] font-bold uppercase text-slate-500 dark:text-slate-400 mb-0.5">
-                      {lang === 'bn' ? 'অ্যাকসেশন / রিপোর্ট আইডি' : 'Accession / Report ID'}
-                    </label>
-                    <input
-                      type="text"
-                      value={accessionNo}
-                      onChange={(e) => setAccessionNo(e.target.value)}
-                      className="w-full bg-purple-50 dark:bg-slate-800 border border-purple-300 dark:border-purple-700 px-2.5 py-1 rounded font-mono font-bold text-purple-950 dark:text-purple-200 text-xs"
-                    />
-                  </div>
-                  <div className="sm:col-span-3">
-                    <label className="block text-[10px] font-bold uppercase text-slate-500 dark:text-slate-400 mb-0.5">
-                      {lang === 'bn' ? 'নমুনার ধরন (Sample Type)' : 'Sample Type'}
-                    </label>
-                    <input
-                      type="text"
-                      value={sampleType}
-                      onChange={(e) => setSampleType(e.target.value)}
-                      placeholder="EDTA Whole Blood / Serum"
-                      className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 px-2.5 py-1 rounded font-bold text-xs"
-                    />
-                  </div>
-                  <div className="sm:col-span-3">
-                    <label className="block text-[10px] font-bold uppercase text-slate-500 dark:text-slate-400 mb-0.5">
-                      {lang === 'bn' ? 'নমুনা সংগ্রহের সময়' : 'Sample Collection Time'}
-                    </label>
-                    <input
-                      type="text"
-                      value={sampleCollectionTime}
-                      onChange={(e) => setSampleCollectionTime(e.target.value)}
-                      placeholder="DD-MM-YYYY HH:MM"
-                      className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 px-2.5 py-1 rounded font-mono text-[11px]"
-                    />
-                  </div>
-                  <div className="sm:col-span-3">
-                    <label className="block text-[10px] font-bold uppercase text-slate-500 dark:text-slate-400 mb-0.5">
-                      {lang === 'bn' ? 'ল্যাবে নমুনা গ্রহণের সময়' : 'Sample Received Time'}
-                    </label>
-                    <input
-                      type="text"
-                      value={sampleReceivedTime}
-                      onChange={(e) => setSampleReceivedTime(e.target.value)}
-                      placeholder="DD-MM-YYYY HH:MM"
-                      className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 px-2.5 py-1 rounded font-mono text-[11px]"
-                    />
-                  </div>
-                </div>
+                    {/* 3. Specimen */}
+                    <div className="grid grid-cols-12 gap-2 items-center">
+                      <label className="col-span-4 font-black uppercase text-slate-800 dark:text-slate-200 text-xs tracking-wide">
+                        Specimen :
+                      </label>
+                      <div className="col-span-8 flex items-center gap-1.5">
+                        <input
+                          type="text"
+                          value={sampleType}
+                          onChange={(e) => setSampleType(e.target.value)}
+                          placeholder="Whole Blood / Serum"
+                          className="w-full bg-white dark:bg-slate-800 border-2 border-slate-400 dark:border-slate-600 px-2.5 py-1.5 rounded-md font-bold text-slate-950 dark:text-slate-100 text-xs focus:ring-2 focus:ring-purple-600 focus:outline-none"
+                        />
+                        <select
+                          onChange={(e) => {
+                            if (e.target.value) setSampleType(e.target.value);
+                          }}
+                          value=""
+                          className="bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-[10px] font-bold rounded-md px-1.5 py-1.5 text-slate-700 dark:text-slate-200 cursor-pointer"
+                          title="Quick Specimen Presets"
+                        >
+                          <option value="">▼ Preset</option>
+                          <option value="Whole Blood">Whole Blood</option>
+                          <option value="EDTA Whole Blood">EDTA Whole Blood</option>
+                          <option value="Serum">Serum</option>
+                          <option value="Plasma">Plasma</option>
+                          <option value="Urine">Urine</option>
+                          <option value="Stool">Stool</option>
+                        </select>
+                      </div>
+                    </div>
 
-                {/* Row 4: Dr. Code, Doctor Name, New Doctor Register */}
-                <div className="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center">
-                  <div className="sm:col-span-2 font-bold text-xs uppercase tracking-wide text-slate-800 dark:text-slate-200">
-                    {t.drCode}
-                  </div>
-                  <div className="sm:col-span-2">
-                    <input
-                      type="text"
-                      value={drCode}
-                      onChange={(e) => setDrCode(e.target.value)}
-                      placeholder={lang === 'bn' ? 'যেমন: DR01' : 'e.g. DR01'}
-                      className="w-full bg-purple-50 dark:bg-slate-800 border-2 border-purple-400 dark:border-purple-600 px-3 py-1.5 rounded-md text-xs font-black uppercase text-purple-950 dark:text-purple-300 placeholder-slate-400 focus:ring-2 focus:ring-purple-600 focus:outline-none"
-                    />
-                  </div>
-                  <div className="sm:col-span-6">
-                    <div className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-slate-400 dark:border-slate-600 px-3 py-1.5 rounded-md text-xs font-bold text-slate-950 dark:text-slate-100 flex items-center justify-between min-h-[34px]">
-                      <span
-                        className={`truncate ${
-                          matchedDoctor ? 'text-slate-950 dark:text-slate-100 font-black' : 'text-slate-400 font-medium'
-                        }`}
-                      >
-                        {matchedDoctor
-                          ? `${matchedDoctor.name} (${matchedDoctor.specialty})`
-                          : drCode.trim()
-                          ? lang === 'bn'
-                            ? `ডাক্তার কোড: ${drCode}`
-                            : `Doctor Code: ${drCode}`
-                          : lang === 'bn'
-                          ? 'ডাক্তার কোড লিখুন বা পাশের বাটনে যোগ করুন'
-                          : 'Doctor name will appear here...'}
-                      </span>
+                    {/* 4. Ref. By */}
+                    <div className="grid grid-cols-12 gap-2 items-start">
+                      <label className="col-span-4 font-black uppercase text-slate-800 dark:text-slate-200 text-xs tracking-wide pt-1.5">
+                        Ref. By :
+                      </label>
+                      <div className="col-span-8 space-y-1">
+                        <div className="flex items-center gap-1.5">
+                          <select
+                            value={drCode}
+                            onChange={(e) => setDrCode(e.target.value)}
+                            className="flex-1 bg-white dark:bg-slate-800 border-2 border-slate-400 dark:border-slate-600 px-2.5 py-1.5 rounded-md text-xs font-bold text-slate-950 dark:text-slate-100 focus:ring-2 focus:ring-purple-600 focus:outline-none cursor-pointer truncate"
+                          >
+                            <option value="">-- ডাক্তার সিলেক্ট করুন / Select Doctor --</option>
+                            {doctors.map((d) => (
+                              <option key={d.code} value={d.code}>
+                                {d.name} ; {d.degree || d.specialty} ({d.code})
+                              </option>
+                            ))}
+                          </select>
+                          <button
+                            type="button"
+                            onClick={() => setShowDoctorModal(true)}
+                            className="px-2 py-1.5 bg-purple-700 hover:bg-purple-800 text-white rounded-md text-[11px] font-bold flex items-center gap-0.5 cursor-pointer shrink-0 shadow-2xs"
+                            title="Add New Doctor"
+                          >
+                            <UserPlus className="w-3.5 h-3.5" />
+                            <span>{lang === 'bn' ? '+ ডাক্তার' : '+ Doc'}</span>
+                          </button>
+                        </div>
+                        {/* Displayed Full Doctor Reference String */}
+                        <div className="px-2.5 py-1 bg-slate-100 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-md text-[11px] font-semibold text-slate-900 dark:text-slate-200 truncate">
+                          {matchedDoctor ? (
+                            <span className="font-bold text-purple-950 dark:text-purple-300">
+                              {matchedDoctor.name} ; {matchedDoctor.degree || matchedDoctor.specialty}
+                            </span>
+                          ) : drCode.trim() ? (
+                            <span>Code: {drCode}</span>
+                          ) : (
+                            <span className="text-slate-400 italic">
+                              e.g. Dr. G.M. Anamul Haque ; MBBS(SSMC); BCS (Health)
+                            </span>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <div className="sm:col-span-2">
-                    <button
-                      type="button"
-                      onClick={() => setShowDoctorModal(true)}
-                      className="w-full px-2 py-1.5 bg-purple-700 hover:bg-purple-800 text-white rounded-md text-xs font-black flex items-center justify-center gap-1 transition cursor-pointer shadow-sm active:scale-95"
-                    >
-                      <UserPlus className="w-3.5 h-3.5" />
-                      <span>{t.addDoctorBtn}</span>
-                    </button>
+
+                  {/* RIGHT COLUMN: Test Date, Age, Sex */}
+                  <div className="space-y-2.5">
+                    {/* 1. Test Date */}
+                    <div className="grid grid-cols-12 gap-2 items-center">
+                      <label className="col-span-4 font-black uppercase text-slate-800 dark:text-slate-200 text-xs tracking-wide">
+                        Test Date :
+                      </label>
+                      <div className="col-span-8 flex items-center gap-1.5">
+                        <div className="relative flex-1">
+                          <input
+                            type="text"
+                            value={billDate}
+                            onChange={(e) => setBillDate(e.target.value)}
+                            placeholder="DD-MM-YYYY (e.g. 21-Oct-26)"
+                            className="w-full bg-white dark:bg-slate-800 border-2 border-slate-400 dark:border-slate-600 pl-2.5 pr-8 py-1.5 rounded-md font-bold text-slate-950 dark:text-slate-100 text-xs focus:ring-2 focus:ring-purple-600 focus:outline-none"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setBillDate(getTodayDateStr(false));
+                              showToast(lang === 'bn' ? 'বিল তারিখ আজকের লাইভ তারিখে আপডেট হয়েছে' : 'Updated to today date');
+                            }}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 text-pink-600 hover:text-purple-800 cursor-pointer"
+                            title="Today"
+                          >
+                            <Clock className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 2. Age */}
+                    <div className="grid grid-cols-12 gap-2 items-center">
+                      <label className="col-span-4 font-black uppercase text-slate-800 dark:text-slate-200 text-xs tracking-wide">
+                        Age :
+                      </label>
+                      <div className="col-span-8">
+                        <input
+                          type="text"
+                          value={age}
+                          onChange={(e) => setAge(e.target.value)}
+                          placeholder="e.g. 70 Y"
+                          className="w-full bg-white dark:bg-slate-800 border-2 border-slate-400 dark:border-slate-600 px-3 py-1.5 rounded-md font-bold text-slate-950 dark:text-slate-100 text-xs focus:ring-2 focus:ring-purple-600 focus:outline-none"
+                        />
+                      </div>
+                    </div>
+
+                    {/* 3. Sex */}
+                    <div className="grid grid-cols-12 gap-2 items-center">
+                      <label className="col-span-4 font-black uppercase text-slate-800 dark:text-slate-200 text-xs tracking-wide">
+                        Sex :
+                      </label>
+                      <div className="col-span-8">
+                        <select
+                          value={sex}
+                          onChange={(e) => setSex(e.target.value as any)}
+                          className="w-full bg-white dark:bg-slate-800 border-2 border-slate-400 dark:border-slate-600 px-2.5 py-1.5 rounded-md font-bold text-slate-950 dark:text-slate-100 text-xs focus:ring-2 focus:ring-purple-600 focus:outline-none cursor-pointer"
+                        >
+                          <option value="">-- সিলেক্ট করুন / Select Sex --</option>
+                          <option value="Female">Female (মহিলা)</option>
+                          <option value="Male">Male (পুরুষ)</option>
+                          <option value="Other">Other (অন্যান্য)</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Compact Secondary / Technical Lab Details (Optional Accordion) */}
+                    <details className="mt-1 pt-1 border-t border-dashed border-slate-300 dark:border-slate-700 text-[11px] text-slate-500">
+                      <summary className="cursor-pointer font-semibold hover:text-purple-700 dark:hover:text-purple-300 select-none">
+                        ⚙️ {lang === 'bn' ? 'অতিরিক্ত টেকনিক্যাল ল্যাব সেটিংস (Accession & Timestamps)' : 'Advanced Lab Details'}
+                      </summary>
+                      <div className="grid grid-cols-2 gap-2 mt-2 pt-1 bg-slate-50 dark:bg-slate-900/60 p-2 rounded-md border border-slate-200 dark:border-slate-700">
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-600 dark:text-slate-400 mb-0.5">
+                            Accession ID:
+                          </label>
+                          <input
+                            type="text"
+                            value={accessionNo}
+                            onChange={(e) => setAccessionNo(e.target.value)}
+                            className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 px-2 py-0.5 rounded text-[11px] font-mono"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-600 dark:text-slate-400 mb-0.5">
+                            Pregnancy Status:
+                          </label>
+                          <select
+                            value={pregnancyStatus}
+                            onChange={(e) => setPregnancyStatus(e.target.value as any)}
+                            disabled={sex === 'Male'}
+                            className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 px-2 py-0.5 rounded text-[11px] disabled:opacity-50"
+                          >
+                            <option value="Non-Pregnant">Non-Pregnant</option>
+                            <option value="Pregnant (1st Trimester)">Pregnant (1st Trimester)</option>
+                            <option value="Pregnant (2nd Trimester)">Pregnant (2nd Trimester)</option>
+                            <option value="Pregnant (3rd Trimester)">Pregnant (3rd Trimester)</option>
+                            <option value="Not Applicable">Not Applicable</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-600 dark:text-slate-400 mb-0.5">
+                            Sample Collection:
+                          </label>
+                          <input
+                            type="text"
+                            value={sampleCollectionTime}
+                            onChange={(e) => setSampleCollectionTime(e.target.value)}
+                            className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 px-2 py-0.5 rounded text-[11px] font-mono"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-600 dark:text-slate-400 mb-0.5">
+                            Sample Received:
+                          </label>
+                          <input
+                            type="text"
+                            value={sampleReceivedTime}
+                            onChange={(e) => setSampleReceivedTime(e.target.value)}
+                            className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 px-2 py-0.5 rounded text-[11px] font-mono"
+                          />
+                        </div>
+                      </div>
+                    </details>
                   </div>
                 </div>
               </div>
