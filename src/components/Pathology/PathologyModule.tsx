@@ -10,6 +10,7 @@ import {
 import { PathologyReportModal } from './PathologyReportModal';
 import { AddCustomTestModal } from './AddCustomTestModal';
 import { AdminTestMasterPanel } from './AdminTestMasterPanel';
+import { EditTechnologistModal } from '../Modals/EditTechnologistModal';
 import {
   RotateCcw,
   Search,
@@ -20,6 +21,7 @@ import {
   Save,
   UserPlus,
   FileText,
+  Pencil,
   CheckCircle,
   FlaskConical,
   Layers,
@@ -113,8 +115,27 @@ export const PathologyModule: React.FC = () => {
   const [sampleReceivedTime, setSampleReceivedTime] = useState<string>('');
   const [reportDateTime, setReportDateTime] = useState<string>('');
   const [workflowStatus, setWorkflowStatus] = useState<PathologyWorkflowStatus>('Pending');
-  const [technicallyValidatedBy, setTechnicallyValidatedBy] = useState<string>('');
-  const [verifiedBy, setVerifiedBy] = useState<string>('');
+  const [technicallyValidatedBy, setTechnicallyValidatedBy] = useState<string>(
+    () => clinicConfig.labInCharge || 'Medical Technologist (Lab In-Charge)'
+  );
+  const [verifiedBy, setVerifiedBy] = useState<string>(
+    () => clinicConfig.pathologistName || 'Dr. Sharmin Akter, MBBS, MD (Pathology)'
+  );
+  const [showEditSignatoryModal, setShowEditSignatoryModal] = useState<'technologist' | 'pathologist' | null>(null);
+
+  // Keep displayed values persistent and synced with clinicConfig
+  useEffect(() => {
+    if (clinicConfig.labInCharge) {
+      setTechnicallyValidatedBy(clinicConfig.labInCharge);
+    }
+  }, [clinicConfig.labInCharge]);
+
+  useEffect(() => {
+    if (clinicConfig.pathologistName) {
+      setVerifiedBy(clinicConfig.pathologistName);
+    }
+  }, [clinicConfig.pathologistName]);
+
   const [releasedBy, setReleasedBy] = useState<string>('');
   const [labDisclaimer, setLabDisclaimer] = useState<string>(DEFAULT_DISCLAIMER);
   const [comments, setComments] = useState('');
@@ -380,8 +401,8 @@ export const PathologyModule: React.FC = () => {
       setSampleReceivedTime(foundPatient?.sampleReceivedTime || `${getTodayDateStr(false)} ${nowTime}`);
       setReportDateTime(foundPatient?.reportDateTime || `${getTodayDateStr(false)} ${nowTime}`);
       setWorkflowStatus(foundPatient?.workflowStatus || 'Sample Collected');
-      setTechnicallyValidatedBy(foundPatient?.technicallyValidatedBy || '');
-      setVerifiedBy(foundPatient?.verifiedBy || '');
+      setTechnicallyValidatedBy(foundPatient?.technicallyValidatedBy || clinicConfig.labInCharge || 'Medical Technologist (Lab In-Charge)');
+      setVerifiedBy(foundPatient?.verifiedBy || clinicConfig.pathologistName || 'Dr. Sharmin Akter, MBBS, MD (Pathology)');
       setReleasedBy(foundPatient?.releasedBy || '');
       setCorrectionAuditTrail(foundPatient?.correctionAuditTrail || []);
       if (foundPatient?.comments) setComments(foundPatient.comments);
@@ -461,8 +482,8 @@ export const PathologyModule: React.FC = () => {
     setSampleReceivedTime(`${today} ${nowTime}`);
     setReportDateTime(`${today} ${nowTime}`);
     setWorkflowStatus('Pending');
-    setTechnicallyValidatedBy('');
-    setVerifiedBy('');
+    setTechnicallyValidatedBy(clinicConfig.labInCharge || 'Medical Technologist (Lab In-Charge)');
+    setVerifiedBy(clinicConfig.pathologistName || 'Dr. Sharmin Akter, MBBS, MD (Pathology)');
     setReleasedBy('');
     setCorrectionReason('');
     setCorrectionAuditTrail([]);
@@ -497,8 +518,8 @@ export const PathologyModule: React.FC = () => {
     setWorkflowStatus(
       pat.workflowStatus || (pat.status === 'Printed' ? 'Released' : pat.status === 'Completed' ? 'Verified' : 'Result Entered')
     );
-    setTechnicallyValidatedBy(pat.technicallyValidatedBy || clinicConfig.labInCharge || '');
-    setVerifiedBy(pat.verifiedBy || (pat.status === 'Completed' || pat.status === 'Printed' ? clinicConfig.pathologistName : ''));
+    setTechnicallyValidatedBy(pat.technicallyValidatedBy || clinicConfig.labInCharge || 'Medical Technologist (Lab In-Charge)');
+    setVerifiedBy(pat.verifiedBy || clinicConfig.pathologistName || 'Dr. Sharmin Akter, MBBS, MD (Pathology)');
     setReleasedBy(pat.releasedBy || '');
     setLabDisclaimer(pat.labDisclaimer || DEFAULT_DISCLAIMER);
     setCorrectionAuditTrail(pat.correctionAuditTrail || []);
@@ -1996,30 +2017,99 @@ export const PathologyModule: React.FC = () => {
               )}
 
               {/* Signatories & Verification Summary Box */}
-              <div className="mb-2.5 p-2.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400">
-                    {lang === 'bn' ? 'টেকনিক্যাল ভ্যালিডেশন:' : 'Tech Validated By:'}
-                  </span>
+              <div className="mb-2.5 p-2.5 rounded-xl bg-white dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-700 text-xs space-y-2 shadow-xs">
+                {/* 1. Technical Validation (Medical Technologist) Box */}
+                <div
+                  onClick={() => setShowEditSignatoryModal('technologist')}
+                  className="p-2 rounded-lg bg-purple-50/80 hover:bg-purple-100/90 dark:bg-slate-850 dark:hover:bg-slate-800 border-2 border-purple-200 dark:border-purple-800 transition cursor-pointer group shadow-2xs"
+                  title={
+                    lang === 'bn'
+                      ? 'ক্লিক করে টেকনিক্যাল ভ্যালিডেশন (মেডিকেল টেকনোলজিস্ট) এর স্থায়ী নাম ও পদবী সেট করুন'
+                      : 'Click to set fixed Technologist Name & Designation'
+                  }
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[11px] font-black text-purple-950 dark:text-purple-200 flex items-center gap-1">
+                      <Lock className="w-3 h-3 text-purple-600 shrink-0" />
+                      <span>{lang === 'bn' ? 'টেকনিক্যাল ভ্যালিডেশন:' : 'Tech Validated By:'}</span>
+                      <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-purple-200 dark:bg-purple-900/60 text-purple-900 dark:text-purple-200">
+                        {lang === 'bn' ? 'স্থায়ী' : 'Fixed'}
+                      </span>
+                    </span>
+                    <span className="text-[10px] font-bold text-purple-700 dark:text-purple-300 group-hover:text-pink-600 flex items-center gap-0.5 transition">
+                      <Pencil className="w-3 h-3 text-pink-600" />
+                      <span>{lang === 'bn' ? 'ক্লিক করে সেট করুন' : 'Click to Set'}</span>
+                    </span>
+                  </div>
                   <input
                     type="text"
-                    value={technicallyValidatedBy}
-                    onChange={(e) => setTechnicallyValidatedBy(e.target.value)}
-                    placeholder={clinicConfig.labInCharge}
-                    className="px-2 py-0.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded text-[11px] font-bold text-right w-44"
+                    readOnly
+                    value={technicallyValidatedBy || clinicConfig.labInCharge || 'Medical Technologist (Lab In-Charge)'}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowEditSignatoryModal('technologist');
+                    }}
+                    placeholder={clinicConfig.labInCharge || 'Medical Technologist (Lab In-Charge)'}
+                    className="w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-purple-300 dark:border-purple-700 rounded-md text-xs font-black text-purple-950 dark:text-purple-100 cursor-pointer shadow-2xs group-hover:border-purple-500 group-hover:ring-1 group-hover:ring-purple-400 focus:outline-none"
                   />
+                  <div className="mt-1 flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-400 px-0.5">
+                    <span className="truncate max-w-[220px]" title={clinicConfig.labInChargeDesignation || 'Medical Technologist (Lab)'}>
+                      {lang === 'bn' ? 'পদবী: ' : 'Desig: '}
+                      <strong className="text-slate-700 dark:text-slate-300 font-bold">
+                        {clinicConfig.labInChargeDesignation || 'Medical Technologist (Lab In-Charge)'}
+                      </strong>
+                    </span>
+                    <span className="text-[9px] text-emerald-600 dark:text-emerald-400 font-bold shrink-0">
+                      ✓ {lang === 'bn' ? 'ফিক্সড থাকবে' : 'Always Fixed'}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400">
-                    {lang === 'bn' ? 'প্যাথলজিস্ট ভেরিফাইড:' : 'Verified By (Doctor):'}
-                  </span>
+
+                {/* 2. Pathologist Verified (Doctor) Box */}
+                <div
+                  onClick={() => setShowEditSignatoryModal('pathologist')}
+                  className="p-2 rounded-lg bg-cyan-50/80 hover:bg-cyan-100/90 dark:bg-slate-850 dark:hover:bg-slate-800 border-2 border-cyan-200 dark:border-cyan-800 transition cursor-pointer group shadow-2xs"
+                  title={
+                    lang === 'bn'
+                      ? 'ক্লিক করে প্যাথলজিস্ট / ডাক্তারের স্থায়ী নাম ও পদবী সেট করুন'
+                      : 'Click to set fixed Pathologist Name & Designation'
+                  }
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[11px] font-black text-cyan-950 dark:text-cyan-200 flex items-center gap-1">
+                      <Lock className="w-3 h-3 text-cyan-600 shrink-0" />
+                      <span>{lang === 'bn' ? 'প্যাথলজিস্ট ভেরিফাইড:' : 'Verified By (Doctor):'}</span>
+                      <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-cyan-200 dark:bg-cyan-900/60 text-cyan-900 dark:text-cyan-200">
+                        {lang === 'bn' ? 'স্থায়ী' : 'Fixed'}
+                      </span>
+                    </span>
+                    <span className="text-[10px] font-bold text-cyan-700 dark:text-cyan-300 group-hover:text-pink-600 flex items-center gap-0.5 transition">
+                      <Pencil className="w-3 h-3 text-pink-600" />
+                      <span>{lang === 'bn' ? 'ক্লিক করে সেট করুন' : 'Click to Set'}</span>
+                    </span>
+                  </div>
                   <input
                     type="text"
-                    value={verifiedBy}
-                    onChange={(e) => setVerifiedBy(e.target.value)}
-                    placeholder={clinicConfig.pathologistName}
-                    className="px-2 py-0.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded text-[11px] font-bold text-right w-44"
+                    readOnly
+                    value={verifiedBy || clinicConfig.pathologistName || 'Dr. Sharmin Akter, MBBS, MD (Pathology)'}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowEditSignatoryModal('pathologist');
+                    }}
+                    placeholder={clinicConfig.pathologistName || 'Dr. Sharmin Akter, MBBS, MD (Pathology)'}
+                    className="w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-cyan-300 dark:border-cyan-700 rounded-md text-xs font-black text-cyan-950 dark:text-cyan-100 cursor-pointer shadow-2xs group-hover:border-cyan-500 group-hover:ring-1 group-hover:ring-cyan-400 focus:outline-none"
                   />
+                  <div className="mt-1 flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-400 px-0.5">
+                    <span className="truncate max-w-[220px]" title={clinicConfig.pathologistDegree || 'Senior Consultant & Lab Director'}>
+                      {lang === 'bn' ? 'পদবী: ' : 'Desig: '}
+                      <strong className="text-slate-700 dark:text-slate-300 font-bold">
+                        {clinicConfig.pathologistDegree || 'Senior Consultant & Lab Director'}
+                      </strong>
+                    </span>
+                    <span className="text-[9px] text-emerald-600 dark:text-emerald-400 font-bold shrink-0">
+                      ✓ {lang === 'bn' ? 'ফিক্সড থাকবে' : 'Always Fixed'}
+                    </span>
+                  </div>
                 </div>
               </div>
 
@@ -2296,6 +2386,23 @@ export const PathologyModule: React.FC = () => {
           onClose={() => setShowCustomTestModal(false)}
           onAddTest={handleAddCustomTest}
           onAddEmptyRowDirectly={addEmptyRow}
+        />
+      )}
+
+      {/* Signatory Name & Designation Edit Modal */}
+      {showEditSignatoryModal && (
+        <EditTechnologistModal
+          initialTarget={showEditSignatoryModal}
+          onClose={() => setShowEditSignatoryModal(null)}
+          onSaved={(cfg) => {
+            setTechnicallyValidatedBy(cfg.labInCharge);
+            setVerifiedBy(cfg.pathologistName);
+            showToast(
+              lang === 'bn'
+                ? 'স্বাক্ষরকারী নাম ও পদবী সফলভাবে স্থায়ী করা হয়েছে!'
+                : 'Signatory Name & Designation permanently updated and fixed!'
+            );
+          }}
         />
       )}
     </div>

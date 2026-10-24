@@ -264,6 +264,9 @@ export const SettingsModule: React.FC = () => {
   const [pathologistName, setPathologistName] = useState(clinicConfig.pathologistName);
   const [pathologistDegree, setPathologistDegree] = useState(clinicConfig.pathologistDegree || 'Senior Consultant & Lab Director');
   const [labInCharge, setLabInCharge] = useState(clinicConfig.labInCharge);
+  const [labInChargeDesignation, setLabInChargeDesignation] = useState(
+    clinicConfig.labInChargeDesignation || 'Medical Technologist (Lab In-Charge)'
+  );
 
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 
@@ -492,6 +495,7 @@ export const SettingsModule: React.FC = () => {
       pathologistName,
       pathologistDegree,
       labInCharge,
+      labInChargeDesignation,
     });
     showToast(lang === 'bn' ? 'ক্লিনিকের তথ্য ও প্যাড সফলভাবে আপডেট হয়েছে!' : 'Clinic profile and letterhead updated successfully!');
   };

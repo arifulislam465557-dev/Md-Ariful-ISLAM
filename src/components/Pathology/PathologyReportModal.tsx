@@ -632,7 +632,7 @@ export const PathologyReportModal: React.FC<PathologyReportModalProps> = ({ pati
                                 </button>
                               </div>
                               <p className="text-xs font-bold text-slate-600 mt-0.5">
-                                Checked & Validated By (Medical Technologist)
+                                {clinicConfig.labInChargeDesignation || 'Checked & Validated By (Medical Technologist)'}
                               </p>
                             </div>
                             {/* Pathologist / Doctor Signature (Optional) */}

@@ -405,6 +405,8 @@ export interface ClinicConfig {
   pathologistName: string;
   pathologistDegree?: string;
   labInCharge: string;
+  labInChargeDesignation?: string;
+  labInChargeDegree?: string;
   logoUrl?: string;
   hospitalBackgroundUrl?: string;
 }

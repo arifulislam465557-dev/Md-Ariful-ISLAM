@@ -13,6 +13,7 @@ export const initialClinicConfig = {
   "pathologistName": "Dr. Sharmin Akter, MBBS, MD (Pathology)",
   "pathologistDegree": "Senior Consultant & Lab Director",
   "labInCharge": "Medical Technologist (Lab In-Charge)",
+  "labInChargeDesignation": "Medical Technologist (Lab)",
   "logoUrl": "",
   "hospitalBackgroundUrl": "/hospital-bg.jpg"
 };
