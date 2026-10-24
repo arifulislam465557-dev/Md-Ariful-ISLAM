@@ -128,91 +128,58 @@ export const generatePathologyPdf = (
       yPos = yPos + 4;
     }
 
-    // Patient Details Box
+    // Patient Details Box (Strictly matches the 7 patient form fields)
     doc.setFillColor(250, 250, 252);
-    doc.rect(14, yPos, pageWidth - 28, 26, 'F');
+    doc.rect(14, yPos, pageWidth - 28, 22, 'F');
     doc.setDrawColor(209, 213, 219);
-    doc.rect(14, yPos, pageWidth - 28, 26, 'D');
+    doc.rect(14, yPos, pageWidth - 28, 22, 'D');
 
     doc.setFontSize(8);
     doc.setTextColor(17, 24, 39);
 
     // Left Column
     doc.setFont('helvetica', 'bold');
-    doc.text('Accession / PID:', 17, yPos + 5);
+    doc.text('ID No:', 17, yPos + 4.8);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`${patient.pId}`, 44, yPos + 4.8);
+
+    doc.setFont('helvetica', 'bold');
+    doc.text("Patient's Name:", 17, yPos + 9.5);
+    doc.setFont('helvetica', 'bold');
+    doc.text(patient.patientName, 44, yPos + 9.5);
+
+    doc.setFont('helvetica', 'bold');
+    doc.text('Specimen:', 17, yPos + 14.2);
     doc.setFont('helvetica', 'normal');
-    doc.text(`${patient.accessionNo || `ACC-${patient.pId}`}  |  PID: ${patient.pId}`, 43, yPos + 5);
+    doc.text(patient.sampleType || pageGroup.departmentConfig.sampleTypeEn || 'Whole Blood', 44, yPos + 14.2);
 
     doc.setFont('helvetica', 'bold');
-    doc.text('Patient Name:', 17, yPos + 9.8);
-    doc.setFont('helvetica', 'bold');
-    doc.text(patient.patientName, 43, yPos + 9.8);
-
-    doc.setFont('helvetica', 'bold');
-    doc.text('Age:', 17, yPos + 14.6);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`${patient.age || 'N/A'}`, 43, yPos + 14.6);
-
-    doc.setFont('helvetica', 'bold');
-    doc.text('Sex:', 17, yPos + 19.4);
-    doc.setFont('helvetica', 'normal');
-    doc.text(
-      `${patient.sex || 'N/A'}${
-        patient.pregnancyStatus && patient.pregnancyStatus !== 'Non-Pregnant'
-          ? ` (${patient.pregnancyStatus})`
-          : ''
-      }`,
-      43,
-      yPos + 19.4
-    );
-
-    // Bottom Single Line: Referred By (Doctor Name + Degree) alongside Sample Type
-    doc.setFont('helvetica', 'bold');
-    doc.text('Referred By:', 17, yPos + 24);
+    doc.text('Ref. By:', 17, yPos + 18.8);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(76, 29, 149);
     const refDoctorLine = (patient.drName || 'Self').replace(/\s*\(DR\w*\)/gi, '').trim();
-    doc.text(refDoctorLine, 43, yPos + 24);
+    doc.text(refDoctorLine, 44, yPos + 18.8);
     doc.setTextColor(17, 24, 39);
 
     // Right Column
-    const rightCol = pageWidth / 2 + 6;
+    const rightCol = pageWidth / 2 + 10;
     doc.setFont('helvetica', 'bold');
-    doc.text('Sample Collected:', rightCol, yPos + 5);
+    doc.text('Test Date:', rightCol, yPos + 4.8);
     doc.setFont('helvetica', 'normal');
-    doc.text(
-      patient.sampleCollectionTime || `${patient.billDate || patient.invDate} 09:00 AM`,
-      rightCol + 28,
-      yPos + 5
-    );
+    doc.text(patient.billDate || patient.invDate, rightCol + 22, yPos + 4.8);
 
     doc.setFont('helvetica', 'bold');
-    doc.text('Sample Received:', rightCol, yPos + 9.8);
+    doc.text('Age:', rightCol, yPos + 9.5);
     doc.setFont('helvetica', 'normal');
-    doc.text(
-      patient.sampleReceivedTime || `${patient.billDate || patient.invDate} 09:30 AM`,
-      rightCol + 28,
-      yPos + 9.8
-    );
+    doc.text(`${patient.age || 'N/A'}`, rightCol + 22, yPos + 9.5);
 
     doc.setFont('helvetica', 'bold');
-    doc.text('Report Date/Time:', rightCol, yPos + 14.6);
+    doc.text('Sex:', rightCol, yPos + 14.2);
     doc.setFont('helvetica', 'normal');
-    doc.text(patient.reportDateTime || patient.invDate, rightCol + 28, yPos + 14.6);
-
-    doc.setFont('helvetica', 'bold');
-    doc.text('Sample Type:', rightCol, yPos + 24);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(76, 29, 149);
-    doc.text(
-      patient.sampleType || pageGroup.departmentConfig.sampleTypeEn || 'Blood / Serum',
-      rightCol + 28,
-      yPos + 24
-    );
-    doc.setTextColor(17, 24, 39);
+    doc.text(`${patient.sex || 'N/A'}`, rightCol + 22, yPos + 14.2);
 
     // Department Header Sub-bar
-    yPos += 29;
+    yPos += 25;
     doc.setFillColor(243, 232, 255);
     doc.rect(14, yPos, pageWidth - 28, 6, 'F');
     doc.setDrawColor(192, 132, 252);

@@ -111,6 +111,54 @@ export const PathologyModule: React.FC = () => {
     'Not Applicable' | 'Non-Pregnant' | 'Pregnant (1st Trimester)' | 'Pregnant (2nd Trimester)' | 'Pregnant (3rd Trimester)'
   >('Non-Pregnant');
   const [drCode, setDrCode] = useState('');
+  const [drCodeInput, setDrCodeInput] = useState<string>('');
+
+  // Keep drCodeInput synced whenever drCode changes (e.g. loaded from patient/invoice or reset)
+  useEffect(() => {
+    setDrCodeInput(drCode || '');
+  }, [drCode]);
+
+  const handleDoctorCodeInput = (val: string) => {
+    setDrCodeInput(val);
+    const clean = val.trim();
+    if (!clean) {
+      setDrCode('');
+      return;
+    }
+    // 1. Exact case-insensitive match (e.g. DR01, DOC-1)
+    let found = doctors.find((d) => d.code.toLowerCase() === clean.toLowerCase());
+
+    // 2. Numeric match (e.g. user enters "1" or "01" -> matches doctor with code "DR01")
+    if (!found && /^\d+$/.test(clean)) {
+      const num = parseInt(clean, 10);
+      found = doctors.find((d) => {
+        const dDigits = d.code.replace(/\D/g, '');
+        return dDigits && parseInt(dDigits, 10) === num;
+      });
+    }
+
+    // 3. Normalized alphanumeric match
+    if (!found) {
+      const alphaNum = clean.replace(/[^a-z0-9]/gi, '').toLowerCase();
+      found = doctors.find((d) => {
+        const dAlphaNum = d.code.replace(/[^a-z0-9]/gi, '').toLowerCase();
+        return dAlphaNum === alphaNum || dAlphaNum.startsWith(alphaNum);
+      });
+    }
+
+    if (found) {
+      setDrCode(found.code);
+    }
+  };
+
+  useEffect(() => {
+    const handleOpenTestMaster = () => {
+      setModuleMode('testMaster');
+    };
+    window.addEventListener('open-pathology-test-master', handleOpenTestMaster);
+    return () => window.removeEventListener('open-pathology-test-master', handleOpenTestMaster);
+  }, []);
+
   const [sampleType, setSampleType] = useState('Whole Blood');
   const [sampleCollectionTime, setSampleCollectionTime] = useState<string>('');
   const [sampleReceivedTime, setSampleReceivedTime] = useState<string>('');
@@ -1191,66 +1239,6 @@ export const PathologyModule: React.FC = () => {
         </div>
       )}
 
-      {/* Top Module Switcher Bar: Worklist & Result Entry vs Admin Test Master & Ready-Made Templates */}
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-2 bg-gradient-to-r from-purple-950 via-indigo-950 to-slate-900 text-white p-2.5 rounded-xl border border-purple-700 shadow-md">
-        <div className="flex items-center gap-2.5">
-          <div className="p-2 bg-pink-500/20 rounded-lg border border-pink-400/30 text-pink-300">
-            <FlaskConical className="w-5 h-5" />
-          </div>
-          <div>
-            <h2 className="text-sm sm:text-base font-black tracking-tight flex items-center gap-2">
-              <span>
-                {lang === 'bn'
-                  ? 'প্যাথলজি ল্যাব ও রেডি-মেড রিপোর্ট টেমপ্লেট সিস্টেম'
-                  : 'Pathology Lab & Ready-Made Report Template System'}
-              </span>
-              <span className="px-2 py-0.5 text-[10px] font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 rounded-md">
-                {activeLabTests.length} Ready Templates
-              </span>
-            </h2>
-            <p className="text-[11px] text-purple-200">
-              {lang === 'bn'
-                ? '৭টি বিভাগ (হেমাটোলজি, বায়োকেমিস্ট্রি, হরমোন, সেরোলজি, ক্লিনিক্যাল প্যাথলজি, মাইক্রোবায়োলজি ও স্পেশাল টেস্ট) • বয়স ও লিঙ্গভিত্তিক রেফারেন্স রেঞ্জ'
-                : '7 Standard Departments • Age/Sex/Pregnancy Dynamic Reference Ranges • 10-Step Verification & Release Workflow'}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-1.5 bg-slate-900/90 p-1 rounded-xl border border-purple-800">
-          <button
-            type="button"
-            onClick={() => setModuleMode('worklist')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-black flex items-center gap-1.5 transition cursor-pointer ${
-              moduleMode === 'worklist'
-                ? 'bg-gradient-to-r from-pink-600 to-purple-700 text-white shadow-sm'
-                : 'text-purple-200 hover:bg-white/10'
-            }`}
-          >
-            <Activity className="w-3.5 h-3.5" />
-            <span>
-              {lang === 'bn' ? 'ল্যাব ওয়ার্কলিস্ট ও রিপোর্ট এন্ট্রি' : 'Lab Worklist & Report Entry'}
-            </span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setModuleMode('testMaster')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-black flex items-center gap-1.5 transition cursor-pointer ${
-              moduleMode === 'testMaster'
-                ? 'bg-gradient-to-r from-pink-600 to-purple-700 text-white shadow-sm'
-                : 'text-purple-200 hover:bg-white/10'
-            }`}
-          >
-            <Settings2 className="w-3.5 h-3.5" />
-            <span>
-              {lang === 'bn'
-                ? `অ্যাডমিন টেস্ট মাস্টার ও টেমপ্লেট (${labTests.length})`
-                : `Admin Test Master & Templates (${labTests.length})`}
-            </span>
-          </button>
-        </div>
-      </div>
-
       {/* ===================================================================== */}
       {/* MODE 2: ADMIN TEST MASTER & TEMPLATE DESIGNER                         */}
       {/* ===================================================================== */}
@@ -1261,6 +1249,7 @@ export const PathologyModule: React.FC = () => {
             setModuleMode('worklist');
             addTestToResults(tmpl);
           }}
+          onBack={() => setModuleMode('worklist')}
         />
       ) : (
         /* ===================================================================== */
@@ -1619,34 +1608,43 @@ export const PathologyModule: React.FC = () => {
                     </div>
 
                     {/* 4. Ref. By */}
-                    <div className="grid grid-cols-12 gap-2 items-start">
-                      <label className="col-span-4 font-black uppercase text-slate-800 dark:text-slate-200 text-xs tracking-wide pt-1.5">
+                    <div className="grid grid-cols-12 gap-2 items-center">
+                      <label className="col-span-4 font-black uppercase text-slate-800 dark:text-slate-200 text-xs tracking-wide">
                         Ref. By :
                       </label>
-                      <div className="col-span-8">
-                        <div className="flex items-center gap-1.5">
-                          <select
-                            value={drCode}
-                            onChange={(e) => setDrCode(e.target.value)}
-                            className="flex-1 bg-white dark:bg-slate-800 border-2 border-slate-400 dark:border-slate-600 px-2.5 py-1.5 rounded-md text-xs font-bold text-slate-950 dark:text-slate-100 focus:ring-2 focus:ring-purple-600 focus:outline-none cursor-pointer truncate"
-                          >
-                            <option value="">-- ডাক্তার সিলেক্ট করুন / Select Doctor --</option>
-                            {doctors.map((d) => (
-                              <option key={d.code} value={d.code}>
-                                {d.name} ; {d.degree || d.specialty} ({d.code})
-                              </option>
-                            ))}
-                          </select>
-                          <button
-                            type="button"
-                            onClick={() => setShowDoctorModal(true)}
-                            className="px-2 py-1.5 bg-purple-700 hover:bg-purple-800 text-white rounded-md text-[11px] font-bold flex items-center gap-0.5 cursor-pointer shrink-0 shadow-2xs"
-                            title="Add New Doctor"
-                          >
-                            <UserPlus className="w-3.5 h-3.5" />
-                            <span>{lang === 'bn' ? '+ ডাক্তার' : '+ Doc'}</span>
-                          </button>
-                        </div>
+                      <div className="col-span-8 flex items-center gap-1.5">
+                        <input
+                          type="text"
+                          value={drCodeInput}
+                          onChange={(e) => handleDoctorCodeInput(e.target.value)}
+                          placeholder="কোড / Code"
+                          className="w-20 sm:w-24 bg-yellow-50 dark:bg-slate-800 border-2 border-slate-400 dark:border-slate-600 px-2 py-1.5 rounded-md text-xs font-mono font-black text-purple-950 dark:text-purple-300 placeholder:text-slate-400 focus:ring-2 focus:ring-purple-600 focus:outline-none shrink-0 shadow-2xs"
+                          title={lang === 'bn' ? 'ডাক্তারের কোড নাম্বার লিখুন (যেমন: DR01, 1, 02)' : 'Enter Doctor Code (e.g. DR01, 1, 02)'}
+                        />
+                        <select
+                          value={drCode}
+                          onChange={(e) => {
+                            setDrCode(e.target.value);
+                            setDrCodeInput(e.target.value);
+                          }}
+                          className="flex-1 bg-white dark:bg-slate-800 border-2 border-slate-400 dark:border-slate-600 px-2.5 py-1.5 rounded-md text-xs font-bold text-slate-950 dark:text-slate-100 focus:ring-2 focus:ring-purple-600 focus:outline-none cursor-pointer truncate"
+                        >
+                          <option value="">-- ডাক্তার সিলেক্ট করুন / Select Doctor --</option>
+                          {doctors.map((d) => (
+                            <option key={d.code} value={d.code}>
+                              {d.name} ; {d.degree || d.specialty} ({d.code})
+                            </option>
+                          ))}
+                        </select>
+                        <button
+                          type="button"
+                          onClick={() => setShowDoctorModal(true)}
+                          className="px-2 py-1.5 bg-purple-700 hover:bg-purple-800 text-white rounded-md text-[11px] font-bold flex items-center gap-0.5 cursor-pointer shrink-0 shadow-2xs"
+                          title="Add New Doctor"
+                        >
+                          <UserPlus className="w-3.5 h-3.5" />
+                          <span>{lang === 'bn' ? '+ ডাক্তার' : '+ Doc'}</span>
+                        </button>
                       </div>
                     </div>
                   </div>

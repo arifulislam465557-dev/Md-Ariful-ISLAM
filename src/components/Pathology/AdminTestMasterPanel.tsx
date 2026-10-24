@@ -29,16 +29,19 @@ import {
   Sliders,
   CheckCheck,
   Power,
+  ArrowLeft,
 } from 'lucide-react';
 
 interface AdminTestMasterPanelProps {
   onPreviewTemplate: (previewPatient: Patient) => void;
   onLoadTemplateIntoWorkspace?: (test: LabTest) => void;
+  onBack?: () => void;
 }
 
 export const AdminTestMasterPanel: React.FC<AdminTestMasterPanelProps> = ({
   onPreviewTemplate,
   onLoadTemplateIntoWorkspace,
+  onBack,
 }) => {
   const {
     labTests,
@@ -641,6 +644,17 @@ export const AdminTestMasterPanel: React.FC<AdminTestMasterPanelProps> = ({
         </div>
 
         <div className="flex flex-wrap items-center gap-2 text-xs">
+          {onBack && (
+            <button
+              type="button"
+              onClick={onBack}
+              className="px-3.5 py-2 bg-gradient-to-r from-emerald-700 to-teal-800 hover:from-emerald-600 hover:to-teal-700 text-white font-black rounded-lg flex items-center gap-1.5 shadow-sm cursor-pointer transition active:scale-95"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>{lang === 'bn' ? 'ল্যাব ওয়ার্কলিস্টে ফিরুন' : 'Back to Lab Worklist'}</span>
+            </button>
+          )}
+
           <button
             type="button"
             onClick={openNewTestDesigner}

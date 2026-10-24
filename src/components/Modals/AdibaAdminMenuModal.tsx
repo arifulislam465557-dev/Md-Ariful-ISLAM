@@ -27,6 +27,7 @@ import {
   Smartphone,
   HardDrive,
   Cloud,
+  Sliders,
 } from 'lucide-react';
 import { PWAInstallButton } from '../PWA/PWAInstallButton';
 import { SUBSCRIPTION_PHONE } from '../../utils/licenseSecurity';
@@ -461,6 +462,32 @@ export const AdibaAdminMenuModal: React.FC<AdibaAdminMenuModalProps> = ({
                 </div>
               </div>
               <ChevronRight className="w-4 h-4 text-slate-400" />
+            </button>
+
+            {/* Pathology Test Master & Template Designer */}
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab('pathology');
+                setTimeout(() => window.dispatchEvent(new CustomEvent('open-pathology-test-master')), 50);
+                onClose();
+              }}
+              className="w-full p-2.5 rounded-2xl bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/40 dark:to-pink-950/40 hover:from-purple-100 hover:to-pink-100 dark:hover:from-purple-900/60 dark:hover:to-pink-900/60 border border-purple-200 dark:border-purple-800 flex items-center justify-between cursor-pointer transition text-left"
+            >
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-purple-600 text-white shadow-2xs">
+                  <Sliders className="w-4 h-4" />
+                </div>
+                <div>
+                  <span className="font-bold text-slate-900 dark:text-slate-100 block">
+                    {lang === 'bn' ? 'ল্যাব টেস্ট মাস্টার ও টেমপ্লেট ডিজাইনার' : 'Pathology Test Master & Templates'}
+                  </span>
+                  <span className="text-[11px] text-purple-700 dark:text-purple-300">
+                    {lang === 'bn' ? 'রেডিমেড ল্যাব টেমপ্লেট ও রেফারেন্স রেঞ্জ ব্যবস্থাপনা' : 'Configure templates, reference ranges & pricing'}
+                  </span>
+                </div>
+              </div>
+              <ChevronRight className="w-4 h-4 text-purple-400" />
             </button>
           </div>
 

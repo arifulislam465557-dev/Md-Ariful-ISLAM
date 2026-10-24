@@ -440,77 +440,59 @@ export const PathologyReportModal: React.FC<PathologyReportModalProps> = ({ pati
                             </div>
                           )}
 
-                          {/* Patient Details Table - Clean, High Contrast & Complete Clinical Metadata */}
-                          <div className="patient-details-box break-inside-avoid p-4 bg-gradient-to-r from-slate-50 to-purple-50/40 rounded-xl border border-slate-300 shadow-2xs print:p-3 print:bg-slate-50 print:border-slate-300 print:rounded-lg print:shadow-none">
+                          {/* Patient Details Table - Clean, High Contrast & Exactly Matching Form Data */}
+                          <div className="patient-details-box break-inside-avoid p-3.5 bg-gradient-to-r from-slate-50 to-purple-50/40 rounded-xl border border-slate-300 shadow-2xs print:p-2.5 print:bg-slate-50 print:border-slate-300 print:rounded-lg print:shadow-none">
                             <div className="patient-details-grid grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5 text-sm text-slate-800">
-                              <div className="space-y-1">
+                              {/* Left Column */}
+                              <div className="space-y-1.5">
                                 <div className="flex items-baseline gap-2">
-                                  <span className="text-xs font-bold text-slate-600 uppercase tracking-wider min-w-28">Accession / ID:</span>
+                                  <span className="text-xs font-black text-slate-600 uppercase tracking-wider min-w-28">ID No :</span>
                                   <strong className="font-mono text-purple-950 font-black text-sm bg-purple-100/80 px-2 py-0.5 rounded border border-purple-200">
-                                    {patient.accessionNo || `ACC-${patient.pId}`} · PID: {patient.pId}
+                                    {patient.pId}
                                   </strong>
                                 </div>
                                 <div className="flex items-baseline gap-2">
-                                  <span className="text-xs font-bold text-slate-600 uppercase tracking-wider min-w-28">Patient Name:</span>
+                                  <span className="text-xs font-black text-slate-600 uppercase tracking-wider min-w-28">Patient's Name :</span>
                                   <strong className="text-slate-950 font-black text-base tracking-tight">
                                     {patient.patientName}
                                   </strong>
                                 </div>
                                 <div className="flex items-baseline gap-2">
-                                  <span className="text-xs font-bold text-slate-600 uppercase tracking-wider min-w-28">Age:</span>
+                                  <span className="text-xs font-black text-slate-600 uppercase tracking-wider min-w-28">Specimen :</span>
+                                  <strong className="text-slate-900 font-bold text-xs bg-white px-2 py-0.5 rounded border border-purple-200 shadow-2xs">
+                                    {patient.sampleType || pageGroup.departmentConfig.sampleTypeEn || 'Whole Blood'}
+                                  </strong>
+                                </div>
+                              </div>
+
+                              {/* Right Column */}
+                              <div className="space-y-1.5 sm:text-right">
+                                <div className="flex items-baseline justify-between sm:justify-end gap-2">
+                                  <span className="text-xs font-black text-slate-600 uppercase tracking-wider">Test Date :</span>
+                                  <strong className="font-mono text-slate-900 font-bold text-xs bg-white px-2 py-0.5 rounded border border-slate-200 shadow-2xs">
+                                    {patient.billDate || patient.invDate}
+                                  </strong>
+                                </div>
+                                <div className="flex items-baseline justify-between sm:justify-end gap-2">
+                                  <span className="text-xs font-black text-slate-600 uppercase tracking-wider">Age :</span>
                                   <span className="font-black text-slate-900 text-sm">
                                     {patient.age}
                                   </span>
                                 </div>
-                                <div className="flex items-baseline gap-2">
-                                  <span className="text-xs font-bold text-slate-600 uppercase tracking-wider min-w-28">Sex:</span>
+                                <div className="flex items-baseline justify-between sm:justify-end gap-2">
+                                  <span className="text-xs font-black text-slate-600 uppercase tracking-wider">Sex :</span>
                                   <span className="font-black text-slate-900 text-sm">
                                     {patient.sex}
-                                    {patient.pregnancyStatus && patient.pregnancyStatus !== 'Non-Pregnant'
-                                      ? ` (${patient.pregnancyStatus})`
-                                      : ''}
                                   </span>
                                 </div>
                               </div>
 
-                              <div className="space-y-1 sm:text-right">
-                                <div className="flex items-baseline justify-between sm:justify-end gap-2">
-                                  <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">Sample Collected:</span>
-                                  <span className="font-mono text-slate-800 font-semibold text-xs">
-                                    {patient.sampleCollectionTime || `${patient.billDate || patient.invDate} 09:00 AM`}
-                                  </span>
-                                </div>
-                                <div className="flex items-baseline justify-between sm:justify-end gap-2">
-                                  <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">Sample Received:</span>
-                                  <span className="font-mono text-slate-800 font-semibold text-xs">
-                                    {patient.sampleReceivedTime || `${patient.billDate || patient.invDate} 09:30 AM`}
-                                  </span>
-                                </div>
-                                <div className="flex items-baseline justify-between sm:justify-end gap-2">
-                                  <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">Report Date & Time:</span>
-                                  <strong className="font-mono text-slate-900 font-bold text-xs bg-white px-2 py-0.5 rounded border border-slate-200 shadow-2xs">
-                                    {patient.reportDateTime || patient.invDate}
-                                  </strong>
-                                </div>
-                              </div>
-
-                              <div className="sm:col-span-2 flex items-baseline justify-between gap-4 pt-1.5 border-t border-slate-200/80 whitespace-nowrap overflow-hidden">
-                                <div className="flex items-baseline gap-2 min-w-0 overflow-hidden">
-                                  <span className="text-xs font-bold text-slate-600 uppercase tracking-wider min-w-28 shrink-0">
-                                    Referred By:
-                                  </span>
-                                  <strong className="text-purple-950 font-black text-sm truncate">
-                                    {refDoctorWithDegree}
-                                  </strong>
-                                </div>
-                                <div className="flex items-baseline gap-2 shrink-0">
-                                  <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">
-                                    Sample Type:
-                                  </span>
-                                  <strong className="text-purple-950 font-black text-xs bg-white px-2.5 py-0.5 rounded border border-purple-200 shadow-2xs">
-                                    {patient.sampleType || pageGroup.departmentConfig.sampleTypeEn}
-                                  </strong>
-                                </div>
+                              {/* Full-Width Ref. By (Doctor Name in a single line across full width) */}
+                              <div className="sm:col-span-2 flex items-baseline gap-2 pt-1 border-t border-slate-200/80">
+                                <span className="text-xs font-black text-slate-600 uppercase tracking-wider shrink-0 min-w-28">Ref. By :</span>
+                                <strong className="text-purple-950 font-black text-sm tracking-tight">
+                                  {refDoctorWithDegree}
+                                </strong>
                               </div>
                             </div>
                           </div>
