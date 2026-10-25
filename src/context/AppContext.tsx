@@ -38,6 +38,9 @@ import {
   ActiveModuleDrafts,
   DepartmentOrder,
   DepartmentOrderStatus,
+  PathologyOrderItem,
+  SampleCollectionStatus,
+  PathologyReportStatus,
   PaymentTransaction,
   BillingConfig,
   ServiceDepartmentId,
@@ -179,6 +182,26 @@ interface AppContextType {
     orderStatus: DepartmentOrderStatus,
     extra?: { reportId?: string; notes?: string }
   ) => Promise<void>;
+
+  pathologyOrders: PathologyOrderItem[];
+  setPathologyOrders: React.Dispatch<React.SetStateAction<PathologyOrderItem[]>>;
+  updatePathologyOrderStatus: (
+    orderId: string,
+    updates: {
+      sampleStatus?: SampleCollectionStatus;
+      reportStatus?: PathologyReportStatus;
+      notes?: string;
+      sampleCollectedBy?: string;
+      sampleReceivedBy?: string;
+    }
+  ) => Promise<{ success: boolean; error?: string }>;
+  reconcileMissingPathologyOrders: () => Promise<{
+    success: boolean;
+    recoveredCount: number;
+    invoicesProcessed: number;
+    totalOrders: number;
+    error?: string;
+  }>;
 
   paymentTransactions: PaymentTransaction[];
   billingConfig: BillingConfig;
@@ -885,6 +908,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
     return buildOrdersFromInvoices(activeInvs, []);
   });
+
+  const [pathologyOrders, setPathologyOrders] = useState<PathologyOrderItem[]>(() => {
+    const saved = localStorage.getItem(`${PREFIX}pathology_orders`);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return parsed;
+      } catch {}
+    }
+    return [];
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(`${PREFIX}pathology_orders`, JSON.stringify(pathologyOrders));
+    } catch {}
+  }, [pathologyOrders]);
 
   const [paymentTransactions, setPaymentTransactions] = useState<PaymentTransaction[]>(() => {
     const saved = localStorage.getItem(`${PREFIX}payment_transactions`);
@@ -2050,6 +2090,45 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const pathologyItems = itemsByDept.get('pathology') || [];
     let createdPathologyPatient: Patient | undefined;
 
+    const newPathologyOrders: PathologyOrderItem[] = pathologyItems.map((item, idx) => {
+      const rawCode = item.code || item.testId || item.testName || `t-${idx}`;
+      const safeCode = String(rawCode).replace(/[^a-zA-Z0-9_-]/g, '_').toLowerCase();
+      const orderId = `ord-path-${newInv.invoiceNo.toLowerCase()}-${safeCode}-${idx}`;
+      const orderNo = `ORD-PATH-${suffix}-${idx + 1}`;
+      return {
+        id: orderId,
+        orderNo,
+        invoiceId: invId,
+        invoiceNo: newInv.invoiceNo,
+        cashMemoNo,
+        receiptNo,
+        pId: newInv.pId,
+        patientId: newInv.pId,
+        oldRegNo: newInv.oldRegNo,
+        patientName: newInv.patientName,
+        age: newInv.age,
+        sex: newInv.sex,
+        phone: newInv.phone,
+        address: newInv.address,
+        drCode: newInv.drCode,
+        drName: newInv.drName,
+        testId: item.testId || item.code || `t-${idx}`,
+        testCode: item.code || item.testId || `TC-${idx + 1}`,
+        testName: item.testName || (item as any).name || 'Pathology Test',
+        nameBn: item.nameBn,
+        category: item.category || 'Pathology',
+        price: Number(item.price) || 0,
+        orderDate: newInv.date,
+        orderTimestamp: nowIso,
+        paymentStatus: newInv.status,
+        sampleType: item.sampleType || 'Whole Blood',
+        sampleStatus: 'Pending',
+        reportStatus: 'Pending',
+        createdAt: nowIso,
+        updatedAt: nowIso,
+      };
+    });
+
     if (pathologyItems.length > 0) {
       const formattedTests = convertInvoiceItemsToTestResults(
         pathologyItems,
@@ -2146,6 +2225,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           invoice: newInv,
           initialPayment: initialPaymentTx,
           departmentOrders: newOrders,
+          pathologyOrders: newPathologyOrders,
           pathologyPatient: createdPathologyPatient,
           opdAppointment: createdOpdAppointment,
         }),
@@ -2180,6 +2260,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const newOrderIds = new Set(newOrders.map((o) => o.id));
       setDepartmentOrders((prev) => [...newOrders, ...prev.filter((o) => !newOrderIds.has(o.id))]);
     }
+    if (newPathologyOrders.length > 0) {
+      const newPathOrderIds = new Set(newPathologyOrders.map((o) => o.id));
+      setPathologyOrders((prev) => [
+        ...newPathologyOrders,
+        ...prev.filter((o) => !newPathOrderIds.has(o.id)),
+      ]);
+    }
     if (createdPathologyPatient) {
       const patToSave = createdPathologyPatient;
       setPatients((prev) => {
@@ -2199,17 +2286,25 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setOpdAppointments((prev) => [apptToSave, ...prev.filter((a) => a.id !== apptToSave.id)]);
     }
 
-    const routedDeptNames = newOrders.map((o) => o.departmentName).join(', ');
+    const hasPathology = newPathologyOrders.length > 0;
     addNotification(
       lang === 'bn' ? 'বিল ও রসিদ স্থায়ীভাবে সংরক্ষিত' : 'Bill & Receipt Saved',
       lang === 'bn'
-        ? `বিল #${newInv.invoiceNo} (মেমো #${cashMemoNo}, রসিদ #${receiptNo}) স্থায়ী ডাটাবেজে সংরক্ষিত ও বিভাগে প্রেরিত।`
-        : `Invoice ${newInv.invoiceNo} (Memo ${cashMemoNo}, Receipt ${receiptNo}) permanently saved in database.`,
+        ? `বিল #${newInv.invoiceNo} (মেমো #${cashMemoNo}, রসিদ #${receiptNo}) স্থায়ী ডাটাবেজে সংরক্ষিত। ${
+            hasPathology
+              ? `প্যাথলজির ${newPathologyOrders.length}টি টেস্ট সফলভাবে প্যাথলজি মডিউলে প্রেরিত ও সিঙ্ক হয়েছে ✓`
+              : ''
+          }`
+        : `Invoice ${newInv.invoiceNo} (Memo ${cashMemoNo}, Receipt ${receiptNo}) permanently saved in database. ${
+            hasPathology
+              ? `All ${newPathologyOrders.length} pathology tests synced to Pathology module.`
+              : ''
+          }`,
       'success'
     );
     addLog(
       'info',
-      `Invoice ${newInv.invoiceNo} (Receipt ${receiptNo}) created for ${newInv.patientName} (${newInv.pId}).`,
+      `Invoice ${newInv.invoiceNo} (Receipt ${receiptNo}) created for ${newInv.patientName} (${newInv.pId}) with ${newPathologyOrders.length} pathology tests.`,
       'Billing'
     );
 
@@ -3479,6 +3574,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       patients,
       invoices,
       departmentOrders,
+      pathologyOrders,
       paymentTransactions,
       doctors,
       labTests,
@@ -3499,6 +3595,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     patients,
     invoices,
     departmentOrders,
+    pathologyOrders,
     paymentTransactions,
     doctors,
     labTests,
@@ -3623,6 +3720,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             setDepartmentOrders(buildOrdersFromInvoices(cols.invoices || invoices, cols.departmentOrders));
           } else if (Array.isArray(cols.invoices) && cols.invoices.length > 0) {
             setDepartmentOrders((prev) => buildOrdersFromInvoices(cols.invoices, prev));
+          }
+          if (Array.isArray(cols.pathologyOrders)) {
+            setPathologyOrders(cols.pathologyOrders);
           }
           if (Array.isArray(cols.paymentTransactions) && cols.paymentTransactions.length > 0) {
             setPaymentTransactions(cols.paymentTransactions);
@@ -3916,6 +4016,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setXrayReports((prev) => prev.filter((x) => x.id !== recordId));
       } else if (entityType === 'usgReport') {
         setUsgReports((prev) => prev.filter((u) => u.id !== recordId));
+      } else if (entityType === 'pathologyOrder') {
+        setPathologyOrders((prev) => prev.filter((o) => o.id !== recordId && o.orderNo !== recordId));
       }
 
       if (Array.isArray(data.trashRecords)) {
@@ -4012,6 +4114,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           setXrayReports((prev) => [orig, ...prev.filter((x) => x.id !== orig.id)]);
         } else if (restored.entityType === 'usgReport') {
           setUsgReports((prev) => [orig, ...prev.filter((u) => u.id !== orig.id)]);
+        } else if (restored.entityType === 'pathologyOrder') {
+          setPathologyOrders((prev) => [orig, ...prev.filter((o) => o.id !== orig.id)]);
         }
       }
 
@@ -4125,6 +4229,123 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
+  const updatePathologyOrderStatus = async (
+    orderId: string,
+    updates: {
+      sampleStatus?: SampleCollectionStatus;
+      reportStatus?: PathologyReportStatus;
+      notes?: string;
+      sampleCollectedBy?: string;
+      sampleReceivedBy?: string;
+    }
+  ): Promise<{ success: boolean; error?: string }> => {
+    const nowIso = new Date().toISOString();
+    const nowReadable = nowIso.replace('T', ' ').slice(0, 19);
+
+    setPathologyOrders((prev) =>
+      prev.map((ord) => {
+        if (ord.id !== orderId && ord.orderNo !== orderId) return ord;
+        return {
+          ...ord,
+          sampleStatus: updates.sampleStatus || ord.sampleStatus,
+          reportStatus: updates.reportStatus || ord.reportStatus,
+          notes: updates.notes !== undefined ? updates.notes : ord.notes,
+          sampleCollectedBy:
+            updates.sampleStatus === 'Collected'
+              ? updates.sampleCollectedBy || currentUser?.fullName || 'Technologist'
+              : ord.sampleCollectedBy,
+          sampleCollectedAt:
+            updates.sampleStatus === 'Collected' ? nowReadable : ord.sampleCollectedAt,
+          sampleReceivedBy:
+            updates.sampleStatus === 'Received'
+              ? updates.sampleReceivedBy || currentUser?.fullName || 'Lab Staff'
+              : ord.sampleReceivedBy,
+          sampleReceivedAt:
+            updates.sampleStatus === 'Received' ? nowReadable : ord.sampleReceivedAt,
+          updatedAt: nowIso,
+        };
+      })
+    );
+
+    try {
+      const res = await fetch('/api/pathology/orders/update-status', {
+        method: 'POST',
+        headers: getActorHeaders(),
+        body: JSON.stringify({
+          orderId,
+          ...updates,
+          sampleCollectedBy: updates.sampleCollectedBy || currentUser?.fullName,
+          sampleReceivedBy: updates.sampleReceivedBy || currentUser?.fullName,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        return { success: false, error: data?.error || 'Failed to update order status' };
+      }
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err?.message || 'Network error updating order status' };
+    }
+  };
+
+  const reconcileMissingPathologyOrders = async (): Promise<{
+    success: boolean;
+    recoveredCount: number;
+    invoicesProcessed: number;
+    totalOrders: number;
+    error?: string;
+  }> => {
+    try {
+      const res = await fetch('/api/pathology/reconcile-missing-orders', {
+        method: 'POST',
+        headers: getActorHeaders(),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        return {
+          success: false,
+          recoveredCount: 0,
+          invoicesProcessed: 0,
+          totalOrders: 0,
+          error: data?.error || 'Failed to reconcile orders',
+        };
+      }
+
+      if (Array.isArray(data.pathologyOrders)) {
+        setPathologyOrders(data.pathologyOrders);
+        try {
+          localStorage.setItem(`${PREFIX}pathology_orders`, JSON.stringify(data.pathologyOrders));
+        } catch {}
+      }
+      if (Array.isArray(data.patients)) {
+        setPatients(data.patients);
+      }
+
+      addNotification(
+        lang === 'bn' ? 'অর্ডার যাচাই ও রিকভারি সম্পন্ন' : 'Orders Reconciled',
+        lang === 'bn'
+          ? `মোট ${data.invoicesProcessed}টি ইনভয়েস যাচাই করে ${data.recoveredCount}টি মিসিং প্যাথলজি অর্ডার রিকভার করা হয়েছে (সর্বমোট অর্ডার: ${data.totalPathologyOrders}টি)।`
+          : `Reconciled ${data.invoicesProcessed} invoices: recovered ${data.recoveredCount} missing pathology orders (total: ${data.totalPathologyOrders}).`,
+        'success'
+      );
+
+      return {
+        success: true,
+        recoveredCount: data.recoveredCount,
+        invoicesProcessed: data.invoicesProcessed,
+        totalOrders: data.totalPathologyOrders,
+      };
+    } catch (err: any) {
+      return {
+        success: false,
+        recoveredCount: 0,
+        invoicesProcessed: 0,
+        totalOrders: 0,
+        error: err?.message || 'Network error while reconciling orders',
+      };
+    }
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -4182,6 +4403,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         cancelOrRefundInvoice,
         departmentOrders,
         updateDepartmentOrderStatus,
+        pathologyOrders,
+        setPathologyOrders,
+        updatePathologyOrderStatus,
+        reconcileMissingPathologyOrders,
         paymentTransactions,
         billingConfig,
         updateBillingConfig,

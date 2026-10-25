@@ -1,9 +1,13 @@
 {
-  "dbVersion": 9,
+  "dbVersion": 16,
   "isInitialized": true,
-  "lastSavedAt": "2026-10-25T04:51:19.127Z",
-  "lastSavedBy": "Super Admin (Admin)",
+  "lastSavedAt": "2026-10-25T06:30:51.126Z",
+  "lastSavedBy": "Pathology Reconciliation Engine",
   "processedMutationIds": [
+    "BILL-FIN-26100103",
+    "BILL-FIN-26100102",
+    "BILL-FIN-26100101",
+    "mut-1792909226136-4422",
     "TEST-BILL-1001",
     "test-nonascii",
     "mut-test",
@@ -14,6 +18,267 @@
   ],
   "collections": {
     "patients": [
+      {
+        "id": "pat-26100103",
+        "pId": "P103",
+        "accessionNo": "ACC-26100103",
+        "invoiceNo": "26100103",
+        "cashMemoNo": "CM-26100103",
+        "invDate": "2026-10-25",
+        "billDate": "2026-10-25",
+        "patientName": "Rokeya Sultana",
+        "age": "45 Y",
+        "sex": "Female",
+        "phone": "01911223344",
+        "address": "",
+        "drCode": "DR02",
+        "drName": "Dr. Anisur Rahman",
+        "status": "Pending",
+        "workflowStatus": "Pending",
+        "paymentStatus": "Paid",
+        "department": "Pathology",
+        "sampleType": "Whole Blood",
+        "testResults": [
+          {
+            "testName": "TSH (Thyroid)",
+            "result": "",
+            "unit": "",
+            "normalRange": "",
+            "status": "Normal",
+            "category": "Hormone"
+          }
+        ],
+        "createdAt": "2026-10-25T06:30:51.099Z"
+      },
+      {
+        "id": "pat-26100102",
+        "pId": "P102",
+        "accessionNo": "ACC-26100102",
+        "invoiceNo": "26100102",
+        "cashMemoNo": "CM-26100102",
+        "invDate": "2026-10-25",
+        "billDate": "2026-10-25",
+        "patientName": "Md. Karim Ullah",
+        "age": "52 Y",
+        "sex": "Male",
+        "phone": "01811223344",
+        "address": "",
+        "drCode": "DR01",
+        "drName": "Dr. Rafiqul Islam",
+        "status": "Pending",
+        "workflowStatus": "Pending",
+        "paymentStatus": "Paid",
+        "department": "Pathology",
+        "sampleType": "Whole Blood",
+        "testResults": [
+          {
+            "testName": "CBC with ESR",
+            "result": "",
+            "unit": "",
+            "normalRange": "",
+            "status": "Normal",
+            "category": "Hematology"
+          },
+          {
+            "testName": "Random Blood Sugar",
+            "result": "",
+            "unit": "",
+            "normalRange": "",
+            "status": "Normal",
+            "category": "Biochemistry"
+          },
+          {
+            "testName": "Serum Creatinine",
+            "result": "",
+            "unit": "",
+            "normalRange": "",
+            "status": "Normal",
+            "category": "Biochemistry"
+          },
+          {
+            "testName": "Lipid Profile",
+            "result": "",
+            "unit": "",
+            "normalRange": "",
+            "status": "Normal",
+            "category": "Biochemistry"
+          },
+          {
+            "testName": "Urine Routine Examination",
+            "result": "",
+            "unit": "",
+            "normalRange": "",
+            "status": "Normal",
+            "category": "Clinical Pathology"
+          }
+        ],
+        "createdAt": "2026-10-25T06:30:51.089Z"
+      },
+      {
+        "id": "pat-26100101",
+        "pId": "P101",
+        "accessionNo": "ACC-26100101",
+        "invoiceNo": "26100101",
+        "cashMemoNo": "CM-26100101",
+        "invDate": "2026-10-25",
+        "billDate": "2026-10-25",
+        "patientName": "Mst. Salma Begum",
+        "age": "35 Y",
+        "sex": "Female",
+        "phone": "01711223344",
+        "address": "",
+        "drCode": "DR01",
+        "drName": "Dr. Rafiqul Islam",
+        "status": "Pending",
+        "workflowStatus": "Pending",
+        "paymentStatus": "Paid",
+        "department": "Pathology",
+        "sampleType": "EDTA Whole Blood",
+        "testResults": [
+          {
+            "testName": "Complete Blood Count (CBC)",
+            "result": "",
+            "unit": "",
+            "normalRange": "",
+            "status": "Normal",
+            "category": "Hematology"
+          }
+        ],
+        "createdAt": "2026-10-25T06:30:51.078Z"
+      },
+      {
+        "id": "pat-inv-2026-1003",
+        "pId": "26100286",
+        "accessionNo": "ACC-2026-1003",
+        "invoiceNo": "INV-2026-1003",
+        "cashMemoNo": "CM-2026-1003",
+        "invDate": "15-10-2026",
+        "billDate": "15-10-2026",
+        "patientName": "Minara",
+        "age": "29 Y",
+        "sex": "Female",
+        "phone": "01712000005",
+        "address": "",
+        "drCode": "DR02",
+        "drName": "Dr. Nusrat Jahan",
+        "status": "Pending",
+        "workflowStatus": "Pending",
+        "paymentStatus": "Paid",
+        "department": "Pathology",
+        "testResults": [
+          {
+            "testName": "Random Blood Sugar (RBS)",
+            "result": "",
+            "unit": "",
+            "normalRange": "",
+            "status": "Normal",
+            "category": "Biochemistry"
+          },
+          {
+            "testName": "Urine Routine & Microscopic (R/M/E)",
+            "result": "",
+            "unit": "",
+            "normalRange": "",
+            "status": "Normal",
+            "category": "Microbiology"
+          }
+        ],
+        "createdAt": "2026-10-15T09:30:00"
+      },
+      {
+        "id": "pat-inv-2026-1002",
+        "pId": "26100290",
+        "accessionNo": "ACC-2026-1002",
+        "invoiceNo": "INV-2026-1002",
+        "cashMemoNo": "CM-2026-1002",
+        "invDate": "13-10-2026",
+        "billDate": "13-10-2026",
+        "patientName": "Masud Shikder",
+        "age": "48 Y",
+        "sex": "Male",
+        "phone": "01812000003",
+        "address": "",
+        "drCode": "DR01",
+        "drName": "Prof. Dr. M. A. Rahman",
+        "status": "Pending",
+        "workflowStatus": "Pending",
+        "paymentStatus": "Partial",
+        "department": "Pathology",
+        "testResults": [
+          {
+            "testName": "Fasting Blood Sugar (FBS)",
+            "result": "",
+            "unit": "",
+            "normalRange": "",
+            "status": "Normal",
+            "category": "Biochemistry"
+          },
+          {
+            "testName": "Glycated Hemoglobin (HbA1c)",
+            "result": "",
+            "unit": "",
+            "normalRange": "",
+            "status": "Normal",
+            "category": "Biochemistry"
+          },
+          {
+            "testName": "Serum Creatinine",
+            "result": "",
+            "unit": "",
+            "normalRange": "",
+            "status": "Normal",
+            "category": "Biochemistry"
+          }
+        ],
+        "createdAt": "2026-10-13T10:00:00"
+      },
+      {
+        "id": "pat-inv-2026-1001",
+        "pId": "26100294",
+        "accessionNo": "ACC-2026-1001",
+        "invoiceNo": "INV-2026-1001",
+        "cashMemoNo": "CM-2026-1001",
+        "invDate": "13-10-2026",
+        "billDate": "13-10-2026",
+        "patientName": "Titly",
+        "age": "24 Y",
+        "sex": "Female",
+        "phone": "01712000001",
+        "address": "",
+        "drCode": "DR01",
+        "drName": "Prof. Dr. M. A. Rahman",
+        "status": "Pending",
+        "workflowStatus": "Pending",
+        "paymentStatus": "Paid",
+        "department": "Pathology",
+        "testResults": [
+          {
+            "testName": "Complete Blood Count (CBC with ESR)",
+            "result": "",
+            "unit": "",
+            "normalRange": "",
+            "status": "Normal",
+            "category": "Hematology"
+          },
+          {
+            "testName": "Serum Creatinine",
+            "result": "",
+            "unit": "",
+            "normalRange": "",
+            "status": "Normal",
+            "category": "Biochemistry"
+          },
+          {
+            "testName": "Fasting Blood Sugar (FBS)",
+            "result": "",
+            "unit": "",
+            "normalRange": "",
+            "status": "Normal",
+            "category": "Biochemistry"
+          }
+        ],
+        "createdAt": "2026-10-13T09:10:00"
+      },
       {
         "id": "pat-test-999",
         "pId": "26999999",
@@ -28,6 +293,177 @@
       }
     ],
     "invoices": [
+      {
+        "id": "inv-test-mixed-103",
+        "invoiceNo": "26100103",
+        "pId": "P103",
+        "patientName": "Rokeya Sultana",
+        "age": "45 Y",
+        "sex": "Female",
+        "phone": "01911223344",
+        "drCode": "DR02",
+        "drName": "Dr. Anisur Rahman",
+        "items": [
+          {
+            "id": "it-mix-1",
+            "testCode": "TSH",
+            "testName": "TSH (Thyroid)",
+            "category": "Hormone",
+            "departmentId": "pathology",
+            "price": 600,
+            "quantity": 1,
+            "total": 600
+          },
+          {
+            "id": "it-mix-2",
+            "testCode": "XRAY_CHEST",
+            "testName": "X-Ray Chest P/A View",
+            "category": "Imaging",
+            "departmentId": "xray",
+            "price": 500,
+            "quantity": 1,
+            "total": 500
+          },
+          {
+            "id": "it-mix-3",
+            "testCode": "USG_W_A",
+            "testName": "USG of Whole Abdomen",
+            "category": "Ultrasound",
+            "departmentId": "ultrasound",
+            "price": 1200,
+            "quantity": 1,
+            "total": 1200
+          },
+          {
+            "id": "it-mix-4",
+            "testCode": "ECG_12",
+            "testName": "ECG 12 Leads",
+            "category": "Cardiology",
+            "departmentId": "ecg",
+            "price": 300,
+            "quantity": 1,
+            "total": 300
+          }
+        ],
+        "subTotal": 2600,
+        "discount": 0,
+        "total": 2600,
+        "paid": 2600,
+        "due": 0,
+        "status": "Paid",
+        "date": "2026-10-25",
+        "cashMemoNo": "CM-26100103",
+        "receiptNo": "RCP-26100103",
+        "payments": []
+      },
+      {
+        "id": "inv-test-multi-102",
+        "invoiceNo": "26100102",
+        "pId": "P102",
+        "patientName": "Md. Karim Ullah",
+        "age": "52 Y",
+        "sex": "Male",
+        "phone": "01811223344",
+        "drCode": "DR01",
+        "drName": "Dr. Rafiqul Islam",
+        "items": [
+          {
+            "id": "it-m1",
+            "testCode": "CBC",
+            "testName": "CBC with ESR",
+            "category": "Hematology",
+            "departmentId": "pathology",
+            "price": 400,
+            "quantity": 1,
+            "total": 400
+          },
+          {
+            "id": "it-m2",
+            "testCode": "RBS",
+            "testName": "Random Blood Sugar",
+            "category": "Biochemistry",
+            "departmentId": "pathology",
+            "price": 150,
+            "quantity": 1,
+            "total": 150
+          },
+          {
+            "id": "it-m3",
+            "testCode": "S_CREAT",
+            "testName": "Serum Creatinine",
+            "category": "Biochemistry",
+            "departmentId": "pathology",
+            "price": 350,
+            "quantity": 1,
+            "total": 350
+          },
+          {
+            "id": "it-m4",
+            "testCode": "LIPID",
+            "testName": "Lipid Profile",
+            "category": "Biochemistry",
+            "departmentId": "pathology",
+            "price": 900,
+            "quantity": 1,
+            "total": 900
+          },
+          {
+            "id": "it-m5",
+            "testCode": "U_RE",
+            "testName": "Urine Routine Examination",
+            "category": "Clinical Pathology",
+            "departmentId": "pathology",
+            "price": 200,
+            "quantity": 1,
+            "total": 200
+          }
+        ],
+        "subTotal": 2000,
+        "discount": 200,
+        "total": 1800,
+        "paid": 1800,
+        "due": 0,
+        "status": "Paid",
+        "date": "2026-10-25",
+        "cashMemoNo": "CM-26100102",
+        "receiptNo": "RCP-26100102",
+        "payments": []
+      },
+      {
+        "id": "inv-test-single-101",
+        "invoiceNo": "26100101",
+        "cashMemoNo": "CM-26100101",
+        "receiptNo": "REC-26100101",
+        "pId": "P101",
+        "patientName": "Mst. Salma Begum",
+        "age": "35 Y",
+        "sex": "Female",
+        "phone": "01711223344",
+        "drCode": "DR01",
+        "drName": "Dr. Rafiqul Islam",
+        "items": [
+          {
+            "id": "it-1",
+            "testCode": "CBC",
+            "testName": "Complete Blood Count (CBC)",
+            "nameBn": "সিবিসি রক্ত পরীক্ষা",
+            "category": "Hematology",
+            "sampleType": "EDTA Whole Blood",
+            "departmentId": "pathology",
+            "price": 400,
+            "quantity": 1,
+            "total": 400
+          }
+        ],
+        "subTotal": 400,
+        "discount": 0,
+        "total": 400,
+        "paid": 400,
+        "due": 0,
+        "status": "Paid",
+        "date": "2026-10-25",
+        "payments": []
+      },
       {
         "id": "inv-1",
         "invoiceNo": "INV-2026-1001",
@@ -67,7 +503,8 @@
         "dueAmount": 0,
         "paymentMethod": "Cash",
         "status": "Paid",
-        "createdAt": "2026-10-13T09:10:00"
+        "createdAt": "2026-10-13T09:10:00",
+        "payments": []
       },
       {
         "id": "inv-2",
@@ -108,7 +545,8 @@
         "dueAmount": 300,
         "paymentMethod": "bKash/Nagad",
         "status": "Partial",
-        "createdAt": "2026-10-13T10:00:00"
+        "createdAt": "2026-10-13T10:00:00",
+        "payments": []
       },
       {
         "id": "inv-3",
@@ -143,10 +581,847 @@
         "dueAmount": 0,
         "paymentMethod": "Cash",
         "status": "Paid",
-        "createdAt": "2026-10-15T09:30:00"
+        "createdAt": "2026-10-15T09:30:00",
+        "payments": []
       }
     ],
-    "departmentOrders": [],
+    "departmentOrders": [
+      {
+        "id": "ord-dept-26100101-pathology",
+        "orderNo": "ORD-PATH-26100101",
+        "invoiceId": "inv-test-single-101",
+        "invoiceNo": "26100101",
+        "cashMemoNo": "CM-26100101",
+        "pId": "P101",
+        "patientName": "Mst. Salma Begum",
+        "age": "35 Y",
+        "sex": "Female",
+        "phone": "01711223344",
+        "address": "",
+        "drCode": "DR01",
+        "drName": "Dr. Rafiqul Islam",
+        "departmentId": "pathology",
+        "departmentName": "Pathology Laboratory",
+        "items": [
+          {
+            "id": "it-1",
+            "testCode": "CBC",
+            "testName": "Complete Blood Count (CBC)",
+            "nameBn": "সিবিসি রক্ত পরীক্ষা",
+            "category": "Hematology",
+            "sampleType": "EDTA Whole Blood",
+            "departmentId": "pathology",
+            "price": 400,
+            "quantity": 1,
+            "total": 400
+          }
+        ],
+        "orderDate": "2026-10-25",
+        "paymentStatus": "Paid",
+        "orderStatus": "Ordered",
+        "createdAt": "2026-10-25T09:00:00.000Z",
+        "updatedAt": "2026-10-25T09:00:00.000Z"
+      },
+      {
+        "id": "ord-dept-26100102-pathology",
+        "orderNo": "ORD-PATH-26100102",
+        "invoiceId": "inv-test-multi-102",
+        "invoiceNo": "26100102",
+        "cashMemoNo": "CM-26100102",
+        "pId": "P102",
+        "patientName": "Md. Karim Ullah",
+        "age": "52 Y",
+        "sex": "Male",
+        "phone": "01811223344",
+        "address": "",
+        "drCode": "DR01",
+        "drName": "Dr. Rafiqul Islam",
+        "departmentId": "pathology",
+        "departmentName": "Pathology Laboratory",
+        "items": [
+          {
+            "id": "it-m1",
+            "testCode": "CBC",
+            "testName": "CBC with ESR",
+            "category": "Hematology",
+            "departmentId": "pathology",
+            "price": 400,
+            "quantity": 1,
+            "total": 400
+          },
+          {
+            "id": "it-m2",
+            "testCode": "RBS",
+            "testName": "Random Blood Sugar",
+            "category": "Biochemistry",
+            "departmentId": "pathology",
+            "price": 150,
+            "quantity": 1,
+            "total": 150
+          },
+          {
+            "id": "it-m3",
+            "testCode": "S_CREAT",
+            "testName": "Serum Creatinine",
+            "category": "Biochemistry",
+            "departmentId": "pathology",
+            "price": 350,
+            "quantity": 1,
+            "total": 350
+          },
+          {
+            "id": "it-m4",
+            "testCode": "LIPID",
+            "testName": "Lipid Profile",
+            "category": "Biochemistry",
+            "departmentId": "pathology",
+            "price": 900,
+            "quantity": 1,
+            "total": 900
+          },
+          {
+            "id": "it-m5",
+            "testCode": "U_RE",
+            "testName": "Urine Routine Examination",
+            "category": "Clinical Pathology",
+            "departmentId": "pathology",
+            "price": 200,
+            "quantity": 1,
+            "total": 200
+          }
+        ],
+        "orderDate": "2026-10-25",
+        "paymentStatus": "Paid",
+        "orderStatus": "Ordered",
+        "createdAt": "2026-10-25T09:00:00.000Z",
+        "updatedAt": "2026-10-25T09:00:00.000Z"
+      },
+      {
+        "id": "ord-dept-26100103-ecg",
+        "orderNo": "ORD-ECG-26100103",
+        "invoiceId": "inv-test-mixed-103",
+        "invoiceNo": "26100103",
+        "cashMemoNo": "CM-26100103",
+        "pId": "P103",
+        "patientName": "Rokeya Sultana",
+        "age": "45 Y",
+        "sex": "Female",
+        "phone": "01911223344",
+        "address": "",
+        "drCode": "DR02",
+        "drName": "Dr. Anisur Rahman",
+        "departmentId": "ecg",
+        "departmentName": "ECG & Cardiology Diagnostics",
+        "items": [
+          {
+            "id": "it-mix-4",
+            "testCode": "ECG_12",
+            "testName": "ECG 12 Leads",
+            "category": "Cardiology",
+            "departmentId": "ecg",
+            "price": 300,
+            "quantity": 1,
+            "total": 300
+          }
+        ],
+        "orderDate": "2026-10-25",
+        "paymentStatus": "Paid",
+        "orderStatus": "Ordered",
+        "createdAt": "2026-10-25T09:00:00.000Z",
+        "updatedAt": "2026-10-25T09:00:00.000Z"
+      },
+      {
+        "id": "ord-dept-26100103-ultrasound",
+        "orderNo": "ORD-ULTR-26100103",
+        "invoiceId": "inv-test-mixed-103",
+        "invoiceNo": "26100103",
+        "cashMemoNo": "CM-26100103",
+        "pId": "P103",
+        "patientName": "Rokeya Sultana",
+        "age": "45 Y",
+        "sex": "Female",
+        "phone": "01911223344",
+        "address": "",
+        "drCode": "DR02",
+        "drName": "Dr. Anisur Rahman",
+        "departmentId": "ultrasound",
+        "departmentName": "Ultrasound (USG) & Doppler",
+        "items": [
+          {
+            "id": "it-mix-3",
+            "testCode": "USG_W_A",
+            "testName": "USG of Whole Abdomen",
+            "category": "Ultrasound",
+            "departmentId": "ultrasound",
+            "price": 1200,
+            "quantity": 1,
+            "total": 1200
+          }
+        ],
+        "orderDate": "2026-10-25",
+        "paymentStatus": "Paid",
+        "orderStatus": "Ordered",
+        "createdAt": "2026-10-25T09:00:00.000Z",
+        "updatedAt": "2026-10-25T09:00:00.000Z"
+      },
+      {
+        "id": "ord-dept-26100103-xray",
+        "orderNo": "ORD-XRAY-26100103",
+        "invoiceId": "inv-test-mixed-103",
+        "invoiceNo": "26100103",
+        "cashMemoNo": "CM-26100103",
+        "pId": "P103",
+        "patientName": "Rokeya Sultana",
+        "age": "45 Y",
+        "sex": "Female",
+        "phone": "01911223344",
+        "address": "",
+        "drCode": "DR02",
+        "drName": "Dr. Anisur Rahman",
+        "departmentId": "xray",
+        "departmentName": "Digital X-Ray & Radiology",
+        "items": [
+          {
+            "id": "it-mix-2",
+            "testCode": "XRAY_CHEST",
+            "testName": "X-Ray Chest P/A View",
+            "category": "Imaging",
+            "departmentId": "xray",
+            "price": 500,
+            "quantity": 1,
+            "total": 500
+          }
+        ],
+        "orderDate": "2026-10-25",
+        "paymentStatus": "Paid",
+        "orderStatus": "Ordered",
+        "createdAt": "2026-10-25T09:00:00.000Z",
+        "updatedAt": "2026-10-25T09:00:00.000Z"
+      },
+      {
+        "id": "ord-dept-26100103-pathology",
+        "orderNo": "ORD-PATH-26100103",
+        "invoiceId": "inv-test-mixed-103",
+        "invoiceNo": "26100103",
+        "cashMemoNo": "CM-26100103",
+        "pId": "P103",
+        "patientName": "Rokeya Sultana",
+        "age": "45 Y",
+        "sex": "Female",
+        "phone": "01911223344",
+        "address": "",
+        "drCode": "DR02",
+        "drName": "Dr. Anisur Rahman",
+        "departmentId": "pathology",
+        "departmentName": "Pathology Laboratory",
+        "items": [
+          {
+            "id": "it-mix-1",
+            "testCode": "TSH",
+            "testName": "TSH (Thyroid)",
+            "category": "Hormone",
+            "departmentId": "pathology",
+            "price": 600,
+            "quantity": 1,
+            "total": 600
+          }
+        ],
+        "orderDate": "2026-10-25",
+        "paymentStatus": "Paid",
+        "orderStatus": "Ordered",
+        "createdAt": "2026-10-25T09:00:00.000Z",
+        "updatedAt": "2026-10-25T09:00:00.000Z"
+      },
+      {
+        "id": "ord-dept-inv-2026-1003-pathology",
+        "orderNo": "ORD-PATH-2026-1003",
+        "invoiceId": "inv-3",
+        "invoiceNo": "INV-2026-1003",
+        "cashMemoNo": "CM-2026-1003",
+        "pId": "26100286",
+        "patientName": "Minara",
+        "age": "29 Y",
+        "sex": "Female",
+        "phone": "01712000005",
+        "address": "",
+        "drCode": "DR02",
+        "drName": "Dr. Nusrat Jahan",
+        "departmentId": "pathology",
+        "departmentName": "Pathology Laboratory",
+        "items": [
+          {
+            "testId": "t-rbs",
+            "testName": "Random Blood Sugar (RBS)",
+            "category": "Biochemistry",
+            "price": 150
+          },
+          {
+            "testId": "t-urine-re",
+            "testName": "Urine Routine & Microscopic (R/M/E)",
+            "category": "Microbiology",
+            "price": 200
+          }
+        ],
+        "orderDate": "15-10-2026",
+        "paymentStatus": "Paid",
+        "orderStatus": "Ordered",
+        "createdAt": "2026-10-15T09:30:00",
+        "updatedAt": "2026-10-15T09:30:00"
+      },
+      {
+        "id": "ord-dept-inv-2026-1002-pathology",
+        "orderNo": "ORD-PATH-2026-1002",
+        "invoiceId": "inv-2",
+        "invoiceNo": "INV-2026-1002",
+        "cashMemoNo": "CM-2026-1002",
+        "pId": "26100290",
+        "patientName": "Masud Shikder",
+        "age": "48 Y",
+        "sex": "Male",
+        "phone": "01812000003",
+        "address": "",
+        "drCode": "DR01",
+        "drName": "Prof. Dr. M. A. Rahman",
+        "departmentId": "pathology",
+        "departmentName": "Pathology Laboratory",
+        "items": [
+          {
+            "testId": "t-fbs",
+            "testName": "Fasting Blood Sugar (FBS)",
+            "category": "Biochemistry",
+            "price": 150
+          },
+          {
+            "testId": "t-hba1c",
+            "testName": "Glycated Hemoglobin (HbA1c)",
+            "category": "Biochemistry",
+            "price": 800
+          },
+          {
+            "testId": "t-creatinine",
+            "testName": "Serum Creatinine",
+            "category": "Biochemistry",
+            "price": 350
+          }
+        ],
+        "orderDate": "13-10-2026",
+        "paymentStatus": "Partial",
+        "orderStatus": "Ordered",
+        "createdAt": "2026-10-13T10:00:00",
+        "updatedAt": "2026-10-13T10:00:00"
+      },
+      {
+        "id": "ord-dept-inv-2026-1001-pathology",
+        "orderNo": "ORD-PATH-2026-1001",
+        "invoiceId": "inv-1",
+        "invoiceNo": "INV-2026-1001",
+        "cashMemoNo": "CM-2026-1001",
+        "pId": "26100294",
+        "patientName": "Titly",
+        "age": "24 Y",
+        "sex": "Female",
+        "phone": "01712000001",
+        "address": "",
+        "drCode": "DR01",
+        "drName": "Prof. Dr. M. A. Rahman",
+        "departmentId": "pathology",
+        "departmentName": "Pathology Laboratory",
+        "items": [
+          {
+            "testId": "t-cbc",
+            "testName": "Complete Blood Count (CBC with ESR)",
+            "category": "Hematology",
+            "price": 450
+          },
+          {
+            "testId": "t-creatinine",
+            "testName": "Serum Creatinine",
+            "category": "Biochemistry",
+            "price": 350
+          },
+          {
+            "testId": "t-fbs",
+            "testName": "Fasting Blood Sugar (FBS)",
+            "category": "Biochemistry",
+            "price": 150
+          }
+        ],
+        "orderDate": "13-10-2026",
+        "paymentStatus": "Paid",
+        "orderStatus": "Ordered",
+        "createdAt": "2026-10-13T09:10:00",
+        "updatedAt": "2026-10-13T09:10:00"
+      }
+    ],
+    "pathologyOrders": [
+      {
+        "id": "ord-path-26100103-tsh__thyroid_-0",
+        "orderNo": "ORD-PATH-26100103-1",
+        "invoiceId": "inv-test-mixed-103",
+        "invoiceNo": "26100103",
+        "cashMemoNo": "CM-26100103",
+        "receiptNo": "RCP-26100103",
+        "pId": "P103",
+        "patientId": "P103",
+        "patientName": "Rokeya Sultana",
+        "age": "45 Y",
+        "sex": "Female",
+        "phone": "01911223344",
+        "address": "",
+        "drCode": "DR02",
+        "drName": "Dr. Anisur Rahman",
+        "testId": "t-0",
+        "testCode": "TC-1",
+        "testName": "TSH (Thyroid)",
+        "nameBn": "",
+        "category": "Hormone",
+        "price": 600,
+        "orderDate": "2026-10-25",
+        "orderTimestamp": "2026-10-25T06:30:51.099Z",
+        "paymentStatus": "Paid",
+        "sampleType": "Whole Blood",
+        "sampleStatus": "Collected",
+        "reportStatus": "Pending",
+        "createdAt": "2026-10-25T06:30:51.099Z",
+        "updatedAt": "2026-10-25T06:30:51.117Z",
+        "sampleCollectedBy": "Medical Technologist Lab",
+        "sampleCollectedAt": "2026-10-25 06:30:51"
+      },
+      {
+        "id": "ord-path-26100102-cbc_with_esr-0",
+        "orderNo": "ORD-PATH-26100102-1",
+        "invoiceId": "inv-test-multi-102",
+        "invoiceNo": "26100102",
+        "cashMemoNo": "CM-26100102",
+        "receiptNo": "RCP-26100102",
+        "pId": "P102",
+        "patientId": "P102",
+        "patientName": "Md. Karim Ullah",
+        "age": "52 Y",
+        "sex": "Male",
+        "phone": "01811223344",
+        "address": "",
+        "drCode": "DR01",
+        "drName": "Dr. Rafiqul Islam",
+        "testId": "t-0",
+        "testCode": "TC-1",
+        "testName": "CBC with ESR",
+        "nameBn": "",
+        "category": "Hematology",
+        "price": 400,
+        "orderDate": "2026-10-25",
+        "orderTimestamp": "2026-10-25T06:30:51.089Z",
+        "paymentStatus": "Paid",
+        "sampleType": "Whole Blood",
+        "sampleStatus": "Pending",
+        "reportStatus": "Pending",
+        "createdAt": "2026-10-25T06:30:51.089Z",
+        "updatedAt": "2026-10-25T06:30:51.089Z"
+      },
+      {
+        "id": "ord-path-26100102-random_blood_sugar-1",
+        "orderNo": "ORD-PATH-26100102-2",
+        "invoiceId": "inv-test-multi-102",
+        "invoiceNo": "26100102",
+        "cashMemoNo": "CM-26100102",
+        "receiptNo": "RCP-26100102",
+        "pId": "P102",
+        "patientId": "P102",
+        "patientName": "Md. Karim Ullah",
+        "age": "52 Y",
+        "sex": "Male",
+        "phone": "01811223344",
+        "address": "",
+        "drCode": "DR01",
+        "drName": "Dr. Rafiqul Islam",
+        "testId": "t-1",
+        "testCode": "TC-2",
+        "testName": "Random Blood Sugar",
+        "nameBn": "",
+        "category": "Biochemistry",
+        "price": 150,
+        "orderDate": "2026-10-25",
+        "orderTimestamp": "2026-10-25T06:30:51.089Z",
+        "paymentStatus": "Paid",
+        "sampleType": "Whole Blood",
+        "sampleStatus": "Pending",
+        "reportStatus": "Pending",
+        "createdAt": "2026-10-25T06:30:51.089Z",
+        "updatedAt": "2026-10-25T06:30:51.089Z"
+      },
+      {
+        "id": "ord-path-26100102-serum_creatinine-2",
+        "orderNo": "ORD-PATH-26100102-3",
+        "invoiceId": "inv-test-multi-102",
+        "invoiceNo": "26100102",
+        "cashMemoNo": "CM-26100102",
+        "receiptNo": "RCP-26100102",
+        "pId": "P102",
+        "patientId": "P102",
+        "patientName": "Md. Karim Ullah",
+        "age": "52 Y",
+        "sex": "Male",
+        "phone": "01811223344",
+        "address": "",
+        "drCode": "DR01",
+        "drName": "Dr. Rafiqul Islam",
+        "testId": "t-2",
+        "testCode": "TC-3",
+        "testName": "Serum Creatinine",
+        "nameBn": "",
+        "category": "Biochemistry",
+        "price": 350,
+        "orderDate": "2026-10-25",
+        "orderTimestamp": "2026-10-25T06:30:51.089Z",
+        "paymentStatus": "Paid",
+        "sampleType": "Whole Blood",
+        "sampleStatus": "Pending",
+        "reportStatus": "Pending",
+        "createdAt": "2026-10-25T06:30:51.089Z",
+        "updatedAt": "2026-10-25T06:30:51.089Z"
+      },
+      {
+        "id": "ord-path-26100102-lipid_profile-3",
+        "orderNo": "ORD-PATH-26100102-4",
+        "invoiceId": "inv-test-multi-102",
+        "invoiceNo": "26100102",
+        "cashMemoNo": "CM-26100102",
+        "receiptNo": "RCP-26100102",
+        "pId": "P102",
+        "patientId": "P102",
+        "patientName": "Md. Karim Ullah",
+        "age": "52 Y",
+        "sex": "Male",
+        "phone": "01811223344",
+        "address": "",
+        "drCode": "DR01",
+        "drName": "Dr. Rafiqul Islam",
+        "testId": "t-3",
+        "testCode": "TC-4",
+        "testName": "Lipid Profile",
+        "nameBn": "",
+        "category": "Biochemistry",
+        "price": 900,
+        "orderDate": "2026-10-25",
+        "orderTimestamp": "2026-10-25T06:30:51.089Z",
+        "paymentStatus": "Paid",
+        "sampleType": "Whole Blood",
+        "sampleStatus": "Pending",
+        "reportStatus": "Pending",
+        "createdAt": "2026-10-25T06:30:51.089Z",
+        "updatedAt": "2026-10-25T06:30:51.089Z"
+      },
+      {
+        "id": "ord-path-26100102-urine_routine_examination-4",
+        "orderNo": "ORD-PATH-26100102-5",
+        "invoiceId": "inv-test-multi-102",
+        "invoiceNo": "26100102",
+        "cashMemoNo": "CM-26100102",
+        "receiptNo": "RCP-26100102",
+        "pId": "P102",
+        "patientId": "P102",
+        "patientName": "Md. Karim Ullah",
+        "age": "52 Y",
+        "sex": "Male",
+        "phone": "01811223344",
+        "address": "",
+        "drCode": "DR01",
+        "drName": "Dr. Rafiqul Islam",
+        "testId": "t-4",
+        "testCode": "TC-5",
+        "testName": "Urine Routine Examination",
+        "nameBn": "",
+        "category": "Clinical Pathology",
+        "price": 200,
+        "orderDate": "2026-10-25",
+        "orderTimestamp": "2026-10-25T06:30:51.089Z",
+        "paymentStatus": "Paid",
+        "sampleType": "Whole Blood",
+        "sampleStatus": "Pending",
+        "reportStatus": "Pending",
+        "createdAt": "2026-10-25T06:30:51.089Z",
+        "updatedAt": "2026-10-25T06:30:51.089Z"
+      },
+      {
+        "id": "ord-path-26100101-complete_blood_count__cbc_-0",
+        "orderNo": "ORD-PATH-26100101-1",
+        "invoiceId": "inv-test-single-101",
+        "invoiceNo": "26100101",
+        "cashMemoNo": "CM-26100101",
+        "receiptNo": "REC-26100101",
+        "pId": "P101",
+        "patientId": "P101",
+        "patientName": "Mst. Salma Begum",
+        "age": "35 Y",
+        "sex": "Female",
+        "phone": "01711223344",
+        "address": "",
+        "drCode": "DR01",
+        "drName": "Dr. Rafiqul Islam",
+        "testId": "t-0",
+        "testCode": "TC-1",
+        "testName": "Complete Blood Count (CBC)",
+        "nameBn": "সিবিসি রক্ত পরীক্ষা",
+        "category": "Hematology",
+        "price": 400,
+        "orderDate": "2026-10-25",
+        "orderTimestamp": "2026-10-25T06:30:51.078Z",
+        "paymentStatus": "Paid",
+        "sampleType": "EDTA Whole Blood",
+        "sampleStatus": "Pending",
+        "reportStatus": "Pending",
+        "createdAt": "2026-10-25T06:30:51.078Z",
+        "updatedAt": "2026-10-25T06:30:51.078Z"
+      },
+      {
+        "id": "ord-path-inv-2026-1003-t-urine-re-1",
+        "orderNo": "ORD-PATH-2026-1003-2",
+        "invoiceId": "inv-3",
+        "invoiceNo": "INV-2026-1003",
+        "cashMemoNo": "CM-2026-1003",
+        "receiptNo": "RCP-2026-1003",
+        "pId": "26100286",
+        "patientId": "26100286",
+        "patientName": "Minara",
+        "age": "29 Y",
+        "sex": "Female",
+        "phone": "01712000005",
+        "address": "",
+        "drCode": "DR02",
+        "drName": "Dr. Nusrat Jahan",
+        "testId": "t-urine-re",
+        "testCode": "t-urine-re",
+        "testName": "Urine Routine & Microscopic (R/M/E)",
+        "nameBn": "",
+        "category": "Microbiology",
+        "price": 200,
+        "orderDate": "15-10-2026",
+        "orderTimestamp": "2026-10-15T09:30:00",
+        "paymentStatus": "Paid",
+        "sampleType": "Blood",
+        "sampleStatus": "Pending",
+        "reportStatus": "Pending",
+        "createdAt": "2026-10-15T09:30:00",
+        "updatedAt": "2026-10-15T09:30:00"
+      },
+      {
+        "id": "ord-path-inv-2026-1003-t-rbs-0",
+        "orderNo": "ORD-PATH-2026-1003-1",
+        "invoiceId": "inv-3",
+        "invoiceNo": "INV-2026-1003",
+        "cashMemoNo": "CM-2026-1003",
+        "receiptNo": "RCP-2026-1003",
+        "pId": "26100286",
+        "patientId": "26100286",
+        "patientName": "Minara",
+        "age": "29 Y",
+        "sex": "Female",
+        "phone": "01712000005",
+        "address": "",
+        "drCode": "DR02",
+        "drName": "Dr. Nusrat Jahan",
+        "testId": "t-rbs",
+        "testCode": "t-rbs",
+        "testName": "Random Blood Sugar (RBS)",
+        "nameBn": "",
+        "category": "Biochemistry",
+        "price": 150,
+        "orderDate": "15-10-2026",
+        "orderTimestamp": "2026-10-15T09:30:00",
+        "paymentStatus": "Paid",
+        "sampleType": "Blood",
+        "sampleStatus": "Pending",
+        "reportStatus": "Pending",
+        "createdAt": "2026-10-15T09:30:00",
+        "updatedAt": "2026-10-15T09:30:00"
+      },
+      {
+        "id": "ord-path-inv-2026-1002-t-creatinine-2",
+        "orderNo": "ORD-PATH-2026-1002-3",
+        "invoiceId": "inv-2",
+        "invoiceNo": "INV-2026-1002",
+        "cashMemoNo": "CM-2026-1002",
+        "receiptNo": "RCP-2026-1002",
+        "pId": "26100290",
+        "patientId": "26100290",
+        "patientName": "Masud Shikder",
+        "age": "48 Y",
+        "sex": "Male",
+        "phone": "01812000003",
+        "address": "",
+        "drCode": "DR01",
+        "drName": "Prof. Dr. M. A. Rahman",
+        "testId": "t-creatinine",
+        "testCode": "t-creatinine",
+        "testName": "Serum Creatinine",
+        "nameBn": "",
+        "category": "Biochemistry",
+        "price": 350,
+        "orderDate": "13-10-2026",
+        "orderTimestamp": "2026-10-13T10:00:00",
+        "paymentStatus": "Partial",
+        "sampleType": "Blood",
+        "sampleStatus": "Pending",
+        "reportStatus": "Pending",
+        "createdAt": "2026-10-13T10:00:00",
+        "updatedAt": "2026-10-13T10:00:00"
+      },
+      {
+        "id": "ord-path-inv-2026-1002-t-hba1c-1",
+        "orderNo": "ORD-PATH-2026-1002-2",
+        "invoiceId": "inv-2",
+        "invoiceNo": "INV-2026-1002",
+        "cashMemoNo": "CM-2026-1002",
+        "receiptNo": "RCP-2026-1002",
+        "pId": "26100290",
+        "patientId": "26100290",
+        "patientName": "Masud Shikder",
+        "age": "48 Y",
+        "sex": "Male",
+        "phone": "01812000003",
+        "address": "",
+        "drCode": "DR01",
+        "drName": "Prof. Dr. M. A. Rahman",
+        "testId": "t-hba1c",
+        "testCode": "t-hba1c",
+        "testName": "Glycated Hemoglobin (HbA1c)",
+        "nameBn": "",
+        "category": "Biochemistry",
+        "price": 800,
+        "orderDate": "13-10-2026",
+        "orderTimestamp": "2026-10-13T10:00:00",
+        "paymentStatus": "Partial",
+        "sampleType": "Blood",
+        "sampleStatus": "Pending",
+        "reportStatus": "Pending",
+        "createdAt": "2026-10-13T10:00:00",
+        "updatedAt": "2026-10-13T10:00:00"
+      },
+      {
+        "id": "ord-path-inv-2026-1002-t-fbs-0",
+        "orderNo": "ORD-PATH-2026-1002-1",
+        "invoiceId": "inv-2",
+        "invoiceNo": "INV-2026-1002",
+        "cashMemoNo": "CM-2026-1002",
+        "receiptNo": "RCP-2026-1002",
+        "pId": "26100290",
+        "patientId": "26100290",
+        "patientName": "Masud Shikder",
+        "age": "48 Y",
+        "sex": "Male",
+        "phone": "01812000003",
+        "address": "",
+        "drCode": "DR01",
+        "drName": "Prof. Dr. M. A. Rahman",
+        "testId": "t-fbs",
+        "testCode": "t-fbs",
+        "testName": "Fasting Blood Sugar (FBS)",
+        "nameBn": "",
+        "category": "Biochemistry",
+        "price": 150,
+        "orderDate": "13-10-2026",
+        "orderTimestamp": "2026-10-13T10:00:00",
+        "paymentStatus": "Partial",
+        "sampleType": "Blood",
+        "sampleStatus": "Pending",
+        "reportStatus": "Pending",
+        "createdAt": "2026-10-13T10:00:00",
+        "updatedAt": "2026-10-13T10:00:00"
+      },
+      {
+        "id": "ord-path-inv-2026-1001-t-fbs-2",
+        "orderNo": "ORD-PATH-2026-1001-3",
+        "invoiceId": "inv-1",
+        "invoiceNo": "INV-2026-1001",
+        "cashMemoNo": "CM-2026-1001",
+        "receiptNo": "RCP-2026-1001",
+        "pId": "26100294",
+        "patientId": "26100294",
+        "patientName": "Titly",
+        "age": "24 Y",
+        "sex": "Female",
+        "phone": "01712000001",
+        "address": "",
+        "drCode": "DR01",
+        "drName": "Prof. Dr. M. A. Rahman",
+        "testId": "t-fbs",
+        "testCode": "t-fbs",
+        "testName": "Fasting Blood Sugar (FBS)",
+        "nameBn": "",
+        "category": "Biochemistry",
+        "price": 150,
+        "orderDate": "13-10-2026",
+        "orderTimestamp": "2026-10-13T09:10:00",
+        "paymentStatus": "Paid",
+        "sampleType": "Blood",
+        "sampleStatus": "Pending",
+        "reportStatus": "Pending",
+        "createdAt": "2026-10-13T09:10:00",
+        "updatedAt": "2026-10-13T09:10:00"
+      },
+      {
+        "id": "ord-path-inv-2026-1001-t-creatinine-1",
+        "orderNo": "ORD-PATH-2026-1001-2",
+        "invoiceId": "inv-1",
+        "invoiceNo": "INV-2026-1001",
+        "cashMemoNo": "CM-2026-1001",
+        "receiptNo": "RCP-2026-1001",
+        "pId": "26100294",
+        "patientId": "26100294",
+        "patientName": "Titly",
+        "age": "24 Y",
+        "sex": "Female",
+        "phone": "01712000001",
+        "address": "",
+        "drCode": "DR01",
+        "drName": "Prof. Dr. M. A. Rahman",
+        "testId": "t-creatinine",
+        "testCode": "t-creatinine",
+        "testName": "Serum Creatinine",
+        "nameBn": "",
+        "category": "Biochemistry",
+        "price": 350,
+        "orderDate": "13-10-2026",
+        "orderTimestamp": "2026-10-13T09:10:00",
+        "paymentStatus": "Paid",
+        "sampleType": "Blood",
+        "sampleStatus": "Pending",
+        "reportStatus": "Pending",
+        "createdAt": "2026-10-13T09:10:00",
+        "updatedAt": "2026-10-13T09:10:00"
+      },
+      {
+        "id": "ord-path-inv-2026-1001-t-cbc-0",
+        "orderNo": "ORD-PATH-2026-1001-1",
+        "invoiceId": "inv-1",
+        "invoiceNo": "INV-2026-1001",
+        "cashMemoNo": "CM-2026-1001",
+        "receiptNo": "RCP-2026-1001",
+        "pId": "26100294",
+        "patientId": "26100294",
+        "patientName": "Titly",
+        "age": "24 Y",
+        "sex": "Female",
+        "phone": "01712000001",
+        "address": "",
+        "drCode": "DR01",
+        "drName": "Prof. Dr. M. A. Rahman",
+        "testId": "t-cbc",
+        "testCode": "t-cbc",
+        "testName": "Complete Blood Count (CBC with ESR)",
+        "nameBn": "",
+        "category": "Hematology",
+        "price": 450,
+        "orderDate": "13-10-2026",
+        "orderTimestamp": "2026-10-13T09:10:00",
+        "paymentStatus": "Paid",
+        "sampleType": "Blood",
+        "sampleStatus": "Pending",
+        "reportStatus": "Pending",
+        "createdAt": "2026-10-13T09:10:00",
+        "updatedAt": "2026-10-13T09:10:00"
+      }
+    ],
     "paymentTransactions": [],
     "doctors": [
       {
@@ -285,7 +1560,10 @@
             "unit": "g/dL",
             "normalRange": "32 - 36"
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "t-hb",
@@ -308,7 +1586,10 @@
         "turnaroundTime": "1 Hour",
         "inputType": "numeric",
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "t-esr",
@@ -328,7 +1609,10 @@
         "turnaroundTime": "2 Hours",
         "inputType": "numeric",
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-twbc",
@@ -347,7 +1631,10 @@
         "turnaroundTime": "2 Hours",
         "inputType": "numeric",
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-dlc",
@@ -403,7 +1690,10 @@
             "highNormal": 1,
             "inputType": "numeric"
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "t-platelets",
@@ -422,7 +1712,10 @@
         "turnaroundTime": "2 Hours",
         "inputType": "numeric",
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "t-pbf",
@@ -494,7 +1787,10 @@
             "normalRange": "Non-specific / Normal peripheral smear",
             "inputType": "text"
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-retic",
@@ -512,7 +1808,10 @@
         "turnaroundTime": "3 Hours",
         "inputType": "numeric",
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-aec",
@@ -529,7 +1828,10 @@
         "turnaroundTime": "2 Hours",
         "inputType": "numeric",
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "t-pt-inr",
@@ -569,7 +1871,10 @@
             "criticalHigh": 4.5,
             "inputType": "numeric"
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "t-aptt",
@@ -603,7 +1908,10 @@
             "normalRange": "28.0 - 32.0",
             "inputType": "numeric"
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-d-dimer",
@@ -621,7 +1929,10 @@
         "turnaroundTime": "3 Hours",
         "inputType": "numeric",
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "t-bg-rh",
@@ -660,7 +1971,10 @@
               "Weak D (Du) Positive"
             ]
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-hb-electro",
@@ -721,7 +2035,10 @@
               "Suggestive of HbE / Beta-Thalassemia"
             ]
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-glucose-profile",
@@ -783,7 +2100,10 @@
               "++++"
             ]
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "t-fbs",
@@ -803,7 +2123,10 @@
         "turnaroundTime": "1 Hour",
         "inputType": "numeric",
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "t-rbs",
@@ -822,7 +2145,10 @@
         "turnaroundTime": "1 Hour",
         "inputType": "numeric",
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "t-2habf",
@@ -842,7 +2168,10 @@
         "turnaroundTime": "1 Hour",
         "inputType": "numeric",
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "t-hba1c",
@@ -860,7 +2189,10 @@
         "turnaroundTime": "3 Hours",
         "inputType": "numeric",
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-urea",
@@ -879,7 +2211,10 @@
         "turnaroundTime": "2 Hours",
         "inputType": "numeric",
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-creatinine",
@@ -901,7 +2236,10 @@
         "turnaroundTime": "2 Hours",
         "inputType": "numeric",
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "t-uric-acid",
@@ -921,7 +2259,10 @@
         "turnaroundTime": "2 Hours",
         "inputType": "numeric",
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "t-lipid",
@@ -962,7 +2303,10 @@
             "unit": "mg/dL",
             "normalRange": "10 - 30"
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "t-lft",
@@ -1023,7 +2367,10 @@
             "unit": "Ratio",
             "normalRange": "1.2 - 2.2"
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-bilirubin",
@@ -1064,7 +2411,10 @@
             "highNormal": 0.9,
             "inputType": "numeric"
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "t-sgpt",
@@ -1084,7 +2434,10 @@
         "turnaroundTime": "2 Hours",
         "inputType": "numeric",
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "t-sgot",
@@ -1102,7 +2455,10 @@
         "turnaroundTime": "2 Hours",
         "inputType": "numeric",
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "t-alp",
@@ -1120,7 +2476,10 @@
         "turnaroundTime": "2 Hours",
         "inputType": "numeric",
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-protein-ag",
@@ -1168,7 +2527,10 @@
             "highNormal": 2.2,
             "inputType": "numeric"
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "t-electrolytes",
@@ -1204,7 +2566,10 @@
             "unit": "mmol/L",
             "normalRange": "22 - 29"
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-ca-phos-mg",
@@ -1249,7 +2614,10 @@
             "criticalHigh": 4.5,
             "inputType": "numeric"
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-amylase-lipase",
@@ -1283,7 +2651,10 @@
             "criticalHigh": 180,
             "inputType": "numeric"
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-ldh",
@@ -1300,7 +2671,10 @@
         "turnaroundTime": "2 Hours",
         "inputType": "numeric",
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "t-crp",
@@ -1318,7 +2692,10 @@
         "turnaroundTime": "2 Hours",
         "inputType": "numeric",
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-pct",
@@ -1336,7 +2713,10 @@
         "turnaroundTime": "3 Hours",
         "inputType": "numeric",
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "t-iron-profile",
@@ -1388,7 +2768,10 @@
             "highNormal": 50,
             "inputType": "numeric"
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-vit-d-b12",
@@ -1420,7 +2803,10 @@
             "highNormal": 900,
             "inputType": "numeric"
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "t-tsh",
@@ -1439,7 +2825,10 @@
         "turnaroundTime": "4 Hours",
         "inputType": "numeric",
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-ft3-ft4",
@@ -1471,7 +2860,10 @@
             "highNormal": 1.48,
             "inputType": "numeric"
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-t3-t4",
@@ -1503,7 +2895,10 @@
             "highNormal": 11.72,
             "inputType": "numeric"
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-fsh-lh",
@@ -1539,7 +2934,10 @@
             "highNormal": 12.6,
             "inputType": "numeric"
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "t-prolactin",
@@ -1559,7 +2957,10 @@
         "turnaroundTime": "4 Hours",
         "inputType": "numeric",
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-estradiol",
@@ -1578,7 +2979,10 @@
         "turnaroundTime": "6 Hours",
         "inputType": "numeric",
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-progesterone",
@@ -1596,7 +3000,10 @@
         "turnaroundTime": "6 Hours",
         "inputType": "numeric",
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-testosterone",
@@ -1615,7 +3022,10 @@
         "turnaroundTime": "6 Hours",
         "inputType": "numeric",
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "t-beta-hcg",
@@ -1633,7 +3043,10 @@
         "turnaroundTime": "3 Hours",
         "inputType": "numeric",
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-cortisol",
@@ -1650,7 +3063,10 @@
         "turnaroundTime": "6 Hours",
         "inputType": "numeric",
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-insulin",
@@ -1667,7 +3083,10 @@
         "turnaroundTime": "6 Hours",
         "inputType": "numeric",
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-pth",
@@ -1684,7 +3103,10 @@
         "turnaroundTime": "6 Hours",
         "inputType": "numeric",
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-anti-tpo",
@@ -1701,7 +3123,10 @@
         "turnaroundTime": "6 Hours",
         "inputType": "numeric",
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-amh",
@@ -1719,7 +3144,10 @@
         "turnaroundTime": "12 Hours",
         "inputType": "numeric",
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "t-hbsag",
@@ -1739,7 +3167,10 @@
         ],
         "isSensitive": true,
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "t-anti-hcv",
@@ -1759,7 +3190,10 @@
         ],
         "isSensitive": true,
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "t-hiv",
@@ -1779,7 +3213,10 @@
         ],
         "isSensitive": true,
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "t-vdrl",
@@ -1803,7 +3240,10 @@
         ],
         "isSensitive": true,
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "t-aso",
@@ -1821,7 +3261,10 @@
         "turnaroundTime": "2 Hours",
         "inputType": "numeric",
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-rf",
@@ -1838,7 +3281,10 @@
         "turnaroundTime": "2 Hours",
         "inputType": "numeric",
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "t-ana",
@@ -1859,7 +3305,10 @@
           "Positive (1:320 Speckled)"
         ],
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-anti-dsdna",
@@ -1876,7 +3325,10 @@
         "turnaroundTime": "12 Hours",
         "inputType": "numeric",
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-dengue",
@@ -1922,7 +3374,10 @@
               "Positive"
             ]
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "t-widal",
@@ -1992,7 +3447,10 @@
               "1:320"
             ]
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-typhoid-igm",
@@ -2028,7 +3486,10 @@
               "Positive"
             ]
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-chikungunya",
@@ -2064,7 +3525,10 @@
               "Positive"
             ]
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-malaria",
@@ -2100,7 +3564,10 @@
               "Positive"
             ]
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "t-trop-i",
@@ -2118,7 +3585,10 @@
         "turnaroundTime": "1 Hour (STAT)",
         "inputType": "numeric",
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-h-pylori",
@@ -2137,7 +3607,10 @@
           "Positive"
         ],
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-covid19",
@@ -2156,7 +3629,10 @@
           "Positive"
         ],
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "t-urine-re",
@@ -2227,7 +3703,10 @@
             "unit": "",
             "normalRange": "Nil"
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-urine-micro",
@@ -2273,7 +3752,10 @@
             "normalRange": "Nil",
             "inputType": "text"
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-urine-preg",
@@ -2293,7 +3775,10 @@
           "Weakly Positive (Repeat after 48h)"
         ],
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "t-stool-re",
@@ -2349,7 +3834,10 @@
             "unit": "/HPF",
             "normalRange": "Nil"
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-stool-obt",
@@ -2368,7 +3856,10 @@
           "Positive"
         ],
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-semen",
@@ -2475,7 +3966,10 @@
               "Azoospermia"
             ]
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-csf",
@@ -2547,7 +4041,10 @@
             "normalRange": "No bacteria or AFB seen",
             "inputType": "text"
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-synovial",
@@ -2617,7 +4114,10 @@
             "normalRange": "70 - 100",
             "inputType": "numeric"
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-pleural",
@@ -2691,7 +4191,10 @@
             "normalRange": "Predominance in Acute Bacterial Effusion",
             "inputType": "numeric"
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-ascitic",
@@ -2760,7 +4263,10 @@
             "normalRange": "50 - 90",
             "inputType": "numeric"
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-body-fluid-count",
@@ -2800,7 +4306,10 @@
             "normalRange": "Few / Occasional",
             "inputType": "text"
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "t-urine-cs",
@@ -2914,7 +4423,10 @@
               "Resistant (R)"
             ]
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "t-blood-cs",
@@ -2992,7 +4504,10 @@
               "Resistant (R)"
             ]
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "t-pus-cs",
@@ -3034,7 +4549,10 @@
             "normalRange": "N/A",
             "inputType": "text"
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-sputum-cs",
@@ -3085,7 +4603,10 @@
             "normalRange": "N/A",
             "inputType": "text"
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-wound-cs",
@@ -3126,7 +4647,10 @@
             "normalRange": "N/A",
             "inputType": "text"
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-throat-cs",
@@ -3159,7 +4683,10 @@
             "normalRange": "N/A",
             "inputType": "text"
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "t-stool-cs",
@@ -3193,7 +4720,10 @@
             "normalRange": "N/A",
             "inputType": "text"
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "t-gram-stain",
@@ -3235,7 +4765,10 @@
               "Budding yeast cells with pseudohyphae seen"
             ]
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-afb",
@@ -3257,7 +4790,10 @@
           "Positive (3+)"
         ],
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-koh",
@@ -3277,7 +4813,10 @@
           "Budding yeast cells & pseudohyphae seen"
         ],
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-fungal-culture",
@@ -3298,7 +4837,10 @@
           "Trichophyton spp. (Dermatophyte) isolated"
         ],
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-psa",
@@ -3340,7 +4882,10 @@
             "highNormal": 100,
             "inputType": "numeric"
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-cea",
@@ -3357,7 +4902,10 @@
         "turnaroundTime": "6 Hours",
         "inputType": "numeric",
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-ca125",
@@ -3375,7 +4923,10 @@
         "turnaroundTime": "6 Hours",
         "inputType": "numeric",
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-ca19-9",
@@ -3392,7 +4943,10 @@
         "turnaroundTime": "6 Hours",
         "inputType": "numeric",
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-afp",
@@ -3409,7 +4963,10 @@
         "turnaroundTime": "6 Hours",
         "inputType": "numeric",
         "isActive": true,
-        "rangeVerified": false
+        "rangeVerified": false,
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-immunoglobulins",
@@ -3449,7 +5006,10 @@
             "highNormal": 230,
             "inputType": "numeric"
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-complement",
@@ -3481,7 +5041,10 @@
             "highNormal": 40,
             "inputType": "numeric"
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "tm-heavy-metals",
@@ -3522,7 +5085,10 @@
             "highNormal": 10,
             "inputType": "numeric"
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": false
       },
       {
         "id": "t-tcdc",
@@ -3532,7 +5098,11 @@
         "unit": "/cumm",
         "normalRange": "TC: 4,000 - 11,000/cumm, N: 40-75%, L: 20-45%",
         "price": 300,
-        "sampleType": "EDTA Whole Blood"
+        "sampleType": "EDTA Whole Blood",
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-btct",
@@ -3542,7 +5112,11 @@
         "unit": "Minutes",
         "normalRange": "BT: 2 - 7 mins (Duke), CT: 4 - 10 mins",
         "price": 200,
-        "sampleType": "Capillary Blood"
+        "sampleType": "Capillary Blood",
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-ferritin",
@@ -3552,7 +5126,11 @@
         "unit": "ng/mL",
         "normalRange": "30 - 400 ng/mL (Male), 15 - 150 ng/mL (Female)",
         "price": 1200,
-        "sampleType": "Clotted Serum"
+        "sampleType": "Clotted Serum",
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-ogtt",
@@ -3562,7 +5140,11 @@
         "unit": "mmol/L",
         "normalRange": "Fasting < 6.1 mmol/L, 2-Hr < 7.8 mmol/L",
         "price": 400,
-        "sampleType": "Fluoride Plasma (2 Samples)"
+        "sampleType": "Fluoride Plasma (2 Samples)",
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-creatinine",
@@ -3572,7 +5154,11 @@
         "unit": "mg/dL",
         "normalRange": "0.6 - 1.2 mg/dL (Male), 0.5 - 1.1 mg/dL (Female)",
         "price": 350,
-        "sampleType": "Clotted Blood (Serum)"
+        "sampleType": "Clotted Blood (Serum)",
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-urea",
@@ -3582,7 +5168,11 @@
         "unit": "mg/dL",
         "normalRange": "15 - 45 mg/dL",
         "price": 350,
-        "sampleType": "Serum"
+        "sampleType": "Serum",
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-bun",
@@ -3592,7 +5182,11 @@
         "unit": "mg/dL",
         "normalRange": "7 - 20 mg/dL",
         "price": 350,
-        "sampleType": "Serum"
+        "sampleType": "Serum",
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-kft",
@@ -3624,7 +5218,11 @@
             "unit": "mg/dL",
             "normalRange": "3.5 - 7.2"
           }
-        ]
+        ],
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-bilirubin",
@@ -3634,7 +5232,11 @@
         "unit": "mg/dL",
         "normalRange": "Total: 0.2 - 1.2 mg/dL, Direct: < 0.3 mg/dL",
         "price": 350,
-        "sampleType": "Serum"
+        "sampleType": "Serum",
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-protein",
@@ -3644,7 +5246,11 @@
         "unit": "g/dL",
         "normalRange": "Protein: 6.4 - 8.3 g/dL, Albumin: 3.5 - 5.0 g/dL",
         "price": 450,
-        "sampleType": "Serum"
+        "sampleType": "Serum",
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-calcium",
@@ -3654,7 +5260,11 @@
         "unit": "mg/dL",
         "normalRange": "8.5 - 10.5 mg/dL",
         "price": 500,
-        "sampleType": "Serum"
+        "sampleType": "Serum",
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-phosphate",
@@ -3664,7 +5274,11 @@
         "unit": "mg/dL",
         "normalRange": "2.5 - 4.5 mg/dL",
         "price": 450,
-        "sampleType": "Serum"
+        "sampleType": "Serum",
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-magnesium",
@@ -3674,7 +5288,11 @@
         "unit": "mg/dL",
         "normalRange": "1.7 - 2.4 mg/dL",
         "price": 600,
-        "sampleType": "Serum"
+        "sampleType": "Serum",
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-amylase",
@@ -3684,7 +5302,11 @@
         "unit": "U/L",
         "normalRange": "28 - 100 U/L",
         "price": 700,
-        "sampleType": "Serum"
+        "sampleType": "Serum",
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-lipase",
@@ -3694,7 +5316,11 @@
         "unit": "U/L",
         "normalRange": "13 - 60 U/L",
         "price": 900,
-        "sampleType": "Serum"
+        "sampleType": "Serum",
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-ft3",
@@ -3704,7 +5330,11 @@
         "unit": "pg/mL",
         "normalRange": "1.71 - 3.71 pg/mL",
         "price": 700,
-        "sampleType": "Serum"
+        "sampleType": "Serum",
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-ft4",
@@ -3714,7 +5344,11 @@
         "unit": "ng/dL",
         "normalRange": "0.70 - 1.48 ng/dL",
         "price": 700,
-        "sampleType": "Serum"
+        "sampleType": "Serum",
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-thyroid-panel",
@@ -3724,7 +5358,11 @@
         "unit": "Panel",
         "normalRange": "See sub-tests",
         "price": 1800,
-        "sampleType": "Serum (Morning)"
+        "sampleType": "Serum (Morning)",
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-testosterone",
@@ -3734,7 +5372,11 @@
         "unit": "ng/dL",
         "normalRange": "249 - 836 ng/dL (Male), 8.4 - 48.1 ng/dL (Female)",
         "price": 1000,
-        "sampleType": "Serum (Morning 8-10 AM)"
+        "sampleType": "Serum (Morning 8-10 AM)",
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-vit-d3",
@@ -3744,7 +5386,11 @@
         "unit": "ng/mL",
         "normalRange": ">= 30 ng/mL (Sufficient), 20 - 29 (Insufficient), < 20 (Deficient)",
         "price": 2200,
-        "sampleType": "Serum"
+        "sampleType": "Serum",
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-vit-b12",
@@ -3754,7 +5400,11 @@
         "unit": "pg/mL",
         "normalRange": "211 - 911 pg/mL",
         "price": 1800,
-        "sampleType": "Fasting Serum"
+        "sampleType": "Fasting Serum",
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-psa",
@@ -3764,7 +5414,11 @@
         "unit": "ng/mL",
         "normalRange": "< 4.0 ng/mL",
         "price": 1000,
-        "sampleType": "Serum"
+        "sampleType": "Serum",
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-dengue-ns1",
@@ -3774,7 +5428,11 @@
         "unit": "Rapid",
         "normalRange": "Negative",
         "price": 400,
-        "sampleType": "Serum / Whole Blood"
+        "sampleType": "Serum / Whole Blood",
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-dengue-ab",
@@ -3784,7 +5442,11 @@
         "unit": "Rapid",
         "normalRange": "IgM: Negative, IgG: Negative",
         "price": 600,
-        "sampleType": "Serum"
+        "sampleType": "Serum",
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-dengue-duo",
@@ -3794,7 +5456,11 @@
         "unit": "Combo",
         "normalRange": "NS1: Negative, IgM: Negative, IgG: Negative",
         "price": 900,
-        "sampleType": "Serum"
+        "sampleType": "Serum",
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-ra-factor",
@@ -3804,7 +5470,11 @@
         "unit": "IU/mL",
         "normalRange": "< 20 IU/mL (Negative)",
         "price": 400,
-        "sampleType": "Serum"
+        "sampleType": "Serum",
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-anti-ccp",
@@ -3814,7 +5484,11 @@
         "unit": "U/mL",
         "normalRange": "< 20 U/mL (Negative)",
         "price": 1800,
-        "sampleType": "Serum"
+        "sampleType": "Serum",
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-urine-hcg",
@@ -3824,7 +5498,11 @@
         "unit": "Qualitative",
         "normalRange": "Negative",
         "price": 150,
-        "sampleType": "First Morning Fresh Urine"
+        "sampleType": "First Morning Fresh Urine",
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-utp-24",
@@ -3834,7 +5512,11 @@
         "unit": "mg/24 hrs",
         "normalRange": "< 150 mg/24 hours",
         "price": 600,
-        "sampleType": "24-Hour Timed Urine Specimen"
+        "sampleType": "24-Hour Timed Urine Specimen",
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-stool-obt",
@@ -3844,7 +5526,11 @@
         "unit": "Qualitative",
         "normalRange": "Negative",
         "price": 300,
-        "sampleType": "Fresh Stool Specimen"
+        "sampleType": "Fresh Stool Specimen",
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-stool-red",
@@ -3854,7 +5540,11 @@
         "unit": "%",
         "normalRange": "Negative (< 0.25%)",
         "price": 250,
-        "sampleType": "Fresh Stool"
+        "sampleType": "Fresh Stool",
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-sputum-afb",
@@ -3864,7 +5554,11 @@
         "unit": "Smear",
         "normalRange": "No Acid Fast Bacilli seen under microscopy",
         "price": 300,
-        "sampleType": "Early Morning Sputum"
+        "sampleType": "Early Morning Sputum",
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-semen",
@@ -3874,7 +5568,11 @@
         "unit": "Panel",
         "normalRange": "Volume >= 1.5 mL, Count >= 15 mil/mL, Total Motility >= 40%",
         "price": 600,
-        "sampleType": "Fresh Semen (3-5 days abstinence)"
+        "sampleType": "Fresh Semen (3-5 days abstinence)",
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-mt",
@@ -3884,7 +5582,11 @@
         "unit": "mm induration",
         "normalRange": "< 10 mm induration after 48-72 hours",
         "price": 400,
-        "sampleType": "Intradermal PPD Injection"
+        "sampleType": "Intradermal PPD Injection",
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-xr-chest-pa",
@@ -3894,7 +5596,11 @@
         "unit": "Digital Film",
         "normalRange": "Clear lung fields, normal cardiothoracic ratio, clear CPA",
         "price": 600,
-        "sampleType": "Radiology"
+        "sampleType": "Radiology",
+        "departmentId": "xray",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-xr-chest-lat",
@@ -3904,7 +5610,11 @@
         "unit": "Digital Film",
         "normalRange": "Normal retrosternal and retrocardiac spaces",
         "price": 600,
-        "sampleType": "Radiology"
+        "sampleType": "Radiology",
+        "departmentId": "xray",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-xr-cerv-bv",
@@ -3914,7 +5624,11 @@
         "unit": "Digital Film",
         "normalRange": "Normal lordosis, vertebral height & disc spaces preserved",
         "price": 800,
-        "sampleType": "Radiology"
+        "sampleType": "Radiology",
+        "departmentId": "xray",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-xr-ls-bv",
@@ -3924,7 +5638,11 @@
         "unit": "Digital Film",
         "normalRange": "Normal lumbar lordosis, no osteophytes, normal disc spaces",
         "price": 900,
-        "sampleType": "Radiology"
+        "sampleType": "Radiology",
+        "departmentId": "xray",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-xr-ls-obl",
@@ -3934,7 +5652,11 @@
         "unit": "Digital Film",
         "normalRange": "Normal pars interarticularis, no spondylolysis",
         "price": 1200,
-        "sampleType": "Radiology"
+        "sampleType": "Radiology",
+        "departmentId": "xray",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-xr-dorsal-bv",
@@ -3944,7 +5666,11 @@
         "unit": "Digital Film",
         "normalRange": "Normal thoracic kyphosis and vertebral bodies",
         "price": 800,
-        "sampleType": "Radiology"
+        "sampleType": "Radiology",
+        "departmentId": "xray",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-xr-skull-bv",
@@ -3954,7 +5680,11 @@
         "unit": "Digital Film",
         "normalRange": "Intact calvarium, normal vascular markings, no fracture",
         "price": 800,
-        "sampleType": "Radiology"
+        "sampleType": "Radiology",
+        "departmentId": "xray",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-xr-pns",
@@ -3964,7 +5694,11 @@
         "unit": "Digital Film",
         "normalRange": "Bilateral maxillary and frontal sinuses clear, no mucosal thickening",
         "price": 600,
-        "sampleType": "Radiology"
+        "sampleType": "Radiology",
+        "departmentId": "xray",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-xr-pelvis-ap",
@@ -3974,7 +5708,11 @@
         "unit": "Digital Film",
         "normalRange": "Symmetric pelvic ring, intact femoral heads, clear hip joints",
         "price": 600,
-        "sampleType": "Radiology"
+        "sampleType": "Radiology",
+        "departmentId": "xray",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-xr-kub",
@@ -3984,7 +5722,11 @@
         "unit": "Digital Film",
         "normalRange": "No radio-opaque shadow along the urinary tract, psoas outlines clear",
         "price": 600,
-        "sampleType": "Radiology"
+        "sampleType": "Radiology",
+        "departmentId": "xray",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-xr-abd-erect",
@@ -3994,7 +5736,11 @@
         "unit": "Digital Film",
         "normalRange": "Normal bowel gas distribution, no free air under diaphragms",
         "price": 600,
-        "sampleType": "Radiology"
+        "sampleType": "Radiology",
+        "departmentId": "xray",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-xr-knee-r",
@@ -4004,7 +5750,11 @@
         "unit": "Digital Film",
         "normalRange": "Adequate joint space, smooth articular margins, no osteophytes",
         "price": 700,
-        "sampleType": "Radiology"
+        "sampleType": "Radiology",
+        "departmentId": "xray",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-xr-knee-l",
@@ -4014,7 +5764,11 @@
         "unit": "Digital Film",
         "normalRange": "Adequate joint space, smooth articular margins, no osteophytes",
         "price": 700,
-        "sampleType": "Radiology"
+        "sampleType": "Radiology",
+        "departmentId": "xray",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-xr-both-knees",
@@ -4024,7 +5778,11 @@
         "unit": "Digital Film",
         "normalRange": "Normal weight-bearing tibiofemoral joint alignment",
         "price": 1000,
-        "sampleType": "Radiology"
+        "sampleType": "Radiology",
+        "departmentId": "xray",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-xr-shoulder-ap",
@@ -4034,7 +5792,11 @@
         "unit": "Digital Film",
         "normalRange": "Normal glenohumeral alignment, intact acromion",
         "price": 600,
-        "sampleType": "Radiology"
+        "sampleType": "Radiology",
+        "departmentId": "xray",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-xr-elbow-bv",
@@ -4044,7 +5806,11 @@
         "unit": "Digital Film",
         "normalRange": "Normal humeroradial and humeroulnar joint relationships",
         "price": 600,
-        "sampleType": "Radiology"
+        "sampleType": "Radiology",
+        "departmentId": "xray",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-xr-wrist-bv",
@@ -4054,7 +5820,11 @@
         "unit": "Digital Film",
         "normalRange": "Intact carpal bones, normal distal radius and ulna alignment",
         "price": 600,
-        "sampleType": "Radiology"
+        "sampleType": "Radiology",
+        "departmentId": "xray",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-xr-hand-bv",
@@ -4064,7 +5834,11 @@
         "unit": "Digital Film",
         "normalRange": "Intact metacarpals and phalanges, normal joints",
         "price": 600,
-        "sampleType": "Radiology"
+        "sampleType": "Radiology",
+        "departmentId": "xray",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-xr-hip-ap",
@@ -4074,7 +5848,11 @@
         "unit": "Digital Film",
         "normalRange": "Intact acetabulum and femoral neck, smooth joint space",
         "price": 700,
-        "sampleType": "Radiology"
+        "sampleType": "Radiology",
+        "departmentId": "xray",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-xr-ankle-bv",
@@ -4084,7 +5862,11 @@
         "unit": "Digital Film",
         "normalRange": "Intact malleoli, normal mortise joint space",
         "price": 600,
-        "sampleType": "Radiology"
+        "sampleType": "Radiology",
+        "departmentId": "xray",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-xr-foot-bv",
@@ -4094,7 +5876,11 @@
         "unit": "Digital Film",
         "normalRange": "Intact tarsals, metatarsals and phalanges, no dislocation",
         "price": 600,
-        "sampleType": "Radiology"
+        "sampleType": "Radiology",
+        "departmentId": "xray",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-xr-mandible",
@@ -4104,7 +5890,11 @@
         "unit": "Digital Film",
         "normalRange": "Intact mandibular body, angle and condyles, no fracture line",
         "price": 700,
-        "sampleType": "Radiology"
+        "sampleType": "Radiology",
+        "departmentId": "xray",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-usg-whole-abd",
@@ -4114,7 +5904,11 @@
         "unit": "Color Doppler Scan",
         "normalRange": "Normal parenchymal architecture of liver, GB, pancreas, spleen & kidneys",
         "price": 1500,
-        "sampleType": "Ultrasound"
+        "sampleType": "Ultrasound",
+        "departmentId": "ultrasound",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-usg-preg",
@@ -4124,7 +5918,11 @@
         "unit": "Color Doppler Scan",
         "normalRange": "Single viable intrauterine fetus with good cardiac activity and normal liquor",
         "price": 1500,
-        "sampleType": "Ultrasound"
+        "sampleType": "Ultrasound",
+        "departmentId": "ultrasound",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-usg-anomaly",
@@ -4134,7 +5932,11 @@
         "unit": "High-Res 3D/4D Scan",
         "normalRange": "No gross congenital anatomical anomaly detected",
         "price": 2500,
-        "sampleType": "Ultrasound"
+        "sampleType": "Ultrasound",
+        "departmentId": "ultrasound",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-usg-kub",
@@ -4144,7 +5946,11 @@
         "unit": "Color Doppler Scan",
         "normalRange": "Normal kidneys, urinary bladder with smooth walls, normal prostate volume",
         "price": 1200,
-        "sampleType": "Ultrasound"
+        "sampleType": "Ultrasound",
+        "departmentId": "ultrasound",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-usg-pelvis",
@@ -4154,7 +5960,11 @@
         "unit": "Color Doppler Scan",
         "normalRange": "Anteverted normal-sized uterus with regular endometrial stripe, bilateral ovaries normal",
         "price": 1200,
-        "sampleType": "Ultrasound"
+        "sampleType": "Ultrasound",
+        "departmentId": "ultrasound",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-usg-upper-abd",
@@ -4164,7 +5974,11 @@
         "unit": "Color Doppler Scan",
         "normalRange": "Normal liver, gallbladder without calculi, normal CBD and spleen",
         "price": 1200,
-        "sampleType": "Ultrasound"
+        "sampleType": "Ultrasound",
+        "departmentId": "ultrasound",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-usg-breast",
@@ -4174,7 +5988,11 @@
         "unit": "High Frequency Scan",
         "normalRange": "Normal fibroglandular parenchyma, no solid or cystic mass (BI-RADS 1)",
         "price": 2000,
-        "sampleType": "Ultrasound"
+        "sampleType": "Ultrasound",
+        "departmentId": "ultrasound",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-usg-thyroid",
@@ -4184,7 +6002,11 @@
         "unit": "High Frequency Scan",
         "normalRange": "Normal thyroid lobes and isthmus, homogeneous echotexture, no nodules",
         "price": 1500,
-        "sampleType": "Ultrasound"
+        "sampleType": "Ultrasound",
+        "departmentId": "ultrasound",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-usg-scrotum",
@@ -4194,7 +6016,11 @@
         "unit": "Color Doppler Scan",
         "normalRange": "Bilateral testes normal in size, shape and vascularity, no hydrocele",
         "price": 2000,
-        "sampleType": "Ultrasound"
+        "sampleType": "Ultrasound",
+        "departmentId": "ultrasound",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-usg-doppler-ll",
@@ -4204,7 +6030,11 @@
         "unit": "Color Doppler Scan",
         "normalRange": "Patent vascular lumens, normal triphasic spectral flow, no thrombus",
         "price": 3000,
-        "sampleType": "Ultrasound"
+        "sampleType": "Ultrasound",
+        "departmentId": "ultrasound",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-ecg",
@@ -4214,7 +6044,11 @@
         "unit": "Graph Report",
         "normalRange": "Normal Sinus Rhythm, normal intervals, no acute ischemic ST-T changes",
         "price": 400,
-        "sampleType": "Cardiology"
+        "sampleType": "Cardiology",
+        "departmentId": "ecg",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-echo-2d",
@@ -4224,7 +6058,11 @@
         "unit": "Doppler Report",
         "normalRange": "Normal chamber dimensions, preserved LV systolic function (LVEF >= 60%)",
         "price": 2500,
-        "sampleType": "Cardiology"
+        "sampleType": "Cardiology",
+        "departmentId": "ultrasound",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-ett",
@@ -4234,7 +6072,11 @@
         "unit": "Stress Test",
         "normalRange": "Negative for inducible myocardial ischemia at peak Bruce protocol",
         "price": 3000,
-        "sampleType": "Cardiology"
+        "sampleType": "Cardiology",
+        "departmentId": "ecg",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-holter",
@@ -4244,7 +6086,11 @@
         "unit": "Continuous Recording",
         "normalRange": "Sinus rhythm throughout, no significant pauses, ventricular or SV ectopics",
         "price": 4000,
-        "sampleType": "Cardiology"
+        "sampleType": "Cardiology",
+        "departmentId": "ecg",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-endoscopy-ugi",
@@ -4254,7 +6100,11 @@
         "unit": "HD Video Report",
         "normalRange": "Normal esophagus, stomach and duodenum, no ulcer or active bleeding",
         "price": 3500,
-        "sampleType": "Endoscopy"
+        "sampleType": "Endoscopy",
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-colonoscopy",
@@ -4264,7 +6114,11 @@
         "unit": "HD Video Report",
         "normalRange": "Normal colonic mucosa up to cecum, no polyps or mass lesion",
         "price": 6000,
-        "sampleType": "Endoscopy"
+        "sampleType": "Endoscopy",
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-spirometry",
@@ -4274,7 +6128,11 @@
         "unit": "Flow-Volume Loop",
         "normalRange": "Normal lung volumes, FEV1/FVC ratio > 75%, no obstruction",
         "price": 1500,
-        "sampleType": "Pulmonology"
+        "sampleType": "Pulmonology",
+        "departmentId": "ecg",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-pap-smear",
@@ -4284,7 +6142,11 @@
         "unit": "Cytology Report",
         "normalRange": "Negative for Intraepithelial Lesion or Malignancy (NILM)",
         "price": 800,
-        "sampleType": "Cervical Scrape Smear"
+        "sampleType": "Cervical Scrape Smear",
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-fnac",
@@ -4294,7 +6156,11 @@
         "unit": "Cytology Report",
         "normalRange": "Benign aspirate, no malignant or atypical cells seen",
         "price": 1200,
-        "sampleType": "Aspirated Cellular Material"
+        "sampleType": "Aspirated Cellular Material",
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
       },
       {
         "id": "t-histopathology",
@@ -4304,7 +6170,2438 @@
         "unit": "Histo Report",
         "normalRange": "Benign tissue morphology, no dysplasia or malignancy",
         "price": 1800,
-        "sampleType": "Formalin-Fixed Tissue"
+        "sampleType": "Formalin-Fixed Tissue",
+        "departmentId": "pathology",
+        "discountEligible": true,
+        "priceVerified": true,
+        "isActive": true
+      },
+      {
+        "id": "bd_hem_cbc",
+        "code": "PATH-CBC",
+        "name": "CBC with ESR (Complete Blood Count)",
+        "nameBn": "সিবিসি ও ইএসআর (সম্পূর্ণ রক্ত পরীক্ষা)",
+        "category": "Hematology",
+        "subcategory": "Hematology",
+        "departmentId": "pathology",
+        "unit": "Full Panel",
+        "normalRange": "Age & Sex Specific",
+        "price": 450,
+        "costPrice": 140,
+        "discountEligible": true,
+        "maxDiscountPercent": 25,
+        "priceVerified": true,
+        "sampleType": "Whole Blood (EDTA)",
+        "method": "5-Part Automated Hematology Analyzer",
+        "turnaroundTime": "3 Hours",
+        "isActive": true,
+        "synonyms": [
+          "cbc",
+          "complete blood count",
+          "blood cp",
+          "hemogram"
+        ]
+      },
+      {
+        "id": "bd_hem_hb",
+        "code": "PATH-HB",
+        "name": "Hemoglobin (Hb%)",
+        "nameBn": "হিমোগ্লোবিন (Hb%)",
+        "category": "Hematology",
+        "subcategory": "Hematology",
+        "departmentId": "pathology",
+        "unit": "g/dL",
+        "normalRange": "M: 13.0-17.0, F: 12.0-15.0",
+        "price": 150,
+        "costPrice": 40,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "Whole Blood (EDTA)",
+        "method": "SLS Hemoglobin Method",
+        "turnaroundTime": "1 Hour",
+        "isActive": true,
+        "synonyms": [
+          "hb",
+          "hemoglobin",
+          "hgb"
+        ]
+      },
+      {
+        "id": "bd_hem_esr",
+        "code": "PATH-ESR",
+        "name": "ESR (Westergren Method)",
+        "nameBn": "ইএসআর (রক্তের আপেক্ষিক তলানি হার)",
+        "category": "Hematology",
+        "subcategory": "Hematology",
+        "departmentId": "pathology",
+        "unit": "mm in 1st hr",
+        "normalRange": "M: 0-15, F: 0-20",
+        "price": 150,
+        "costPrice": 30,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "Whole Blood (EDTA/Citrate)",
+        "method": "Modified Westergren",
+        "turnaroundTime": "2 Hours",
+        "isActive": true,
+        "synonyms": [
+          "esr",
+          "erythrocyte sedimentation rate"
+        ]
+      },
+      {
+        "id": "bd_hem_plt",
+        "code": "PATH-PLT",
+        "name": "Platelet Count",
+        "nameBn": "প্লাটিলেট কাউন্ট (অনুচক্রিকা)",
+        "category": "Hematology",
+        "subcategory": "Hematology",
+        "departmentId": "pathology",
+        "unit": "/cmm",
+        "normalRange": "150,000 - 450,000",
+        "price": 250,
+        "costPrice": 70,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "Whole Blood (EDTA)",
+        "method": "Automated Optical / Microscopic Check",
+        "turnaroundTime": "2 Hours",
+        "isActive": true,
+        "synonyms": [
+          "plt",
+          "platelet",
+          "dengue platelet"
+        ]
+      },
+      {
+        "id": "bd_hem_bg",
+        "code": "PATH-BG",
+        "name": "Blood Grouping & Rh Typing (ABO & Rh)",
+        "nameBn": "রক্তের গ্রুপ ও আরএইচ টাইপিং",
+        "category": "Hematology",
+        "subcategory": "Hematology",
+        "departmentId": "pathology",
+        "unit": "Group",
+        "normalRange": "A / B / AB / O (+/-)",
+        "price": 150,
+        "costPrice": 40,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "Whole Blood (EDTA)",
+        "method": "Forward & Reverse Agglutination",
+        "turnaroundTime": "1 Hour",
+        "isActive": true,
+        "synonyms": [
+          "blood group",
+          "abo",
+          "rh factor"
+        ]
+      },
+      {
+        "id": "bd_hem_ptinr",
+        "code": "PATH-PTINR",
+        "name": "Prothrombin Time (PT) with INR",
+        "nameBn": "প্রোথ্রম্বিন টাইম (PT/INR)",
+        "category": "Hematology",
+        "subcategory": "Coagulation",
+        "departmentId": "pathology",
+        "unit": "Seconds / Ratio",
+        "normalRange": "PT: 11-14 sec, INR: 0.8-1.2",
+        "price": 600,
+        "costPrice": 200,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "Citrated Plasma (Blue Top)",
+        "method": "Optical Coagulometry",
+        "turnaroundTime": "3 Hours",
+        "isActive": true,
+        "synonyms": [
+          "pt",
+          "inr",
+          "prothrombin time",
+          "coagulation"
+        ]
+      },
+      {
+        "id": "bd_hem_aptt",
+        "code": "PATH-APTT",
+        "name": "APTT (Activated Partial Thromboplastin Time)",
+        "nameBn": "এপিটিটি (APTT)",
+        "category": "Hematology",
+        "subcategory": "Coagulation",
+        "departmentId": "pathology",
+        "unit": "Seconds",
+        "normalRange": "25 - 35 sec",
+        "price": 650,
+        "costPrice": 220,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "Citrated Plasma (Blue Top)",
+        "method": "Optical Coagulometry",
+        "turnaroundTime": "3 Hours",
+        "isActive": true,
+        "synonyms": [
+          "aptt",
+          "ptt"
+        ]
+      },
+      {
+        "id": "bd_hem_pbf",
+        "code": "PATH-PBF",
+        "name": "Peripheral Blood Film (PBF / Comment)",
+        "nameBn": "পেরিফেরাল ব্লাড ফিল্ম (PBF)",
+        "category": "Hematology",
+        "subcategory": "Hematology",
+        "departmentId": "pathology",
+        "unit": "Morphology",
+        "normalRange": "Normocytic Normochromic",
+        "price": 500,
+        "costPrice": 120,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "Whole Blood (EDTA)",
+        "method": "Leishman Stain Microscopy",
+        "turnaroundTime": "6 Hours",
+        "isActive": true,
+        "synonyms": [
+          "pbf",
+          "blood film"
+        ]
+      },
+      {
+        "id": "bd_bio_rbs",
+        "code": "PATH-RBS",
+        "name": "Random Blood Sugar (RBS / Glucose)",
+        "nameBn": "র‍্যান্ডম ব্লাড সুগার (RBS)",
+        "category": "Biochemistry",
+        "subcategory": "Diabetes Profile",
+        "departmentId": "pathology",
+        "unit": "mmol/L",
+        "normalRange": "< 7.8 mmol/L",
+        "price": 150,
+        "costPrice": 35,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "Fluoride Plasma / Serum",
+        "method": "GOD-PAP Enzymatic",
+        "turnaroundTime": "1 Hour",
+        "isActive": true,
+        "synonyms": [
+          "rbs",
+          "blood sugar",
+          "glucose"
+        ]
+      },
+      {
+        "id": "bd_bio_fbs",
+        "code": "PATH-FBS",
+        "name": "Fasting Blood Sugar (FBS)",
+        "nameBn": "ফাস্টিং ব্লাড সুগার (খালি পেটে রক্তের গ্লুকোজ)",
+        "category": "Biochemistry",
+        "subcategory": "Diabetes Profile",
+        "departmentId": "pathology",
+        "unit": "mmol/L",
+        "normalRange": "3.9 - 5.5 mmol/L",
+        "price": 150,
+        "costPrice": 35,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "Fluoride Plasma (Fasting)",
+        "method": "GOD-PAP / Hexokinase",
+        "turnaroundTime": "2 Hours",
+        "isActive": true,
+        "synonyms": [
+          "fbs",
+          "fasting glucose",
+          "fasting sugar"
+        ]
+      },
+      {
+        "id": "bd_bio_2habf",
+        "code": "PATH-2HABF",
+        "name": "Blood Sugar 2 Hours After Breakfast (2HABF / PPBS)",
+        "nameBn": "নাস্তার ২ ঘণ্টা পর রক্তের গ্লুকোজ (2HABF)",
+        "category": "Biochemistry",
+        "subcategory": "Diabetes Profile",
+        "departmentId": "pathology",
+        "unit": "mmol/L",
+        "normalRange": "< 7.8 mmol/L",
+        "price": 150,
+        "costPrice": 35,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "Fluoride Plasma",
+        "method": "GOD-PAP Enzymatic",
+        "turnaroundTime": "2 Hours",
+        "isActive": true,
+        "synonyms": [
+          "2habf",
+          "ppbs",
+          "after meal sugar"
+        ]
+      },
+      {
+        "id": "bd_bio_hba1c",
+        "code": "PATH-HBA1C",
+        "name": "HbA1c (Glycosylated Hemoglobin)",
+        "nameBn": "এইচবিএ১সি (৩ মাসের গড় ডায়াবেটিস পরীক্ষা)",
+        "category": "Biochemistry",
+        "subcategory": "Diabetes Profile",
+        "departmentId": "pathology",
+        "unit": "%",
+        "normalRange": "Non-diabetic: 4.0 - 5.6%",
+        "price": 1000,
+        "costPrice": 350,
+        "discountEligible": true,
+        "maxDiscountPercent": 25,
+        "priceVerified": true,
+        "sampleType": "Whole Blood (EDTA)",
+        "method": "HPLC / Immunoturbidimetry",
+        "turnaroundTime": "4 Hours",
+        "isActive": true,
+        "synonyms": [
+          "hba1c",
+          "a1c",
+          "glycated hemoglobin"
+        ]
+      },
+      {
+        "id": "bd_bio_creat",
+        "code": "PATH-CREAT",
+        "name": "Serum Creatinine (with eGFR)",
+        "nameBn": "সিরাম ক্রিয়েটিনিন (কিডনি ফাংশন পরীক্ষা)",
+        "category": "Biochemistry",
+        "subcategory": "Renal Function",
+        "departmentId": "pathology",
+        "unit": "mg/dL",
+        "normalRange": "M: 0.7-1.3, F: 0.6-1.1 mg/dL",
+        "price": 350,
+        "costPrice": 80,
+        "discountEligible": true,
+        "maxDiscountPercent": 25,
+        "priceVerified": true,
+        "sampleType": "Serum",
+        "method": "Enzymatic / Modified Jaffe",
+        "turnaroundTime": "2 Hours",
+        "isActive": true,
+        "synonyms": [
+          "creatinine",
+          "s creatinine",
+          "kidney test",
+          "egfr"
+        ]
+      },
+      {
+        "id": "bd_bio_urea",
+        "code": "PATH-UREA",
+        "name": "Blood Urea / BUN",
+        "nameBn": "ব্লাড ইউরিয়া / বিইউএন",
+        "category": "Biochemistry",
+        "subcategory": "Renal Function",
+        "departmentId": "pathology",
+        "unit": "mg/dL",
+        "normalRange": "15 - 40 mg/dL",
+        "price": 350,
+        "costPrice": 80,
+        "discountEligible": true,
+        "maxDiscountPercent": 25,
+        "priceVerified": true,
+        "sampleType": "Serum",
+        "method": "Urease-GLDH",
+        "turnaroundTime": "2 Hours",
+        "isActive": true,
+        "synonyms": [
+          "urea",
+          "bun",
+          "blood urea"
+        ]
+      },
+      {
+        "id": "bd_bio_uric",
+        "code": "PATH-URIC",
+        "name": "Serum Uric Acid",
+        "nameBn": "সিরাম ইউরিক এসিড",
+        "category": "Biochemistry",
+        "subcategory": "Renal Function",
+        "departmentId": "pathology",
+        "unit": "mg/dL",
+        "normalRange": "M: 3.4-7.0, F: 2.4-6.0 mg/dL",
+        "price": 400,
+        "costPrice": 90,
+        "discountEligible": true,
+        "maxDiscountPercent": 25,
+        "priceVerified": true,
+        "sampleType": "Serum",
+        "method": "Uricase-PAP",
+        "turnaroundTime": "2 Hours",
+        "isActive": true,
+        "synonyms": [
+          "uric acid",
+          "gout test"
+        ]
+      },
+      {
+        "id": "bd_bio_lipid",
+        "code": "PATH-LIPID",
+        "name": "Fasting Lipid Profile (Cholesterol, TG, HDL, LDL)",
+        "nameBn": "লিপিড প্রোফাইল (রক্তের চর্বি পরীক্ষা)",
+        "category": "Biochemistry",
+        "subcategory": "Cardiac & Lipid",
+        "departmentId": "pathology",
+        "unit": "mg/dL",
+        "normalRange": "TC < 200, TG < 150, HDL > 40, LDL < 100",
+        "price": 1000,
+        "costPrice": 280,
+        "discountEligible": true,
+        "maxDiscountPercent": 25,
+        "priceVerified": true,
+        "sampleType": "Fasting Serum",
+        "method": "Enzymatic Colorimetric",
+        "turnaroundTime": "3 Hours",
+        "isActive": true,
+        "synonyms": [
+          "lipid profile",
+          "cholesterol",
+          "triglycerides",
+          "hdl",
+          "ldl"
+        ]
+      },
+      {
+        "id": "bd_bio_lft",
+        "code": "PATH-LFT",
+        "name": "Liver Function Test (LFT Complete Panel)",
+        "nameBn": "লিভার ফাংশন টেস্ট (LFT - বিলিউবিন, SGPT, SGOT, ALP)",
+        "category": "Biochemistry",
+        "subcategory": "Liver Profile",
+        "departmentId": "pathology",
+        "unit": "Panel",
+        "normalRange": "Bilirubin: 0.2-1.2, SGPT < 45 U/L",
+        "price": 1000,
+        "costPrice": 300,
+        "discountEligible": true,
+        "maxDiscountPercent": 25,
+        "priceVerified": true,
+        "sampleType": "Serum",
+        "method": "IFCC Kinetic / Colorimetric",
+        "turnaroundTime": "3 Hours",
+        "isActive": true,
+        "synonyms": [
+          "lft",
+          "liver function test",
+          "sgpt",
+          "bilirubin"
+        ]
+      },
+      {
+        "id": "bd_bio_sgpt",
+        "code": "PATH-SGPT",
+        "name": "SGPT (ALT)",
+        "nameBn": "এসজিপিটি (লিভার এনজাইম - ALT)",
+        "category": "Biochemistry",
+        "subcategory": "Liver Profile",
+        "departmentId": "pathology",
+        "unit": "U/L",
+        "normalRange": "M: < 45 U/L, F: < 34 U/L",
+        "price": 350,
+        "costPrice": 80,
+        "discountEligible": true,
+        "maxDiscountPercent": 25,
+        "priceVerified": true,
+        "sampleType": "Serum",
+        "method": "IFCC Kinetic without P5P",
+        "turnaroundTime": "2 Hours",
+        "isActive": true,
+        "synonyms": [
+          "sgpt",
+          "alt",
+          "liver enzyme"
+        ]
+      },
+      {
+        "id": "bd_bio_bili",
+        "code": "PATH-BILI",
+        "name": "Serum Bilirubin (Total, Direct & Indirect)",
+        "nameBn": "সিরাম বিলিরুবিন (জন্ডিস পরীক্ষা)",
+        "category": "Biochemistry",
+        "subcategory": "Liver Profile",
+        "departmentId": "pathology",
+        "unit": "mg/dL",
+        "normalRange": "0.2 - 1.2 mg/dL",
+        "price": 350,
+        "costPrice": 80,
+        "discountEligible": true,
+        "maxDiscountPercent": 25,
+        "priceVerified": true,
+        "sampleType": "Serum",
+        "method": "Jendrassik-Grof",
+        "turnaroundTime": "2 Hours",
+        "isActive": true,
+        "synonyms": [
+          "bilirubin",
+          "jaundice test"
+        ]
+      },
+      {
+        "id": "bd_bio_elec",
+        "code": "PATH-ELEC",
+        "name": "Serum Electrolytes (Na+, K+, Cl-, HCO3-)",
+        "nameBn": "সিরাম ইলেকট্রোলাইটস (সোডিয়াম, পটাশিয়াম, ক্লোরাইড)",
+        "category": "Biochemistry",
+        "subcategory": "Electrolytes",
+        "departmentId": "pathology",
+        "unit": "mmol/L",
+        "normalRange": "Na: 135-145, K: 3.5-5.1, Cl: 98-107",
+        "price": 800,
+        "costPrice": 250,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "Serum",
+        "method": "Ion Selective Electrode (ISE)",
+        "turnaroundTime": "2 Hours",
+        "isActive": true,
+        "synonyms": [
+          "electrolytes",
+          "sodium",
+          "potassium",
+          "se"
+        ]
+      },
+      {
+        "id": "bd_bio_calcium",
+        "code": "PATH-CA",
+        "name": "Serum Calcium",
+        "nameBn": "সিরাম ক্যালসিয়াম",
+        "category": "Biochemistry",
+        "subcategory": "Bone & Mineral",
+        "departmentId": "pathology",
+        "unit": "mg/dL",
+        "normalRange": "8.5 - 10.5 mg/dL",
+        "price": 450,
+        "costPrice": 120,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "Serum",
+        "method": "Arsenazo III",
+        "turnaroundTime": "3 Hours",
+        "isActive": true,
+        "synonyms": [
+          "calcium",
+          "s calcium"
+        ]
+      },
+      {
+        "id": "bd_bio_troponini",
+        "code": "PATH-TROPI",
+        "name": "Troponin-I (High Sensitivity Quantitative)",
+        "nameBn": "ট্রপোনিন-আই (হার্ট অ্যাটাক নির্ণয় পরীক্ষা)",
+        "category": "Biochemistry",
+        "subcategory": "Cardiac Markers",
+        "departmentId": "pathology",
+        "unit": "ng/mL",
+        "normalRange": "< 0.04 ng/mL",
+        "price": 1200,
+        "costPrice": 450,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "Serum",
+        "method": "CLIA / FIA Quantitative",
+        "turnaroundTime": "1 Hour (STAT)",
+        "isActive": true,
+        "isSensitive": true,
+        "synonyms": [
+          "troponin",
+          "trop i",
+          "cardiac marker"
+        ]
+      },
+      {
+        "id": "bd_hor_tsh",
+        "code": "PATH-TSH",
+        "name": "TSH (Thyroid Stimulating Hormone)",
+        "nameBn": "টিএসএইচ (থাইরয়েড হরমোন পরীক্ষা)",
+        "category": "Hormone",
+        "subcategory": "Thyroid Profile",
+        "departmentId": "pathology",
+        "unit": "µIU/mL",
+        "normalRange": "0.35 - 4.94 µIU/mL",
+        "price": 700,
+        "costPrice": 220,
+        "discountEligible": true,
+        "maxDiscountPercent": 25,
+        "priceVerified": true,
+        "sampleType": "Serum",
+        "method": "CMIA / CLIA",
+        "turnaroundTime": "4 Hours",
+        "isActive": true,
+        "synonyms": [
+          "tsh",
+          "thyroid"
+        ]
+      },
+      {
+        "id": "bd_hor_ft3",
+        "code": "PATH-FT3",
+        "name": "Free T3 (FT3)",
+        "nameBn": "ফ্রি টি-৩ (FT3 হরমোন)",
+        "category": "Hormone",
+        "subcategory": "Thyroid Profile",
+        "departmentId": "pathology",
+        "unit": "pg/mL",
+        "normalRange": "1.71 - 3.71 pg/mL",
+        "price": 750,
+        "costPrice": 240,
+        "discountEligible": true,
+        "maxDiscountPercent": 25,
+        "priceVerified": true,
+        "sampleType": "Serum",
+        "method": "CMIA / CLIA",
+        "turnaroundTime": "4 Hours",
+        "isActive": true,
+        "synonyms": [
+          "ft3",
+          "free t3",
+          "t3"
+        ]
+      },
+      {
+        "id": "bd_hor_ft4",
+        "code": "PATH-FT4",
+        "name": "Free T4 (FT4)",
+        "nameBn": "ফ্রি টি-৪ (FT4 হরমোন)",
+        "category": "Hormone",
+        "subcategory": "Thyroid Profile",
+        "departmentId": "pathology",
+        "unit": "ng/dL",
+        "normalRange": "0.70 - 1.48 ng/dL",
+        "price": 750,
+        "costPrice": 240,
+        "discountEligible": true,
+        "maxDiscountPercent": 25,
+        "priceVerified": true,
+        "sampleType": "Serum",
+        "method": "CMIA / CLIA",
+        "turnaroundTime": "4 Hours",
+        "isActive": true,
+        "synonyms": [
+          "ft4",
+          "free t4",
+          "t4"
+        ]
+      },
+      {
+        "id": "bd_hor_fsh",
+        "code": "PATH-FSH",
+        "name": "Serum FSH (Follicle Stimulating Hormone)",
+        "nameBn": "সিরাম এফএসএইচ (FSH হরমোন)",
+        "category": "Hormone",
+        "subcategory": "Reproductive Hormone",
+        "departmentId": "pathology",
+        "unit": "mIU/mL",
+        "normalRange": "Cycle & Sex Specific",
+        "price": 900,
+        "costPrice": 300,
+        "discountEligible": true,
+        "maxDiscountPercent": 25,
+        "priceVerified": true,
+        "sampleType": "Serum",
+        "method": "CLIA",
+        "turnaroundTime": "6 Hours",
+        "isActive": true,
+        "synonyms": [
+          "fsh"
+        ]
+      },
+      {
+        "id": "bd_hor_lh",
+        "code": "PATH-LH",
+        "name": "Serum LH (Luteinizing Hormone)",
+        "nameBn": "সিরাম এলএইচ (LH হরমোন)",
+        "category": "Hormone",
+        "subcategory": "Reproductive Hormone",
+        "departmentId": "pathology",
+        "unit": "mIU/mL",
+        "normalRange": "Cycle & Sex Specific",
+        "price": 900,
+        "costPrice": 300,
+        "discountEligible": true,
+        "maxDiscountPercent": 25,
+        "priceVerified": true,
+        "sampleType": "Serum",
+        "method": "CLIA",
+        "turnaroundTime": "6 Hours",
+        "isActive": true,
+        "synonyms": [
+          "lh",
+          "luteinizing hormone"
+        ]
+      },
+      {
+        "id": "bd_hor_prl",
+        "code": "PATH-PRL",
+        "name": "Serum Prolactin",
+        "nameBn": "সিরাম প্রোল্যাকটিন",
+        "category": "Hormone",
+        "subcategory": "Reproductive Hormone",
+        "departmentId": "pathology",
+        "unit": "ng/mL",
+        "normalRange": "M: 3.5-19.4, F: 5.2-26.5 ng/mL",
+        "price": 900,
+        "costPrice": 300,
+        "discountEligible": true,
+        "maxDiscountPercent": 25,
+        "priceVerified": true,
+        "sampleType": "Serum",
+        "method": "CLIA",
+        "turnaroundTime": "6 Hours",
+        "isActive": true,
+        "synonyms": [
+          "prolactin",
+          "prl"
+        ]
+      },
+      {
+        "id": "bd_hor_bhcg",
+        "code": "PATH-BHCG",
+        "name": "Beta-hCG (Quantitative Pregnancy Hormone)",
+        "nameBn": "বিটা-এইচসিজি (গর্ভধারণ হরমোন পরীক্ষা)",
+        "category": "Hormone",
+        "subcategory": "Reproductive Hormone",
+        "departmentId": "pathology",
+        "unit": "mIU/mL",
+        "normalRange": "Non-pregnant: < 5.0 mIU/mL",
+        "price": 1000,
+        "costPrice": 350,
+        "discountEligible": true,
+        "maxDiscountPercent": 25,
+        "priceVerified": true,
+        "sampleType": "Serum",
+        "method": "CMIA / CLIA",
+        "turnaroundTime": "4 Hours",
+        "isActive": true,
+        "synonyms": [
+          "beta hcg",
+          "bhcg",
+          "pregnancy blood test"
+        ]
+      },
+      {
+        "id": "bd_ser_hbsag",
+        "code": "PATH-HBSAG",
+        "name": "HBsAg (Screening / ICT & ELISA)",
+        "nameBn": "এইচবিএসএজি (হেপাটাইটিস-বি ভাইরাস পরীক্ষা)",
+        "category": "Serology & Immunology",
+        "subcategory": "Viral Marker",
+        "departmentId": "pathology",
+        "unit": "Reactive / Non-Reactive",
+        "normalRange": "Non-Reactive",
+        "price": 400,
+        "costPrice": 110,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "Serum",
+        "method": "ICT / ELISA",
+        "turnaroundTime": "2 Hours",
+        "isActive": true,
+        "synonyms": [
+          "hbsag",
+          "hepatitis b"
+        ]
+      },
+      {
+        "id": "bd_ser_hcv",
+        "code": "PATH-HCV",
+        "name": "Anti-HCV (Hepatitis C Virus Antibody)",
+        "nameBn": "অ্যান্টি-এইচসিভি (হেপাটাইটিস-সি ভাইরাস পরীক্ষা)",
+        "category": "Serology & Immunology",
+        "subcategory": "Viral Marker",
+        "departmentId": "pathology",
+        "unit": "Reactive / Non-Reactive",
+        "normalRange": "Non-Reactive",
+        "price": 600,
+        "costPrice": 180,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "Serum",
+        "method": "ICT / CLIA",
+        "turnaroundTime": "3 Hours",
+        "isActive": true,
+        "synonyms": [
+          "anti hcv",
+          "hcv",
+          "hepatitis c"
+        ]
+      },
+      {
+        "id": "bd_ser_crp",
+        "code": "PATH-CRP",
+        "name": "CRP (C-Reactive Protein Quantitative)",
+        "nameBn": "সিআরপি (CRP ইনফেকশন মার্কার)",
+        "category": "Serology & Immunology",
+        "subcategory": "Inflammatory Marker",
+        "departmentId": "pathology",
+        "unit": "mg/L",
+        "normalRange": "< 6.0 mg/L",
+        "price": 500,
+        "costPrice": 150,
+        "discountEligible": true,
+        "maxDiscountPercent": 25,
+        "priceVerified": true,
+        "sampleType": "Serum",
+        "method": "Nephelometry / Immunoturbidimetry",
+        "turnaroundTime": "2 Hours",
+        "isActive": true,
+        "synonyms": [
+          "crp",
+          "c reactive protein"
+        ]
+      },
+      {
+        "id": "bd_ser_aso",
+        "code": "PATH-ASO",
+        "name": "ASO Titre (Quantitative)",
+        "nameBn": "এএসও টাইটার (বাতজ্বর পরীক্ষা)",
+        "category": "Serology & Immunology",
+        "subcategory": "Rheumatology",
+        "departmentId": "pathology",
+        "unit": "IU/mL",
+        "normalRange": "< 200 IU/mL",
+        "price": 500,
+        "costPrice": 140,
+        "discountEligible": true,
+        "maxDiscountPercent": 25,
+        "priceVerified": true,
+        "sampleType": "Serum",
+        "method": "Latex Turbidimetry",
+        "turnaroundTime": "2 Hours",
+        "isActive": true,
+        "synonyms": [
+          "aso",
+          "aso titre",
+          "rheumatic fever"
+        ]
+      },
+      {
+        "id": "bd_ser_rf",
+        "code": "PATH-RF",
+        "name": "RA / RF Factor (Rheumatoid Factor Quantitative)",
+        "nameBn": "আরএ / আরএফ টেস্ট (বাতের পরীক্ষা)",
+        "category": "Serology & Immunology",
+        "subcategory": "Rheumatology",
+        "departmentId": "pathology",
+        "unit": "IU/mL",
+        "normalRange": "< 14 IU/mL",
+        "price": 500,
+        "costPrice": 140,
+        "discountEligible": true,
+        "maxDiscountPercent": 25,
+        "priceVerified": true,
+        "sampleType": "Serum",
+        "method": "Immunoturbidimetry",
+        "turnaroundTime": "2 Hours",
+        "isActive": true,
+        "synonyms": [
+          "ra test",
+          "rf",
+          "rheumatoid factor"
+        ]
+      },
+      {
+        "id": "bd_ser_denguens1",
+        "code": "PATH-DNS1",
+        "name": "Dengue NS1 Antigen",
+        "nameBn": "ডেঙ্গু এনএস১ অ্যান্টিজেন (Dengue NS1)",
+        "category": "Serology & Immunology",
+        "subcategory": "Dengue Profile",
+        "departmentId": "pathology",
+        "unit": "Positive / Negative",
+        "normalRange": "Negative",
+        "price": 300,
+        "costPrice": 120,
+        "discountEligible": true,
+        "maxDiscountPercent": 15,
+        "priceVerified": true,
+        "sampleType": "Serum",
+        "method": "ICT / ELISA",
+        "turnaroundTime": "1 Hour",
+        "isActive": true,
+        "synonyms": [
+          "dengue",
+          "ns1",
+          "dengue ns1"
+        ]
+      },
+      {
+        "id": "bd_ser_dengueigm",
+        "code": "PATH-DIGM",
+        "name": "Dengue IgG / IgM Antibody",
+        "nameBn": "ডেঙ্গু আইজিজি ও আইজিএম অ্যান্টিবডি",
+        "category": "Serology & Immunology",
+        "subcategory": "Dengue Profile",
+        "departmentId": "pathology",
+        "unit": "Positive / Negative",
+        "normalRange": "Negative",
+        "price": 500,
+        "costPrice": 180,
+        "discountEligible": true,
+        "maxDiscountPercent": 15,
+        "priceVerified": true,
+        "sampleType": "Serum",
+        "method": "Immunochromatography",
+        "turnaroundTime": "2 Hours",
+        "isActive": true,
+        "synonyms": [
+          "dengue igg",
+          "dengue igm",
+          "dengue antibody"
+        ]
+      },
+      {
+        "id": "bd_ser_widal",
+        "code": "PATH-WIDAL",
+        "name": "Widal Test (Febrile Antigen / Typhoid)",
+        "nameBn": "উইডাল টেস্ট (টাইফয়েড পরীক্ষা)",
+        "category": "Serology & Immunology",
+        "subcategory": "Fever Profile",
+        "departmentId": "pathology",
+        "unit": "Titre",
+        "normalRange": "TO & TH <= 1:80",
+        "price": 400,
+        "costPrice": 100,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "Serum",
+        "method": "Slide / Tube Agglutination",
+        "turnaroundTime": "2 Hours",
+        "isActive": true,
+        "synonyms": [
+          "widal",
+          "typhoid test",
+          "febrile antigen"
+        ]
+      },
+      {
+        "id": "bd_cp_urinere",
+        "code": "PATH-URE",
+        "name": "Urine R/M/E (Routine Microscopic Examination)",
+        "nameBn": "ইউরিন আর/এম/ই (প্রস্রাবের রুটিন পরীক্ষা)",
+        "category": "Clinical Pathology",
+        "subcategory": "Urine Analysis",
+        "departmentId": "pathology",
+        "unit": "HPF / Qualitative",
+        "normalRange": "Pus Cells: 0-5/HPF, Albumin: Nil, Sugar: Nil",
+        "price": 200,
+        "costPrice": 40,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "Mid-Stream Spot Urine",
+        "method": "Dipstick + Microscopy",
+        "turnaroundTime": "1 Hour",
+        "isActive": true,
+        "synonyms": [
+          "urine re",
+          "urine rme",
+          "urine routine"
+        ]
+      },
+      {
+        "id": "bd_cp_stoolre",
+        "code": "PATH-SRE",
+        "name": "Stool R/M/E (Routine Microscopic Examination)",
+        "nameBn": "স্টুল আর/এম/ই (মল পরীক্ষা)",
+        "category": "Clinical Pathology",
+        "subcategory": "Stool Analysis",
+        "departmentId": "pathology",
+        "unit": "Microscopy",
+        "normalRange": "Ova/Cyst/Parasite: Not Found",
+        "price": 200,
+        "costPrice": 40,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "Fresh Stool Sample",
+        "method": "Saline & Iodine Wet Mount",
+        "turnaroundTime": "2 Hours",
+        "isActive": true,
+        "synonyms": [
+          "stool re",
+          "stool rme"
+        ]
+      },
+      {
+        "id": "bd_cp_semen",
+        "code": "PATH-SEMEN",
+        "name": "Semen Analysis (WHO 6th Ed. Protocol)",
+        "nameBn": "সিমেন অ্যানালাইসিস (বীর্য পরীক্ষা)",
+        "category": "Clinical Pathology",
+        "subcategory": "Andrology",
+        "departmentId": "pathology",
+        "unit": "Million/mL & % Motility",
+        "normalRange": "Count >= 16M/mL, Total Motility >= 42%",
+        "price": 600,
+        "costPrice": 150,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "Fresh Semen (3-5 Days Abstinence)",
+        "method": "Makler Chamber / Automated CASA",
+        "turnaroundTime": "3 Hours",
+        "isActive": true,
+        "isSensitive": true,
+        "synonyms": [
+          "semen analysis",
+          "sperm count"
+        ]
+      },
+      {
+        "id": "bd_mic_urinecs",
+        "code": "PATH-UCS",
+        "name": "Urine for Culture & Sensitivity (C/S)",
+        "nameBn": "ইউরিন কালচার ও সেনসিটিভিটি (C/S)",
+        "category": "Microbiology",
+        "subcategory": "Bacteriology",
+        "departmentId": "pathology",
+        "unit": "CFU/mL & Antibiogram",
+        "normalRange": "No Growth after 48 hrs incubation",
+        "price": 800,
+        "costPrice": 250,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "Sterile Mid-Stream Urine",
+        "method": "CLED Agar & Kirby-Bauer Disc Diffusion",
+        "turnaroundTime": "48 - 72 Hours",
+        "isActive": true,
+        "synonyms": [
+          "urine cs",
+          "urine culture"
+        ]
+      },
+      {
+        "id": "bd_mic_bloodcs",
+        "code": "PATH-BCS",
+        "name": "Blood for Culture & Sensitivity (Automated BACTEC)",
+        "nameBn": "ব্লাড কালচার ও সেনসিটিভিটি (Automated)",
+        "category": "Microbiology",
+        "subcategory": "Bacteriology",
+        "departmentId": "pathology",
+        "unit": "Growth & Antibiogram",
+        "normalRange": "No Bacterial Growth",
+        "price": 1400,
+        "costPrice": 500,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "Venous Blood in BACTEC Bottle",
+        "method": "Automated Blood Culture System",
+        "turnaroundTime": "72 Hours",
+        "isActive": true,
+        "synonyms": [
+          "blood cs",
+          "blood culture"
+        ]
+      },
+      {
+        "id": "bd_mic_gram",
+        "code": "PATH-GRAM",
+        "name": "Gram Stain Examination",
+        "nameBn": "গ্রাম স্টেইন পরীক্ষা",
+        "category": "Microbiology",
+        "subcategory": "Microscopy",
+        "departmentId": "pathology",
+        "unit": "Morphology",
+        "normalRange": "No Organism Seen",
+        "price": 350,
+        "costPrice": 80,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "Swab / Pus / Sputum / Fluid",
+        "method": "Gram Staining Microscopy",
+        "turnaroundTime": "3 Hours",
+        "isActive": true,
+        "synonyms": [
+          "gram stain"
+        ]
+      },
+      {
+        "id": "bd_mic_afb",
+        "code": "PATH-AFB",
+        "name": "Sputum for AFB (Acid Fast Bacilli / TB)",
+        "nameBn": "কফ পরীক্ষা (যক্ষ্মা / AFB)",
+        "category": "Microbiology",
+        "subcategory": "Mycobacteriology",
+        "departmentId": "pathology",
+        "unit": "Qualitative",
+        "normalRange": "AFB Not Found",
+        "price": 300,
+        "costPrice": 60,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "Early Morning Sputum",
+        "method": "Ziehl-Neelsen / Auramine Stain",
+        "turnaroundTime": "4 Hours",
+        "isActive": true,
+        "synonyms": [
+          "afb",
+          "sputum afb",
+          "tb test"
+        ]
+      },
+      {
+        "id": "bd_mic_koh",
+        "code": "PATH-KOH",
+        "name": "Skin / Nail Scraping for Fungus (KOH Preparation)",
+        "nameBn": "স্কিন বা নখের ফাঙ্গাস পরীক্ষা (KOH Mount)",
+        "category": "Microbiology",
+        "subcategory": "Mycology",
+        "departmentId": "pathology",
+        "unit": "Microscopy",
+        "normalRange": "Fungal Elements Not Found",
+        "price": 350,
+        "costPrice": 70,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "Skin / Nail / Hair Scraping",
+        "method": "10-20% KOH Wet Mount",
+        "turnaroundTime": "2 Hours",
+        "isActive": true,
+        "synonyms": [
+          "koh",
+          "fungus test",
+          "skin scraping"
+        ]
+      },
+      {
+        "id": "bd_spc_vitd",
+        "code": "PATH-VITD",
+        "name": "25-OH Vitamin D (Total)",
+        "nameBn": "ভিটামিন ডি (25-OH Vitamin D)",
+        "category": "Special Tests",
+        "subcategory": "Vitamins & Nutrition",
+        "departmentId": "pathology",
+        "unit": "ng/mL",
+        "normalRange": "Sufficient: 30 - 100 ng/mL",
+        "price": 2200,
+        "costPrice": 850,
+        "discountEligible": true,
+        "maxDiscountPercent": 25,
+        "priceVerified": true,
+        "sampleType": "Serum",
+        "method": "CMIA / CLIA",
+        "turnaroundTime": "6 Hours",
+        "isActive": true,
+        "synonyms": [
+          "vitamin d",
+          "vit d",
+          "cholecalciferol"
+        ]
+      },
+      {
+        "id": "bd_spc_vitb12",
+        "code": "PATH-B12",
+        "name": "Serum Vitamin B12",
+        "nameBn": "সিরাম ভিটামিন বি-১২",
+        "category": "Special Tests",
+        "subcategory": "Vitamins & Nutrition",
+        "departmentId": "pathology",
+        "unit": "pg/mL",
+        "normalRange": "187 - 883 pg/mL",
+        "price": 1600,
+        "costPrice": 600,
+        "discountEligible": true,
+        "maxDiscountPercent": 25,
+        "priceVerified": true,
+        "sampleType": "Serum",
+        "method": "CMIA / CLIA",
+        "turnaroundTime": "6 Hours",
+        "isActive": true,
+        "synonyms": [
+          "vitamin b12",
+          "b12",
+          "cobalamin"
+        ]
+      },
+      {
+        "id": "bd_spc_ferritin",
+        "code": "PATH-FER",
+        "name": "Serum Ferritin",
+        "nameBn": "সিরাম ফেরিটিন (আয়রন স্টোর পরীক্ষা)",
+        "category": "Special Tests",
+        "subcategory": "Iron Profile",
+        "departmentId": "pathology",
+        "unit": "ng/mL",
+        "normalRange": "M: 22-322, F: 10-291 ng/mL",
+        "price": 1000,
+        "costPrice": 350,
+        "discountEligible": true,
+        "maxDiscountPercent": 25,
+        "priceVerified": true,
+        "sampleType": "Serum",
+        "method": "CMIA / CLIA",
+        "turnaroundTime": "4 Hours",
+        "isActive": true,
+        "synonyms": [
+          "ferritin",
+          "iron profile"
+        ]
+      },
+      {
+        "id": "bd_spc_psa",
+        "code": "PATH-PSA",
+        "name": "Total PSA (Prostate Specific Antigen)",
+        "nameBn": "টোটাল পিএসএ (প্রোস্টেট পরীক্ষা)",
+        "category": "Special Tests",
+        "subcategory": "Tumor Markers",
+        "departmentId": "pathology",
+        "unit": "ng/mL",
+        "normalRange": "< 4.0 ng/mL",
+        "price": 1200,
+        "costPrice": 420,
+        "discountEligible": true,
+        "maxDiscountPercent": 25,
+        "priceVerified": true,
+        "sampleType": "Serum",
+        "method": "CMIA / CLIA",
+        "turnaroundTime": "6 Hours",
+        "isActive": true,
+        "synonyms": [
+          "psa",
+          "prostate"
+        ]
+      },
+      {
+        "id": "bd_spc_ca125",
+        "code": "PATH-CA125",
+        "name": "CA-125 (Ovarian Tumor Marker)",
+        "nameBn": "সিএ-১২৫ (টিউমার মার্কার)",
+        "category": "Special Tests",
+        "subcategory": "Tumor Markers",
+        "departmentId": "pathology",
+        "unit": "U/mL",
+        "normalRange": "< 35.0 U/mL",
+        "price": 1400,
+        "costPrice": 500,
+        "discountEligible": true,
+        "maxDiscountPercent": 25,
+        "priceVerified": true,
+        "sampleType": "Serum",
+        "method": "CMIA / CLIA",
+        "turnaroundTime": "6 Hours",
+        "isActive": true,
+        "synonyms": [
+          "ca 125",
+          "ca125",
+          "tumor marker"
+        ]
+      },
+      {
+        "id": "bd_spc_cea",
+        "code": "PATH-CEA",
+        "name": "CEA (Carcinoembryonic Antigen)",
+        "nameBn": "সিইএ (CEA টিউমার মার্কার)",
+        "category": "Special Tests",
+        "subcategory": "Tumor Markers",
+        "departmentId": "pathology",
+        "unit": "ng/mL",
+        "normalRange": "< 5.0 ng/mL",
+        "price": 1300,
+        "costPrice": 450,
+        "discountEligible": true,
+        "maxDiscountPercent": 25,
+        "priceVerified": true,
+        "sampleType": "Serum",
+        "method": "CMIA / CLIA",
+        "turnaroundTime": "6 Hours",
+        "isActive": true,
+        "synonyms": [
+          "cea",
+          "tumor marker"
+        ]
+      },
+      {
+        "id": "bd_xr_cxr",
+        "code": "XR-CXRPA",
+        "name": "Digital X-Ray Chest P/A View",
+        "nameBn": "ডিজিটাল এক্স-রে চেস্ট পি/এ ভিউ (বুকের এক্স-রে)",
+        "category": "X-Ray",
+        "subcategory": "Chest X-Ray",
+        "departmentId": "xray",
+        "unit": "1 Film",
+        "normalRange": "Normal Radiograph",
+        "price": 500,
+        "costPrice": 150,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "Radiography",
+        "method": "DR Digital Radiography",
+        "turnaroundTime": "1 Hour",
+        "isActive": true,
+        "synonyms": [
+          "cxr",
+          "chest xray",
+          "x-ray chest",
+          "chest pa"
+        ]
+      },
+      {
+        "id": "bd_xr_skull",
+        "code": "XR-SKULL",
+        "name": "Digital X-Ray Skull B/V (AP & Lateral)",
+        "nameBn": "ডিজিটাল এক্স-রে স্কাল বি/ভি (মাথার এক্স-রে)",
+        "category": "X-Ray",
+        "subcategory": "Skull &PNS",
+        "departmentId": "xray",
+        "unit": "2 Views",
+        "normalRange": "Normal Radiograph",
+        "price": 700,
+        "costPrice": 200,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "Radiography",
+        "method": "DR Digital Radiography",
+        "turnaroundTime": "1 Hour",
+        "isActive": true,
+        "synonyms": [
+          "skull xray",
+          "x-ray skull"
+        ]
+      },
+      {
+        "id": "bd_xr_pns",
+        "code": "XR-PNS",
+        "name": "Digital X-Ray PNS (OM View)",
+        "nameBn": "ডিজিটাল এক্স-রে পিএনএস (সাইনাস এক্স-রে)",
+        "category": "X-Ray",
+        "subcategory": "Skull & PNS",
+        "departmentId": "xray",
+        "unit": "1 View",
+        "normalRange": "Clear Sinuses",
+        "price": 550,
+        "costPrice": 160,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "Radiography",
+        "method": "DR Digital Radiography",
+        "turnaroundTime": "1 Hour",
+        "isActive": true,
+        "synonyms": [
+          "pns xray",
+          "sinus xray"
+        ]
+      },
+      {
+        "id": "bd_xr_cspine",
+        "code": "XR-CSPINE",
+        "name": "Digital X-Ray Cervical Spine B/V (AP & Lat)",
+        "nameBn": "ডিজিটাল এক্স-রে সার্ভাইক্যাল স্পাইন (ঘাড়ের এক্স-রে)",
+        "category": "X-Ray",
+        "subcategory": "Spine X-Ray",
+        "departmentId": "xray",
+        "unit": "2 Views",
+        "normalRange": "Normal Alignment",
+        "price": 750,
+        "costPrice": 220,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "Radiography",
+        "method": "DR Digital Radiography",
+        "turnaroundTime": "1 Hour",
+        "isActive": true,
+        "synonyms": [
+          "c spine",
+          "cervical spine xray",
+          "neck xray"
+        ]
+      },
+      {
+        "id": "bd_xr_lsspine",
+        "code": "XR-LSSPINE",
+        "name": "Digital X-Ray Lumbosacral (L/S) Spine B/V",
+        "nameBn": "ডিজিটাল এক্স-রে এল/এস স্পাইন (কোমরের এক্স-রে)",
+        "category": "X-Ray",
+        "subcategory": "Spine X-Ray",
+        "departmentId": "xray",
+        "unit": "2 Views",
+        "normalRange": "Normal Alignment",
+        "price": 800,
+        "costPrice": 240,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "Radiography",
+        "method": "DR Digital Radiography",
+        "turnaroundTime": "1 Hour",
+        "isActive": true,
+        "synonyms": [
+          "ls spine",
+          "lumbar spine",
+          "back xray"
+        ]
+      },
+      {
+        "id": "bd_xr_kub",
+        "code": "XR-KUB",
+        "name": "Digital X-Ray KUB / Plain Abdomen Erect",
+        "nameBn": "ডিজিটাল এক্স-রে কেইউবি / পেটের এক্স-রে",
+        "category": "X-Ray",
+        "subcategory": "Abdomen & Pelvis",
+        "departmentId": "xray",
+        "unit": "1 View",
+        "normalRange": "No Radio-opaque Calculus",
+        "price": 600,
+        "costPrice": 180,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "Radiography",
+        "method": "DR Digital Radiography",
+        "turnaroundTime": "1 Hour",
+        "isActive": true,
+        "synonyms": [
+          "xray kub",
+          "abdomen xray"
+        ]
+      },
+      {
+        "id": "bd_xr_pelvis",
+        "code": "XR-PELVIS",
+        "name": "Digital X-Ray Pelvis including Both Hip Joints A/P",
+        "nameBn": "ডিজিটাল এক্স-রে পেলভিস ও হিপ জয়েন্ট",
+        "category": "X-Ray",
+        "subcategory": "Abdomen & Pelvis",
+        "departmentId": "xray",
+        "unit": "1 View",
+        "normalRange": "Normal Pelvis",
+        "price": 650,
+        "costPrice": 190,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "Radiography",
+        "method": "DR Digital Radiography",
+        "turnaroundTime": "1 Hour",
+        "isActive": true,
+        "synonyms": [
+          "pelvis xray",
+          "hip xray"
+        ]
+      },
+      {
+        "id": "bd_xr_knee",
+        "code": "XR-KNEE",
+        "name": "Digital X-Ray Knee Joint B/V (AP & Lateral)",
+        "nameBn": "ডিজিটাল এক্স-রে হাঁটুর জয়েন্ট (Knee B/V)",
+        "category": "X-Ray",
+        "subcategory": "Extremities",
+        "departmentId": "xray",
+        "unit": "2 Views",
+        "normalRange": "Normal Joint Space",
+        "price": 700,
+        "costPrice": 200,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "Radiography",
+        "method": "DR Digital Radiography",
+        "turnaroundTime": "1 Hour",
+        "isActive": true,
+        "synonyms": [
+          "knee xray",
+          "joint xray",
+          "extremities xray"
+        ]
+      },
+      {
+        "id": "bd_usg_wa",
+        "code": "USG-WABD",
+        "name": "USG of Whole Abdomen",
+        "nameBn": "আল্ট্রাসনোগ্রাফি - পুরো পেট (Whole Abdomen)",
+        "category": "Ultrasound",
+        "subcategory": "Abdominal USG",
+        "departmentId": "ultrasound",
+        "unit": "Scan & Report",
+        "normalRange": "Normal Sonographic Study",
+        "price": 1000,
+        "costPrice": 300,
+        "discountEligible": true,
+        "maxDiscountPercent": 25,
+        "priceVerified": true,
+        "sampleType": "Ultrasound Scan",
+        "method": "4D / Color Doppler Ultrasound",
+        "turnaroundTime": "1 Hour",
+        "isActive": true,
+        "synonyms": [
+          "usg whole abdomen",
+          "ultrasound abdomen",
+          "wa usg"
+        ]
+      },
+      {
+        "id": "bd_usg_uabd",
+        "code": "USG-UABD",
+        "name": "USG of Upper Abdomen (HBS / Hepatobiliary System)",
+        "nameBn": "আল্ট্রাসনোগ্রাফি - উপরের পেট ও লিভার (Upper Abdomen)",
+        "category": "Ultrasound",
+        "subcategory": "Abdominal USG",
+        "departmentId": "ultrasound",
+        "unit": "Scan & Report",
+        "normalRange": "Normal HBS",
+        "price": 800,
+        "costPrice": 250,
+        "discountEligible": true,
+        "maxDiscountPercent": 25,
+        "priceVerified": true,
+        "sampleType": "Ultrasound Scan",
+        "method": "High Resolution USG",
+        "turnaroundTime": "1 Hour",
+        "isActive": true,
+        "synonyms": [
+          "upper abdomen usg",
+          "hbs usg"
+        ]
+      },
+      {
+        "id": "bd_usg_kub",
+        "code": "USG-KUB",
+        "name": "USG of KUB with Prostate & PVR",
+        "nameBn": "আল্ট্রাসনোগ্রাফি - কিডনি, মূত্রথলি ও প্রোস্টেট (KUB & PVR)",
+        "category": "Ultrasound",
+        "subcategory": "Renal & Pelvic USG",
+        "departmentId": "ultrasound",
+        "unit": "Scan & Report",
+        "normalRange": "Normal Renal Tract",
+        "price": 900,
+        "costPrice": 280,
+        "discountEligible": true,
+        "maxDiscountPercent": 25,
+        "priceVerified": true,
+        "sampleType": "Full Bladder USG",
+        "method": "High Resolution USG",
+        "turnaroundTime": "1 Hour",
+        "isActive": true,
+        "synonyms": [
+          "usg kub",
+          "kidney ultrasound",
+          "pvr"
+        ]
+      },
+      {
+        "id": "bd_usg_pelvic",
+        "code": "USG-PELV",
+        "name": "USG of Lower Abdomen / Pelvic Organs (Uterus & Adnexa)",
+        "nameBn": "আল্ট্রাসনোগ্রাফি - তলপেট ও জরায়ু (Lower Abdomen / Pelvis)",
+        "category": "Ultrasound",
+        "subcategory": "Renal & Pelvic USG",
+        "departmentId": "ultrasound",
+        "unit": "Scan & Report",
+        "normalRange": "Normal Uterus & Adnexa",
+        "price": 800,
+        "costPrice": 250,
+        "discountEligible": true,
+        "maxDiscountPercent": 25,
+        "priceVerified": true,
+        "sampleType": "Full Bladder USG",
+        "method": "High Resolution USG",
+        "turnaroundTime": "1 Hour",
+        "isActive": true,
+        "synonyms": [
+          "lower abdomen usg",
+          "pelvic usg",
+          "uterus usg"
+        ]
+      },
+      {
+        "id": "bd_usg_preg",
+        "code": "USG-PREG",
+        "name": "USG of Pregnancy Profile / Obstetric Scan (Fetal Well-being)",
+        "nameBn": "আল্ট্রাসনোগ্রাফি - গর্ভকালীন পরীক্ষা (Pregnancy Profile)",
+        "category": "Ultrasound",
+        "subcategory": "Obstetric USG",
+        "departmentId": "ultrasound",
+        "unit": "Scan & Report",
+        "normalRange": "Normal Live Intrauterine Pregnancy",
+        "price": 900,
+        "costPrice": 280,
+        "discountEligible": true,
+        "maxDiscountPercent": 25,
+        "priceVerified": true,
+        "sampleType": "Obstetric USG",
+        "method": "High Resolution Obstetric USG",
+        "turnaroundTime": "1 Hour",
+        "isActive": true,
+        "synonyms": [
+          "pregnancy usg",
+          "obstetric scan",
+          "fetal profile"
+        ]
+      },
+      {
+        "id": "bd_usg_anomaly",
+        "code": "USG-ANOM",
+        "name": "USG of Fetal Anomaly Scan (Level-II 4D Obstetric Scan)",
+        "nameBn": "আল্ট্রাসনোগ্রাফি - ফিটাল অ্যানোমালি স্ক্যান (4D Level-II)",
+        "category": "Ultrasound",
+        "subcategory": "Obstetric USG",
+        "departmentId": "ultrasound",
+        "unit": "Detailed Scan",
+        "normalRange": "No Gross Congenital Anomaly Seen",
+        "price": 2200,
+        "costPrice": 700,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "Obstetric USG (18-22 Weeks)",
+        "method": "4D Color Doppler USG",
+        "turnaroundTime": "2 Hours",
+        "isActive": true,
+        "synonyms": [
+          "anomaly scan",
+          "level 2 usg"
+        ]
+      },
+      {
+        "id": "bd_usg_breast",
+        "code": "USG-BRST",
+        "name": "USG of Both Breasts & Axillae (Sonomammography)",
+        "nameBn": "আল্ট্রাসনোগ্রাফি - উভয় ব্রেস্ট (Sonomammography)",
+        "category": "Ultrasound",
+        "subcategory": "Small Parts USG",
+        "departmentId": "ultrasound",
+        "unit": "Scan & Report",
+        "normalRange": "BI-RADS Category 1",
+        "price": 1500,
+        "costPrice": 450,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "High Frequency Linear Probe",
+        "method": "High Resolution Linear USG",
+        "turnaroundTime": "1 Hour",
+        "isActive": true,
+        "synonyms": [
+          "breast usg",
+          "sonomammography"
+        ]
+      },
+      {
+        "id": "bd_usg_thyroid",
+        "code": "USG-THYR",
+        "name": "USG of Thyroid Gland & Neck with Color Doppler",
+        "nameBn": "আল্ট্রাসনোগ্রাফি - থাইরয়েড গ্ল্যান্ড ও গলা",
+        "category": "Ultrasound",
+        "subcategory": "Small Parts USG",
+        "departmentId": "ultrasound",
+        "unit": "Scan & Report",
+        "normalRange": "TI-RADS Category 1",
+        "price": 1400,
+        "costPrice": 400,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "High Frequency Linear Probe",
+        "method": "High Resolution Linear USG",
+        "turnaroundTime": "1 Hour",
+        "isActive": true,
+        "synonyms": [
+          "thyroid usg",
+          "neck ultrasound"
+        ]
+      },
+      {
+        "id": "bd_usg_scrotum",
+        "code": "USG-SCRT",
+        "name": "USG of Scrotum & Testes with Color Doppler",
+        "nameBn": "আল্ট্রাসনোগ্রাফি - স্ক্রোটাম ও অণ্ডকোষ (Color Doppler)",
+        "category": "Ultrasound",
+        "subcategory": "Small Parts USG",
+        "departmentId": "ultrasound",
+        "unit": "Scan & Report",
+        "normalRange": "Normal Testicular Vascularity",
+        "price": 1500,
+        "costPrice": 450,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "High Frequency Linear Probe",
+        "method": "Color Doppler USG",
+        "turnaroundTime": "1 Hour",
+        "isActive": true,
+        "synonyms": [
+          "scrotum usg",
+          "testes doppler"
+        ]
+      },
+      {
+        "id": "bd_usg_dop_obs",
+        "code": "DOP-OBS",
+        "name": "Obstetric Color Doppler Study (Umbilical & MCA)",
+        "nameBn": "অবস্টেট্রিক কালার ডপলার স্টাডি (গর্ভস্থ শিশুর রক্তপ্রবাহ)",
+        "category": "Ultrasound",
+        "subcategory": "Doppler Study",
+        "departmentId": "ultrasound",
+        "unit": "Doppler Report",
+        "normalRange": "Normal Feto-Placental Perfusion",
+        "price": 2000,
+        "costPrice": 650,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "Color Doppler Scan",
+        "method": "Duplex Color Doppler",
+        "turnaroundTime": "1 Hour",
+        "isActive": true,
+        "synonyms": [
+          "obstetric doppler",
+          "fetal doppler"
+        ]
+      },
+      {
+        "id": "bd_usg_dop_limb",
+        "code": "DOP-LIMB",
+        "name": "Duplex Color Doppler of Lower Limb Vessels (Arterial & Venous)",
+        "nameBn": "লোয়ার লিম্ব কালার ডপলার (পায়ের রক্তনালী পরীক্ষা)",
+        "category": "Ultrasound",
+        "subcategory": "Doppler Study",
+        "departmentId": "ultrasound",
+        "unit": "Doppler Report",
+        "normalRange": "No DVT / Normal Triphasic Flow",
+        "price": 2500,
+        "costPrice": 800,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "Color Doppler Scan",
+        "method": "Duplex Vascular Doppler",
+        "turnaroundTime": "2 Hours",
+        "isActive": true,
+        "synonyms": [
+          "doppler lower limb",
+          "dvt doppler",
+          "vascular doppler"
+        ]
+      },
+      {
+        "id": "bd_crd_ecg",
+        "code": "ECG-12L",
+        "name": "Digital 12-Lead ECG (with Rhythm Strip)",
+        "nameBn": "ডিজিটাল ১২-লিড ইসিজি (ECG)",
+        "category": "ECG & Cardiology",
+        "subcategory": "Cardiology",
+        "departmentId": "ecg",
+        "unit": "Tracing & Report",
+        "normalRange": "Normal Sinus Rhythm",
+        "price": 350,
+        "costPrice": 80,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "12-Lead Surface ECG",
+        "method": "12-Channel Digital Electrocardiograph",
+        "turnaroundTime": "30 Minutes",
+        "isActive": true,
+        "synonyms": [
+          "ecg",
+          "ekg",
+          "12 lead ecg"
+        ]
+      },
+      {
+        "id": "bd_crd_echo",
+        "code": "CRD-ECHO",
+        "name": "2D & Color Doppler Echocardiogram (Echo)",
+        "nameBn": "২ডি ও কালার ডপলার ইকোকার্ডিওগ্রাম (Echo)",
+        "category": "ECG & Cardiology",
+        "subcategory": "Cardiology",
+        "departmentId": "ecg",
+        "unit": "Cardiac Study",
+        "normalRange": "LVEF >= 55%, Normal Valves",
+        "price": 2200,
+        "costPrice": 700,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "Transthoracic Echo",
+        "method": "Color Doppler Echocardiography",
+        "turnaroundTime": "1 Hour",
+        "isActive": true,
+        "synonyms": [
+          "echo",
+          "echocardiogram",
+          "color doppler echo"
+        ]
+      },
+      {
+        "id": "bd_crd_tmt",
+        "code": "CRD-TMT",
+        "name": "ETT / TMT (Exercise Tolerance Test - Treadmill)",
+        "nameBn": "ইটিটি / টিএমটি (হৃদরোগের ব্যায়াম পরীক্ষা)",
+        "category": "ECG & Cardiology",
+        "subcategory": "Cardiology",
+        "departmentId": "ecg",
+        "unit": "Bruce Protocol",
+        "normalRange": "Negative for Inducible Ischemia",
+        "price": 2500,
+        "costPrice": 800,
+        "discountEligible": true,
+        "maxDiscountPercent": 15,
+        "priceVerified": true,
+        "sampleType": "Treadmill Stress ECG",
+        "method": "Modified Bruce Protocol",
+        "turnaroundTime": "2 Hours",
+        "isActive": true,
+        "synonyms": [
+          "ett",
+          "tmt",
+          "treadmill test"
+        ]
+      },
+      {
+        "id": "bd_crd_holter",
+        "code": "CRD-HOLT",
+        "name": "24-Hour Ambulatory Holter ECG Monitoring",
+        "nameBn": "২৪ ঘণ্টার হোল্টার ইসিজি মনিটরিং",
+        "category": "ECG & Cardiology",
+        "subcategory": "Cardiology",
+        "departmentId": "ecg",
+        "unit": "24h Recording",
+        "normalRange": "No Significant Arrhythmia",
+        "price": 3500,
+        "costPrice": 1200,
+        "discountEligible": true,
+        "maxDiscountPercent": 15,
+        "priceVerified": true,
+        "sampleType": "24h Ambulatory ECG",
+        "method": "Digital Holter Recorder",
+        "turnaroundTime": "24 Hours",
+        "isActive": true,
+        "synonyms": [
+          "holter",
+          "24 hour ecg"
+        ]
+      },
+      {
+        "id": "bd_crd_pft",
+        "code": "CRD-PFT",
+        "name": "PFT / Computerized Spirometry (Pre & Post Bronchodilator)",
+        "nameBn": "পিএফটি / স্পাইরোমেট্রি (ফুসফুসের কার্যক্ষমতা পরীক্ষা)",
+        "category": "ECG & Cardiology",
+        "subcategory": "Pulmonology",
+        "departmentId": "ecg",
+        "unit": "FEV1 / FVC Ratio",
+        "normalRange": "Normal Ventilatory Function",
+        "price": 1200,
+        "costPrice": 350,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "Spirometry Breath Test",
+        "method": "Digital Pneumotachograph",
+        "turnaroundTime": "1 Hour",
+        "isActive": true,
+        "synonyms": [
+          "pft",
+          "spirometry",
+          "lung function"
+        ]
+      },
+      {
+        "id": "bd_crd_eeg",
+        "code": "CRD-EEG",
+        "name": "Digital EEG (Electroencephalogram)",
+        "nameBn": "ডিজিটাল ইইজি (মস্তিষ্কের তরঙ্গ পরীক্ষা)",
+        "category": "ECG & Cardiology",
+        "subcategory": "Neurology Diagnostics",
+        "departmentId": "ecg",
+        "unit": "Brain Wave Study",
+        "normalRange": "Normal Awake/Sleep EEG",
+        "price": 2000,
+        "costPrice": 650,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "Scalp Electrodes",
+        "method": "32-Channel Digital EEG",
+        "turnaroundTime": "3 Hours",
+        "isActive": true,
+        "synonyms": [
+          "eeg",
+          "brain wave test"
+        ]
+      },
+      {
+        "id": "bd_doc_gp",
+        "code": "OPD-GP",
+        "name": "Consultation — General Physician / Medical Officer",
+        "nameBn": "ডাক্তার ভিজিট — জেনারেল ফিজিশিয়ান / মেডিকেল অফিসার",
+        "category": "Doctor Consultation",
+        "subcategory": "General Medicine",
+        "departmentId": "doctorVisit",
+        "unit": "1 Visit",
+        "normalRange": "OPD Consultation",
+        "price": 400,
+        "costPrice": 0,
+        "discountEligible": true,
+        "maxDiscountPercent": 25,
+        "priceVerified": true,
+        "sampleType": "OPD Consultation",
+        "method": "Chamber Consultation",
+        "turnaroundTime": "Same Day",
+        "isActive": true,
+        "synonyms": [
+          "gp",
+          "general physician",
+          "medical officer",
+          "doctor visit"
+        ]
+      },
+      {
+        "id": "bd_doc_med",
+        "code": "OPD-MED",
+        "name": "Consultation — Medicine Specialist (FCPS / MD)",
+        "nameBn": "ডাক্তার ভিজিট — মেডিসিন বিশেষজ্ঞ",
+        "category": "Doctor Consultation",
+        "subcategory": "Medicine",
+        "departmentId": "doctorVisit",
+        "unit": "1 Visit",
+        "normalRange": "Specialist Consultation",
+        "price": 800,
+        "costPrice": 0,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "OPD Consultation",
+        "method": "Chamber Consultation",
+        "turnaroundTime": "Same Day",
+        "isActive": true,
+        "synonyms": [
+          "medicine specialist",
+          "doctor fee"
+        ]
+      },
+      {
+        "id": "bd_doc_gyn",
+        "code": "OPD-GYN",
+        "name": "Consultation — Gynecology & Obstetrics Specialist",
+        "nameBn": "ডাক্তার ভিজিট — গাইনি ও প্রসূতিবিদ্যা বিশেষজ্ঞ",
+        "category": "Doctor Consultation",
+        "subcategory": "Gynecology & Obstetrics",
+        "departmentId": "doctorVisit",
+        "unit": "1 Visit",
+        "normalRange": "Specialist Consultation",
+        "price": 700,
+        "costPrice": 0,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "OPD Consultation",
+        "method": "Chamber Consultation",
+        "turnaroundTime": "Same Day",
+        "isActive": true,
+        "synonyms": [
+          "gynecology",
+          "obstetrics",
+          "gyn doctor"
+        ]
+      },
+      {
+        "id": "bd_doc_ped",
+        "code": "OPD-PED",
+        "name": "Consultation — Pediatrician (Child Specialist)",
+        "nameBn": "ডাক্তার ভিজিট — শিশু রোগ বিশেষজ্ঞ",
+        "category": "Doctor Consultation",
+        "subcategory": "Pediatrics",
+        "departmentId": "doctorVisit",
+        "unit": "1 Visit",
+        "normalRange": "Specialist Consultation",
+        "price": 700,
+        "costPrice": 0,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "OPD Consultation",
+        "method": "Chamber Consultation",
+        "turnaroundTime": "Same Day",
+        "isActive": true,
+        "synonyms": [
+          "pediatrician",
+          "child specialist"
+        ]
+      },
+      {
+        "id": "bd_doc_card",
+        "code": "OPD-CRD",
+        "name": "Consultation — Cardiology Specialist",
+        "nameBn": "ডাক্তার ভিজিট — হৃদরোগ বিশেষজ্ঞ (Cardiologist)",
+        "category": "Doctor Consultation",
+        "subcategory": "Cardiology",
+        "departmentId": "doctorVisit",
+        "unit": "1 Visit",
+        "normalRange": "Specialist Consultation",
+        "price": 800,
+        "costPrice": 0,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "OPD Consultation",
+        "method": "Chamber Consultation",
+        "turnaroundTime": "Same Day",
+        "isActive": true,
+        "synonyms": [
+          "cardiologist",
+          "heart specialist"
+        ]
+      },
+      {
+        "id": "bd_doc_ortho",
+        "code": "OPD-ORT",
+        "name": "Consultation — Orthopedics & Trauma Specialist",
+        "nameBn": "ডাক্তার ভিজিট — হাড়জোড়া ও অর্থোপেডিক বিশেষজ্ঞ",
+        "category": "Doctor Consultation",
+        "subcategory": "Orthopedics",
+        "departmentId": "doctorVisit",
+        "unit": "1 Visit",
+        "normalRange": "Specialist Consultation",
+        "price": 800,
+        "costPrice": 0,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "OPD Consultation",
+        "method": "Chamber Consultation",
+        "turnaroundTime": "Same Day",
+        "isActive": true,
+        "synonyms": [
+          "orthopedics",
+          "bone specialist"
+        ]
+      },
+      {
+        "id": "bd_doc_surg",
+        "code": "OPD-SRG",
+        "name": "Consultation — General & Laparoscopic Surgery Specialist",
+        "nameBn": "ডাক্তার ভিজিট — জেনারেল ও ল্যাপারোস্কোপিক সার্জারি বিশেষজ্ঞ",
+        "category": "Doctor Consultation",
+        "subcategory": "Surgery",
+        "departmentId": "doctorVisit",
+        "unit": "1 Visit",
+        "normalRange": "Specialist Consultation",
+        "price": 800,
+        "costPrice": 0,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "OPD Consultation",
+        "method": "Chamber Consultation",
+        "turnaroundTime": "Same Day",
+        "isActive": true,
+        "synonyms": [
+          "surgeon",
+          "surgery consultation"
+        ]
+      },
+      {
+        "id": "bd_doc_derm",
+        "code": "OPD-DRM",
+        "name": "Consultation — Dermatology (Skin & VD Specialist)",
+        "nameBn": "ডাক্তার ভিজিট — চর্ম ও যৌনরোগ বিশেষজ্ঞ",
+        "category": "Doctor Consultation",
+        "subcategory": "Dermatology",
+        "departmentId": "doctorVisit",
+        "unit": "1 Visit",
+        "normalRange": "Specialist Consultation",
+        "price": 700,
+        "costPrice": 0,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "OPD Consultation",
+        "method": "Chamber Consultation",
+        "turnaroundTime": "Same Day",
+        "isActive": true,
+        "synonyms": [
+          "dermatologist",
+          "skin specialist"
+        ]
+      },
+      {
+        "id": "bd_doc_neuro",
+        "code": "OPD-NEU",
+        "name": "Consultation — Neuromedicine Specialist",
+        "nameBn": "ডাক্তার ভিজিট — নিউরোমেডিসিন (মস্তিষ্ক ও স্নায়ুরোগ) বিশেষজ্ঞ",
+        "category": "Doctor Consultation",
+        "subcategory": "Neurology",
+        "departmentId": "doctorVisit",
+        "unit": "1 Visit",
+        "normalRange": "Specialist Consultation",
+        "price": 900,
+        "costPrice": 0,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "OPD Consultation",
+        "method": "Chamber Consultation",
+        "turnaroundTime": "Same Day",
+        "isActive": true,
+        "synonyms": [
+          "neurologist",
+          "neuromedicine"
+        ]
+      },
+      {
+        "id": "bd_srv_reg",
+        "code": "SRV-REG",
+        "name": "Patient Registration & Digital ID Card Fee",
+        "nameBn": "রোগী নিবন্ধন ও ডিজিটাল আইডি কার্ড ফি",
+        "category": "Other Services",
+        "subcategory": "Registration",
+        "departmentId": "other",
+        "unit": "1 Card",
+        "normalRange": "N/A",
+        "price": 50,
+        "costPrice": 10,
+        "discountEligible": false,
+        "maxDiscountPercent": 0,
+        "priceVerified": true,
+        "sampleType": "Service",
+        "method": "Reception Desk",
+        "turnaroundTime": "Instant",
+        "isActive": true,
+        "synonyms": [
+          "registration fee",
+          "id card"
+        ]
+      },
+      {
+        "id": "bd_srv_vac",
+        "code": "SRV-VAC",
+        "name": "Vacutainer / Disposable Sample Collection Fee",
+        "nameBn": "ভ্যাকুটেইনার / রক্তের নমুনা সংগ্রহ চার্জ",
+        "category": "Other Services",
+        "subcategory": "Sample Collection",
+        "departmentId": "other",
+        "unit": "Per Collection",
+        "normalRange": "N/A",
+        "price": 50,
+        "costPrice": 20,
+        "discountEligible": false,
+        "maxDiscountPercent": 0,
+        "priceVerified": true,
+        "sampleType": "Consumable",
+        "method": "Phlebotomy Station",
+        "turnaroundTime": "Instant",
+        "isActive": true,
+        "synonyms": [
+          "sample collection",
+          "needle",
+          "vacutainer"
+        ]
+      },
+      {
+        "id": "bd_srv_home",
+        "code": "SRV-HOME",
+        "name": "Home Sample Collection Service Charge (Within City)",
+        "nameBn": "বাসা থেকে নমুনা সংগ্রহ চার্জ (Home Collection)",
+        "category": "Other Services",
+        "subcategory": "Sample Collection",
+        "departmentId": "other",
+        "unit": "1 Trip",
+        "normalRange": "N/A",
+        "price": 300,
+        "costPrice": 120,
+        "discountEligible": true,
+        "maxDiscountPercent": 15,
+        "priceVerified": true,
+        "sampleType": "Home Visit",
+        "method": "Mobile Phlebotomy Team",
+        "turnaroundTime": "Scheduled",
+        "isActive": true,
+        "synonyms": [
+          "home collection",
+          "home sample"
+        ]
+      },
+      {
+        "id": "bd_srv_neb",
+        "code": "SRV-NEB",
+        "name": "Emergency Nebulization Charge (Per Session)",
+        "nameBn": "জরুরি নেবুলাইজেশন চার্জ (প্রতি সেশন)",
+        "category": "Other Services",
+        "subcategory": "Procedure Charges",
+        "departmentId": "other",
+        "unit": "1 Session",
+        "normalRange": "N/A",
+        "price": 150,
+        "costPrice": 40,
+        "discountEligible": true,
+        "maxDiscountPercent": 15,
+        "priceVerified": true,
+        "sampleType": "Emergency Procedure",
+        "method": "Emergency Room",
+        "turnaroundTime": "20 Minutes",
+        "isActive": true,
+        "synonyms": [
+          "nebulization",
+          "gas"
+        ]
+      },
+      {
+        "id": "bd_srv_dress",
+        "code": "SRV-DRESS",
+        "name": "Aseptic Wound Dressing & Minor Procedure Charge",
+        "nameBn": "ক্ষত ড্রেসিং ও মাইনর প্রসিডিউর চার্জ",
+        "category": "Other Services",
+        "subcategory": "Procedure Charges",
+        "departmentId": "other",
+        "unit": "1 Procedure",
+        "normalRange": "N/A",
+        "price": 300,
+        "costPrice": 80,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "Minor Procedure",
+        "method": "Emergency / Dressing Room",
+        "turnaroundTime": "30 Minutes",
+        "isActive": true,
+        "synonyms": [
+          "dressing",
+          "wound care",
+          "stitch"
+        ]
+      },
+      {
+        "id": "bd_srv_bed",
+        "code": "SRV-BED",
+        "name": "Day-Care / Emergency Observation Bed Charge (Per Day)",
+        "nameBn": "ডে-কেয়ার / অবজারভেশন বেড চার্জ (প্রতি দিন)",
+        "category": "Other Services",
+        "subcategory": "Admission & Bed Charges",
+        "departmentId": "other",
+        "unit": "Per Day",
+        "normalRange": "N/A",
+        "price": 1000,
+        "costPrice": 200,
+        "discountEligible": true,
+        "maxDiscountPercent": 20,
+        "priceVerified": true,
+        "sampleType": "Inpatient / Observation",
+        "method": "Observation Ward",
+        "turnaroundTime": "Daily",
+        "isActive": true,
+        "synonyms": [
+          "bed charge",
+          "admission",
+          "observation bed"
+        ]
+      },
+      {
+        "id": "bd_phm_kit",
+        "code": "PHM-OGTT75",
+        "name": "Pharmacy — Dextrose 75gm Oral Glucose Pack (for OGTT)",
+        "nameBn": "ফার্মেসি — ৭৫ গ্রাম গ্লুকোজ প্যাক (OGTT পরীক্ষার জন্য)",
+        "category": "Pharmacy Products",
+        "subcategory": "Diagnostic Consumables",
+        "departmentId": "pharmacy",
+        "unit": "1 Pack",
+        "normalRange": "N/A",
+        "price": 80,
+        "costPrice": 45,
+        "discountEligible": false,
+        "maxDiscountPercent": 0,
+        "priceVerified": true,
+        "sampleType": "Pharmacy Item",
+        "method": "Dispensing Counter",
+        "turnaroundTime": "Instant",
+        "isActive": true,
+        "synonyms": [
+          "glucose pack",
+          "pharmacy",
+          "medicine"
+        ]
+      },
+      {
+        "id": "bd_phm_med",
+        "code": "PHM-EMERG",
+        "name": "Pharmacy — Emergency IV Cannula, Syringe & Saline Set",
+        "nameBn": "ফার্মেসি — জরুরি আইভি ক্যানুলা, সিরিঞ্জ ও স্যালাইন সেট",
+        "category": "Pharmacy Products",
+        "subcategory": "Emergency Medicine",
+        "departmentId": "pharmacy",
+        "unit": "1 Set",
+        "normalRange": "N/A",
+        "price": 250,
+        "costPrice": 160,
+        "discountEligible": true,
+        "maxDiscountPercent": 10,
+        "priceVerified": true,
+        "sampleType": "Pharmacy Item",
+        "method": "Hospital Pharmacy",
+        "turnaroundTime": "Instant",
+        "isActive": true,
+        "synonyms": [
+          "cannula",
+          "saline",
+          "pharmacy"
+        ]
+      },
+      {
+        "id": "doc_srv_doc-1",
+        "code": "DOC-DR01",
+        "name": "Consultation — Prof. Dr. M. A. Rahman (Internal Medicine & Diabetology)",
+        "nameBn": "ডাক্তার ভিজিট — Prof. Dr. M. A. Rahman (Internal Medicine & Diabetology)",
+        "category": "Doctor Consultation",
+        "subcategory": "Internal Medicine & Diabetology",
+        "departmentId": "doctorVisit",
+        "doctorId": "doc-1",
+        "unit": "Room 201",
+        "normalRange": "MBBS, FCPS (Medicine), MACP (USA)",
+        "price": 1000,
+        "costPrice": 0,
+        "discountEligible": true,
+        "maxDiscountPercent": 25,
+        "priceVerified": true,
+        "sampleType": "OPD Consultation",
+        "method": "Room 201",
+        "turnaroundTime": "Same Day",
+        "isActive": true,
+        "synonyms": [
+          "prof. dr. m. a. rahman",
+          "dr01",
+          "internal medicine & diabetology",
+          "doctor visit"
+        ]
+      },
+      {
+        "id": "doc_srv_doc-2",
+        "code": "DOC-DR02",
+        "name": "Consultation — Dr. Nusrat Jahan (Gynaecology & Obstetrics Specialist)",
+        "nameBn": "ডাক্তার ভিজিট — Dr. Nusrat Jahan (Gynaecology & Obstetrics Specialist)",
+        "category": "Doctor Consultation",
+        "subcategory": "Gynaecology & Obstetrics Specialist",
+        "departmentId": "doctorVisit",
+        "doctorId": "doc-2",
+        "unit": "Room 203",
+        "normalRange": "MBBS, DGO, FCPS (Obs & Gynae)",
+        "price": 800,
+        "costPrice": 0,
+        "discountEligible": true,
+        "maxDiscountPercent": 25,
+        "priceVerified": true,
+        "sampleType": "OPD Consultation",
+        "method": "Room 203",
+        "turnaroundTime": "Same Day",
+        "isActive": true,
+        "synonyms": [
+          "dr. nusrat jahan",
+          "dr02",
+          "gynaecology & obstetrics specialist",
+          "doctor visit"
+        ]
+      },
+      {
+        "id": "doc_srv_doc-3",
+        "code": "DOC-DR03",
+        "name": "Consultation — Dr. Tanvir Hossain (Cardiologist & Clinical Specialist)",
+        "nameBn": "ডাক্তার ভিজিট — Dr. Tanvir Hossain (Cardiologist & Clinical Specialist)",
+        "category": "Doctor Consultation",
+        "subcategory": "Cardiologist & Clinical Specialist",
+        "departmentId": "doctorVisit",
+        "doctorId": "doc-3",
+        "unit": "Room 104",
+        "normalRange": "MBBS, MD (Cardiology)",
+        "price": 1200,
+        "costPrice": 0,
+        "discountEligible": true,
+        "maxDiscountPercent": 25,
+        "priceVerified": true,
+        "sampleType": "OPD Consultation",
+        "method": "Room 104",
+        "turnaroundTime": "Same Day",
+        "isActive": true,
+        "synonyms": [
+          "dr. tanvir hossain",
+          "dr03",
+          "cardiologist & clinical specialist",
+          "doctor visit"
+        ]
+      },
+      {
+        "id": "doc_srv_doc-4",
+        "code": "DOC-DR04",
+        "name": "Consultation — Dr. Sabrina Farhana (Consultant Radiologist & Sonologist)",
+        "nameBn": "ডাক্তার ভিজিট — Dr. Sabrina Farhana (Consultant Radiologist & Sonologist)",
+        "category": "Doctor Consultation",
+        "subcategory": "Consultant Radiologist & Sonologist",
+        "departmentId": "doctorVisit",
+        "doctorId": "doc-4",
+        "unit": "Room 108",
+        "normalRange": "MBBS, D-Card, MD (Radiology)",
+        "price": 900,
+        "costPrice": 0,
+        "discountEligible": true,
+        "maxDiscountPercent": 25,
+        "priceVerified": true,
+        "sampleType": "OPD Consultation",
+        "method": "Room 108",
+        "turnaroundTime": "Same Day",
+        "isActive": true,
+        "synonyms": [
+          "dr. sabrina farhana",
+          "dr04",
+          "consultant radiologist & sonologist",
+          "doctor visit"
+        ]
+      },
+      {
+        "id": "doc_srv_doc-5",
+        "code": "DOC-DR05",
+        "name": "Consultation — Self / Direct Patient (General Screening)",
+        "nameBn": "ডাক্তার ভিজিট — Self / Direct Patient (General Screening)",
+        "category": "Doctor Consultation",
+        "subcategory": "General Screening",
+        "departmentId": "doctorVisit",
+        "doctorId": "doc-5",
+        "unit": "Room Lab Counter",
+        "normalRange": "Self Requested Investigation",
+        "price": 500,
+        "costPrice": 0,
+        "discountEligible": true,
+        "maxDiscountPercent": 25,
+        "priceVerified": true,
+        "sampleType": "OPD Consultation",
+        "method": "Room Lab Counter",
+        "turnaroundTime": "Same Day",
+        "isActive": true,
+        "synonyms": [
+          "self / direct patient",
+          "dr05",
+          "general screening",
+          "doctor visit"
+        ]
       }
     ],
     "medicines": [],
@@ -5236,6 +9533,70 @@
     ],
     "auditLogs": [
       {
+        "id": "AUD-PATH-ORD-1792909851118",
+        "timestamp": "2026-10-25 06:30:51",
+        "ipAddress": "127.0.0.1",
+        "workstationCode": "PC-01",
+        "username": "unknown",
+        "userFullName": "unknown",
+        "role": "Staff",
+        "department": "Pathology",
+        "actionType": "RECORD_UPDATE",
+        "patientId": "P103",
+        "patientName": "Rokeya Sultana",
+        "entityType": "pathologyOrder",
+        "recordId": "ord-path-26100103-tsh__thyroid_-0",
+        "details": "Pathology Order ORD-PATH-26100103-1 (TSH (Thyroid)) status updated — Sample: Collected, Report: Pending by unknown."
+      },
+      {
+        "id": "AUD-BILL-1792909851099-303",
+        "timestamp": "2026-10-25 06:30:51",
+        "ipAddress": "127.0.0.1",
+        "workstationCode": "PC-01",
+        "username": "unknown",
+        "userFullName": "unknown",
+        "role": "Staff",
+        "department": "Billing",
+        "actionType": "INVOICE_CREATE",
+        "patientId": "P103",
+        "patientName": "Rokeya Sultana",
+        "entityType": "invoice",
+        "recordId": "inv-test-mixed-103",
+        "details": "[BILL FINALIZED & ROUTED] Bill #26100103 (Receipt #RCP-26100103, Memo #CM-26100103) for Rokeya Sultana (P103) — Net: ৳undefined, Paid: ৳undefined, Due: ৳undefined (undefined). Auto-routed to: General Billing (Pathology Tests: 1)."
+      },
+      {
+        "id": "AUD-BILL-1792909851089-910",
+        "timestamp": "2026-10-25 06:30:51",
+        "ipAddress": "127.0.0.1",
+        "workstationCode": "PC-01",
+        "username": "unknown",
+        "userFullName": "unknown",
+        "role": "Staff",
+        "department": "Billing",
+        "actionType": "INVOICE_CREATE",
+        "patientId": "P102",
+        "patientName": "Md. Karim Ullah",
+        "entityType": "invoice",
+        "recordId": "inv-test-multi-102",
+        "details": "[BILL FINALIZED & ROUTED] Bill #26100102 (Receipt #RCP-26100102, Memo #CM-26100102) for Md. Karim Ullah (P102) — Net: ৳undefined, Paid: ৳undefined, Due: ৳undefined (undefined). Auto-routed to: General Billing (Pathology Tests: 5)."
+      },
+      {
+        "id": "AUD-BILL-1792909851078-121",
+        "timestamp": "2026-10-25 06:30:51",
+        "ipAddress": "127.0.0.1",
+        "workstationCode": "PC-01",
+        "username": "unknown",
+        "userFullName": "unknown",
+        "role": "Staff",
+        "department": "Billing",
+        "actionType": "INVOICE_CREATE",
+        "patientId": "P101",
+        "patientName": "Mst. Salma Begum",
+        "entityType": "invoice",
+        "recordId": "inv-test-single-101",
+        "details": "[BILL FINALIZED & ROUTED] Bill #26100101 (Receipt #REC-26100101, Memo #CM-26100101) for Mst. Salma Begum (P101) — Net: ৳undefined, Paid: ৳undefined, Due: ৳undefined (undefined). Auto-routed to: General Billing (Pathology Tests: 1)."
+      },
+      {
         "id": "AUD-DEL-1792903879127",
         "timestamp": "2026-10-25 04:51:19",
         "ipAddress": "127.0.0.1",
@@ -5470,8 +9831,8 @@
       "hospitalBackgroundUrl": "/hospital-bg.jpg"
     },
     "activeDrafts": {
-      "updatedAt": "2026-10-24T17:11:25.770Z",
-      "updatedBy": "unknown"
+      "updatedAt": "2026-10-25T06:20:35.429Z",
+      "updatedBy": "Hospital Staff"
     }
   }
 }

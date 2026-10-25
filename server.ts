@@ -2113,6 +2113,7 @@ app.post('/api/billing/finalize', (req, res) => {
       initialPayment,
       departmentOrders = [],
       pathologyPatient,
+      pathologyOrders = [],
       opdAppointment,
     } = req.body || {};
 
@@ -2135,10 +2136,15 @@ app.post('/api/billing/finalize', (req, res) => {
       const existingInv = (hospitalDb.collections.invoices || []).find(
         (inv: any) => inv.invoiceNo === invoice.invoiceNo
       );
+      const existingOrders = (hospitalDb.collections.pathologyOrders || []).filter(
+        (o: any) => o.invoiceNo === invoice.invoiceNo
+      );
       res.json({
         success: true,
         deduplicated: true,
         invoice: existingInv || invoice,
+        pathologyOrders: existingOrders,
+        pathologyOrdersCount: existingOrders.length,
         dbVersion: hospitalDb.dbVersion,
       });
       return;
@@ -2199,17 +2205,119 @@ app.post('/api/billing/finalize', (req, res) => {
       ];
     }
 
-    // 4. Save Pathology Worklist Record if routed to Pathology
-    if (pathologyPatient && pathologyPatient.id) {
-      hospitalDb.collections.patients = [
-        pathologyPatient,
-        ...(hospitalDb.collections.patients || []).filter(
-          (p: any) => p.id !== pathologyPatient.id && p.invoiceNo !== invoice.invoiceNo
+    // 4. Guaranteed Individual Pathology Orders Generation & Atomic Storage
+    if (!Array.isArray(hospitalDb.collections.pathologyOrders)) {
+      hospitalDb.collections.pathologyOrders = [];
+    }
+
+    const items = Array.isArray(invoice.items) ? invoice.items : [];
+    const pathologyItems = items.filter((it: any) => classifyDepartment(it) === 'pathology');
+
+    let ordersToSave: any[] = Array.isArray(pathologyOrders) ? [...pathologyOrders] : [];
+    const knownKeys = new Set(
+      ordersToSave.map((o) => `${o.invoiceNo || invoice.invoiceNo}:${o.testId || o.testCode || o.testName}`.toLowerCase())
+    );
+
+    // Auto-synthesize individual PathologyOrderItem for every pathology test on the invoice if not already passed
+    pathologyItems.forEach((item: any, idx: number) => {
+      const rawCode = item.code || item.testId || item.testName || `t-${idx}`;
+      const safeCode = String(rawCode).replace(/[^a-zA-Z0-9_-]/g, '_').toLowerCase();
+      const testKey = `${invoice.invoiceNo}:${item.testId || item.code || item.testName}`.toLowerCase();
+
+      if (!knownKeys.has(testKey)) {
+        const orderId = `ord-path-${String(invoice.invoiceNo).toLowerCase()}-${safeCode}-${idx}`;
+        const orderNo = `ORD-PATH-${suffix}-${idx + 1}`;
+        ordersToSave.push({
+          id: orderId,
+          orderNo,
+          invoiceId: invoice.id || `inv-${invoice.invoiceNo}`,
+          invoiceNo: invoice.invoiceNo,
+          cashMemoNo,
+          receiptNo,
+          pId: invoice.pId,
+          patientId: invoice.pId,
+          oldRegNo: invoice.oldRegNo,
+          patientName: invoice.patientName,
+          age: invoice.age || 'N/A',
+          sex: invoice.sex || 'Other',
+          phone: invoice.phone || '',
+          address: invoice.address || '',
+          drCode: invoice.drCode || 'DR01',
+          drName: invoice.drName || 'Self / Hospital',
+          testId: item.testId || item.code || `t-${idx}`,
+          testCode: item.code || item.testId || `TC-${idx + 1}`,
+          testName: item.testName || item.name || 'Pathology Test',
+          nameBn: item.nameBn || '',
+          category: item.category || 'Pathology',
+          price: Number(item.price) || 0,
+          orderDate: invoice.date || nowIso.slice(0, 10),
+          orderTimestamp: nowIso,
+          paymentStatus: invoice.status || 'Paid',
+          sampleType: item.sampleType || 'Whole Blood',
+          sampleStatus: 'Pending',
+          reportStatus: 'Pending',
+          createdAt: nowIso,
+          updatedAt: nowIso,
+        });
+        knownKeys.add(testKey);
+      }
+    });
+
+    if (ordersToSave.length > 0) {
+      const orderIds = new Set(ordersToSave.map((o) => o.id));
+      hospitalDb.collections.pathologyOrders = [
+        ...ordersToSave,
+        ...hospitalDb.collections.pathologyOrders.filter(
+          (o: any) => !orderIds.has(o.id) && !(o.invoiceNo === invoice.invoiceNo && ordersToSave.some((no) => no.testId === o.testId || no.testName === o.testName))
         ),
       ];
     }
 
-    // 5. Save OPD Appointment Record if routed to Doctor Visit
+    // 5. Save Pathology Worklist Consolidated Record if routed to Pathology
+    let finalPathologyPatient = pathologyPatient;
+    if (!finalPathologyPatient && ordersToSave.length > 0) {
+      finalPathologyPatient = {
+        id: `pat-${String(invoice.invoiceNo).toLowerCase()}`,
+        pId: invoice.pId,
+        accessionNo: `ACC-${suffix}`,
+        invoiceNo: invoice.invoiceNo,
+        cashMemoNo,
+        invDate: invoice.date || nowIso.slice(0, 10),
+        billDate: invoice.date || nowIso.slice(0, 10),
+        patientName: invoice.patientName,
+        age: invoice.age || 'N/A',
+        sex: invoice.sex || 'Other',
+        phone: invoice.phone || '',
+        address: invoice.address || '',
+        drCode: invoice.drCode || 'DR01',
+        drName: invoice.drName || 'Self / Hospital',
+        status: 'Pending',
+        workflowStatus: 'Pending',
+        paymentStatus: invoice.status || 'Paid',
+        department: 'Pathology',
+        sampleType: ordersToSave[0]?.sampleType || 'Whole Blood',
+        testResults: ordersToSave.map((o) => ({
+          testName: o.testName,
+          result: '',
+          unit: '',
+          normalRange: '',
+          status: 'Normal',
+          category: o.category || 'Pathology',
+        })),
+        createdAt: nowIso,
+      };
+    }
+
+    if (finalPathologyPatient && finalPathologyPatient.id) {
+      hospitalDb.collections.patients = [
+        finalPathologyPatient,
+        ...(hospitalDb.collections.patients || []).filter(
+          (p: any) => p.id !== finalPathologyPatient.id && p.invoiceNo !== invoice.invoiceNo
+        ),
+      ];
+    }
+
+    // 6. Save OPD Appointment Record if routed to Doctor Visit
     if (opdAppointment && opdAppointment.id) {
       hospitalDb.collections.opdAppointments = [
         opdAppointment,
@@ -2219,7 +2327,7 @@ app.post('/api/billing/finalize', (req, res) => {
       ];
     }
 
-    // 6. Immutable Audit Log
+    // 7. Immutable Audit Log
     const routedDeptsSummary = (departmentOrders || [])
       .map((o: any) => `${o.departmentName} (${(o.items || []).length})`)
       .join(', ');
@@ -2238,7 +2346,7 @@ app.post('/api/billing/finalize', (req, res) => {
       patientName: invoice.patientName,
       entityType: 'invoice',
       recordId: invoice.id,
-      details: `[BILL FINALIZED & ROUTED] Bill #${invoice.invoiceNo} (Receipt #${receiptNo}, Memo #${cashMemoNo}) for ${invoice.patientName} (${invoice.pId}) — Net: ৳${invoice.netTotal}, Paid: ৳${invoice.paidAmount}, Due: ৳${invoice.dueAmount} (${invoice.paymentMethod}). Auto-routed to: ${routedDeptsSummary || 'General Billing'}.`,
+      details: `[BILL FINALIZED & ROUTED] Bill #${invoice.invoiceNo} (Receipt #${receiptNo}, Memo #${cashMemoNo}) for ${invoice.patientName} (${invoice.pId}) — Net: ৳${invoice.netTotal}, Paid: ৳${invoice.paidAmount}, Due: ৳${invoice.dueAmount} (${invoice.paymentMethod}). Auto-routed to: ${routedDeptsSummary || 'General Billing'} (Pathology Tests: ${ordersToSave.length}).`,
     };
 
     hospitalDb.collections.auditLogs.unshift(auditEntry);
@@ -2256,6 +2364,8 @@ app.post('/api/billing/finalize', (req, res) => {
       invoice,
       paymentTransaction: savedPaymentTx || null,
       departmentOrders,
+      pathologyOrders: ordersToSave,
+      pathologyOrdersCount: ordersToSave.length,
       auditLog: auditEntry,
     });
   } catch (err: any) {
@@ -2844,6 +2954,187 @@ app.post('/api/orders/update-status', (req, res) => {
     res.status(500).json({
       success: false,
       error: err?.message || 'Failed to update department order status.',
+    });
+  }
+});
+
+// ============================================================================
+// 12. DEDICATED PATHOLOGY TEST ORDERS & RECONCILIATION API
+// ============================================================================
+
+app.get('/api/pathology/orders', (req, res) => {
+  try {
+    const q = String(req.query.q || '').trim().toLowerCase();
+    const sampleStatus = String(req.query.sampleStatus || '').trim();
+    const reportStatus = String(req.query.reportStatus || '').trim();
+    const date = String(req.query.date || '').trim();
+    const paymentStatus = String(req.query.paymentStatus || '').trim();
+
+    let orders = Array.isArray(hospitalDb.collections.pathologyOrders)
+      ? [...hospitalDb.collections.pathologyOrders]
+      : [];
+
+    if (q) {
+      orders = orders.filter((o: any) =>
+        String(o.invoiceNo || '').toLowerCase().includes(q) ||
+        String(o.cashMemoNo || '').toLowerCase().includes(q) ||
+        String(o.receiptNo || '').toLowerCase().includes(q) ||
+        String(o.orderNo || '').toLowerCase().includes(q) ||
+        String(o.pId || '').toLowerCase().includes(q) ||
+        String(o.patientName || '').toLowerCase().includes(q) ||
+        String(o.testName || '').toLowerCase().includes(q) ||
+        String(o.testCode || '').toLowerCase().includes(q) ||
+        String(o.phone || '').includes(q)
+      );
+    }
+
+    if (sampleStatus && sampleStatus !== 'ALL') {
+      orders = orders.filter(
+        (o: any) => String(o.sampleStatus).toLowerCase() === sampleStatus.toLowerCase()
+      );
+    }
+
+    if (reportStatus && reportStatus !== 'ALL') {
+      orders = orders.filter(
+        (o: any) => String(o.reportStatus).toLowerCase() === reportStatus.toLowerCase()
+      );
+    }
+
+    if (paymentStatus && paymentStatus !== 'ALL') {
+      orders = orders.filter(
+        (o: any) => String(o.paymentStatus).toLowerCase() === paymentStatus.toLowerCase()
+      );
+    }
+
+    if (date && date !== 'ALL') {
+      orders = orders.filter((o: any) => String(o.orderDate || '').startsWith(date));
+    }
+
+    res.json({
+      success: true,
+      total: orders.length,
+      orders,
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      error: err?.message || 'Failed to fetch pathology orders.',
+    });
+  }
+});
+
+app.post('/api/pathology/orders/update-status', (req, res) => {
+  try {
+    const { orderId, sampleStatus, reportStatus, notes, sampleCollectedBy, sampleReceivedBy } =
+      req.body || {};
+    if (!orderId) {
+      res.status(400).json({ success: false, error: 'orderId is required.' });
+      return;
+    }
+
+    const actor = extractActorFromRequest(req);
+    const nowIso = new Date().toISOString();
+    const nowReadable = nowIso.replace('T', ' ').slice(0, 19);
+
+    let updatedOrder: any = null;
+    hospitalDb.collections.pathologyOrders = (hospitalDb.collections.pathologyOrders || []).map(
+      (ord: any) => {
+        if (ord.id !== orderId && ord.orderNo !== orderId) return ord;
+        updatedOrder = {
+          ...ord,
+          sampleStatus: sampleStatus || ord.sampleStatus,
+          reportStatus: reportStatus || ord.reportStatus,
+          notes: notes !== undefined ? notes : ord.notes,
+          sampleCollectedBy:
+            sampleStatus === 'Collected'
+              ? sampleCollectedBy || actor.fullName
+              : ord.sampleCollectedBy,
+          sampleCollectedAt: sampleStatus === 'Collected' ? nowReadable : ord.sampleCollectedAt,
+          sampleReceivedBy:
+            sampleStatus === 'Received'
+              ? sampleReceivedBy || actor.fullName
+              : ord.sampleReceivedBy,
+          sampleReceivedAt: sampleStatus === 'Received' ? nowReadable : ord.sampleReceivedAt,
+          updatedAt: nowIso,
+        };
+        return updatedOrder;
+      }
+    );
+
+    if (!updatedOrder) {
+      res.status(404).json({ success: false, error: 'Pathology order not found.' });
+      return;
+    }
+
+    hospitalDb.collections.auditLogs.unshift({
+      id: `AUD-PATH-ORD-${Date.now()}`,
+      timestamp: nowReadable,
+      ipAddress: actor.ipAddress,
+      workstationCode: actor.workstationCode,
+      username: actor.username,
+      userFullName: actor.fullName,
+      role: actor.role,
+      department: 'Pathology',
+      actionType: 'RECORD_UPDATE',
+      patientId: updatedOrder.pId,
+      patientName: updatedOrder.patientName,
+      entityType: 'pathologyOrder',
+      recordId: updatedOrder.id,
+      details: `Pathology Order ${updatedOrder.orderNo || updatedOrder.id} (${updatedOrder.testName}) status updated — Sample: ${updatedOrder.sampleStatus}, Report: ${updatedOrder.reportStatus} by ${actor.fullName}.`,
+    });
+
+    hospitalDb.dbVersion += 1;
+    hospitalDb.lastSavedAt = nowIso;
+    hospitalDb.lastSavedBy = `${actor.fullName} (${actor.role})`;
+    savePermanentDb();
+
+    res.json({
+      success: true,
+      order: updatedOrder,
+      dbVersion: hospitalDb.dbVersion,
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      error: err?.message || 'Failed to update pathology order status.',
+    });
+  }
+});
+
+app.post('/api/pathology/reconcile-missing-orders', (req, res) => {
+  try {
+    const actor = extractActorFromRequest(req);
+    const result = reconcileMissingPathologyOrders();
+    const nowIso = new Date().toISOString();
+
+    if (result.recoveredCount > 0) {
+      hospitalDb.collections.auditLogs.unshift({
+        id: `AUD-RECON-${Date.now()}`,
+        timestamp: nowIso.replace('T', ' ').slice(0, 19),
+        ipAddress: actor.ipAddress,
+        workstationCode: actor.workstationCode,
+        username: actor.username,
+        userFullName: actor.fullName,
+        role: actor.role,
+        department: 'Pathology',
+        actionType: 'RECORD_UPDATE',
+        details: `[RECONCILIATION] Recovered and synchronized ${result.recoveredCount} missing pathology test orders from ${result.invoicesProcessed} invoices. Total orders now: ${result.totalPathologyOrders}.`,
+      });
+      savePermanentDb();
+    }
+
+    res.json({
+      success: true,
+      recoveredCount: result.recoveredCount,
+      invoicesProcessed: result.invoicesProcessed,
+      totalPathologyOrders: result.totalPathologyOrders,
+      pathologyOrders: hospitalDb.collections.pathologyOrders,
+      patients: hospitalDb.collections.patients,
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      error: err?.message || 'Failed to reconcile pathology orders.',
     });
   }
 });

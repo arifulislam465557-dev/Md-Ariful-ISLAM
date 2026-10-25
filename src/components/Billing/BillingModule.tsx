@@ -221,9 +221,13 @@ export const BillingModule: React.FC = () => {
         ...items,
         {
           testId: found.id,
+          code: found.code,
           testName: found.name,
+          nameBn: (found as any).nameBn,
           category: found.category,
           price: found.price,
+          sampleType: (found as any).sampleType,
+          departmentId: (found as any).departmentId || 'pathology',
         },
       ];
       setItems(newItems);
@@ -424,10 +428,20 @@ export const BillingModule: React.FC = () => {
       }
 
       setSelectedInvoice(res.invoice);
+      const pathCount =
+        (res as any).pathologyOrdersCount ??
+        (res.invoice.items || []).filter((i: any) => i.departmentId === 'pathology').length;
+      const syncStatusText =
+        pathCount > 0
+          ? lang === 'bn'
+            ? `✓ Pathology Orders Synced Successfully (${pathCount}টি টেস্ট প্যাথলজিতে পৌঁছেছে)`
+            : `✓ Pathology Orders Synced Successfully (${pathCount} tests synced)`
+          : '';
+
       setAlertMsg(
         lang === 'bn'
-          ? `বিল #${invoiceNo} (ক্যাশ মেমো #${res.invoice.cashMemoNo || ''}, রসিদ #${res.invoice.receiptNo || ''}) সফলভাবে তৈরি ও স্থায়ী ডাটাবেজে সংরক্ষিত হয়েছে!`
-          : `Invoice ${invoiceNo} (Memo #${res.invoice.cashMemoNo || ''}, Receipt #${res.invoice.receiptNo || ''}) permanently saved in database!`
+          ? `✓ Receipt Saved: বিল #${invoiceNo} (ক্যাশ মেমো #${res.invoice.cashMemoNo || ''}, রসিদ #${res.invoice.receiptNo || ''}) স্থায়ী ডাটাবেজে সংরক্ষিত! ${syncStatusText}`
+          : `✓ Receipt Saved: Bill #${invoiceNo} (Memo #${res.invoice.cashMemoNo || ''}, Receipt #${res.invoice.receiptNo || ''}) saved to database! ${syncStatusText}`
       );
       setPId(`26100${Math.floor(100 + Math.random() * 900)}`);
       setBillDate(getTodayDateStr(true));

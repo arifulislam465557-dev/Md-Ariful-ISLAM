@@ -279,7 +279,7 @@ export interface DepartmentOrder {
 }
 
 export type SampleCollectionStatus = 'Pending' | 'Collected' | 'Received' | 'Rejected';
-export type PathologyReportStatus = 'Pending' | 'Entered' | 'Verified' | 'Released';
+export type PathologyReportStatus = 'Pending' | 'Entered' | 'In Progress' | 'Completed' | 'Verified' | 'Released';
 
 export interface PathologyOrderItem {
   id: string;
@@ -288,12 +288,16 @@ export interface PathologyOrderItem {
   invoiceNo: string;
   cashMemoNo?: string;
   receiptNo?: string;
+  receiptId?: string;
+  billId?: string;
   pId: string;
   patientId?: string;
   oldRegNo?: string;
   patientName: string;
   age: string;
+  patientAge?: string;
   sex: 'Male' | 'Female' | 'Other' | string;
+  patientSex?: string;
   phone?: string;
   address?: string;
   drCode?: string;
@@ -305,10 +309,12 @@ export interface PathologyOrderItem {
   category: string;
   price: number;
   orderDate: string;
+  orderTime?: string;
   orderTimestamp: string;
-  paymentStatus: 'Paid' | 'Partial' | 'Due' | 'Refunded' | 'Cancelled';
+  paymentStatus: 'Paid' | 'Partial' | 'Due' | 'Refunded' | 'Cancelled' | 'PAID' | 'DUE' | 'PARTIAL';
   sampleType?: string;
   sampleStatus: SampleCollectionStatus;
+  sampleCollectionStatus?: SampleCollectionStatus;
   sampleCollectedAt?: string;
   sampleCollectedBy?: string;
   sampleReceivedAt?: string;
@@ -921,6 +927,7 @@ export type DeletableEntityType =
   | 'doctor'
   | 'labTest'
   | 'pathologyReport'
+  | 'pathologyOrder'
   | 'ecgReport'
   | 'xrayReport'
   | 'usgReport'
