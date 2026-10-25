@@ -228,6 +228,8 @@ export interface PaymentTransaction {
   cashMemoNo?: string;
   pId: string;
   patientName?: string;
+  phone?: string;
+  date?: string;
   amount: number;
   type: 'INITIAL_PAYMENT' | 'DUE_COLLECTION' | 'ADVANCE_ADJUSTMENT' | 'REFUND';
   paymentMethod: string;
@@ -271,15 +273,58 @@ export interface DepartmentOrder {
   cancelledAt?: string;
   cancelReason?: string;
   reportId?: string;
+  updatedAt?: string;
+}
+
+export type SampleCollectionStatus = 'Pending' | 'Collected' | 'Received' | 'Rejected';
+export type PathologyReportStatus = 'Pending' | 'Entered' | 'Verified' | 'Released';
+
+export interface PathologyOrderItem {
+  id: string;
+  orderNo?: string;
+  invoiceId: string;
+  invoiceNo: string;
+  cashMemoNo?: string;
+  receiptNo?: string;
+  pId: string;
+  patientId?: string;
+  oldRegNo?: string;
+  patientName: string;
+  age: string;
+  sex: 'Male' | 'Female' | 'Other' | string;
+  phone?: string;
+  address?: string;
+  drCode?: string;
+  drName?: string;
+  testId: string;
+  testCode: string;
+  testName: string;
+  nameBn?: string;
+  category: string;
+  price: number;
+  orderDate: string;
+  orderTimestamp: string;
+  paymentStatus: 'Paid' | 'Partial' | 'Due' | 'Refunded' | 'Cancelled';
+  sampleType?: string;
+  sampleStatus: SampleCollectionStatus;
+  sampleCollectedAt?: string;
+  sampleCollectedBy?: string;
+  sampleReceivedAt?: string;
+  sampleReceivedBy?: string;
+  reportStatus: PathologyReportStatus;
+  reportId?: string;
+  accessionNo?: string;
   notes?: string;
   createdAt: string;
   updatedAt?: string;
+  isDeleted?: boolean;
 }
 
 export interface Invoice {
   id: string;
   invoiceNo: string;
   cashMemoNo?: string;
+  receiptNo?: string;
   pId: string;
   oldRegNo?: string;
   appointmentId?: string;
@@ -870,6 +915,7 @@ export type AutoSaveStatus =
 export type DeletableEntityType =
   | 'patient'
   | 'invoice'
+  | 'receipt'
   | 'doctor'
   | 'labTest'
   | 'pathologyReport'

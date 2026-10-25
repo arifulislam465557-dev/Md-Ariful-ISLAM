@@ -145,9 +145,19 @@ interface AppContextType {
   setSelectedPatientForReport: (p: Patient | null) => void;
 
   invoices: Invoice[];
-  addInvoice: (inv: Omit<Invoice, 'id'>) => Invoice;
+  addInvoice: (inv: Omit<Invoice, 'id'>) => Promise<{ success: boolean; invoice?: Invoice; error?: string }>;
   updateInvoice: (id: string, inv: Partial<Invoice>) => void;
   deleteInvoice: (id: string) => void;
+  deleteReceipt: (idOrReceiptNo: string) => void;
+  searchReceiptsAndInvoices: (params: {
+    q?: string;
+    startDate?: string;
+    endDate?: string;
+    status?: string;
+    paymentMethod?: string;
+    page?: number;
+    limit?: number;
+  }) => Promise<{ success: boolean; total: number; receipts: any[]; invoices: any[]; error?: string }>;
   collectInvoiceDue: (params: {
     invoiceId: string;
     amount: number;
@@ -1920,12 +1930,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
   };
 
-  const addInvoice = (inv: Omit<Invoice, 'id'>): Invoice => {
+  const addInvoice = async (
+    inv: Omit<Invoice, 'id'>
+  ): Promise<{ success: boolean; invoice?: Invoice; error?: string }> => {
     const nowIso = new Date().toISOString();
     const nowReadable = nowIso.replace('T', ' ').slice(0, 19);
     const invId = `inv-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
     const suffix = inv.invoiceNo ? inv.invoiceNo.replace(/^INV-/i, '') : `${new Date().getFullYear()}-${Date.now().toString().slice(-4)}`;
     const cashMemoNo = inv.cashMemoNo || `${billingConfig.cashMemoPrefix || 'CM'}-${suffix}`;
+    const receiptNo = inv.receiptNo || `RCP-${suffix}`;
 
     // Enrich items with resolved departmentId and snapshot pricing
     const enrichedItems = (inv.items || []).map((it) => {
@@ -1948,12 +1961,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       inv.paidAmount > 0
         ? {
             id: `PAY-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-            receiptNo: `RCP-${suffix}`,
+            receiptNo,
             invoiceId: invId,
             invoiceNo: inv.invoiceNo,
             cashMemoNo,
             pId: inv.pId,
             patientName: inv.patientName,
+            phone: inv.phone,
+            date: inv.date,
             amount: inv.paidAmount,
             type: 'INITIAL_PAYMENT',
             paymentMethod: inv.paymentMethod || 'Cash',
@@ -2020,6 +2035,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const newInv: Invoice = {
       ...inv,
       id: invId,
+      receiptNo,
       cashMemoNo,
       items: enrichedItems,
       payments: initialPaymentTx ? [initialPaymentTx] : [],
@@ -2029,14 +2045,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       reprintCount: 0,
       createdAt: nowIso,
     };
-
-    setInvoices((prev) => [newInv, ...prev]);
-    if (initialPaymentTx) {
-      setPaymentTransactions((prev) => [initialPaymentTx, ...prev]);
-    }
-    if (newOrders.length > 0) {
-      setDepartmentOrders((prev) => [...newOrders, ...prev]);
-    }
 
     // 1. AUTO-ROUTE TO PATHOLOGY WORKLIST (if Pathology items exist on the bill)
     const pathologyItems = itemsByDept.get('pathology') || [];
@@ -2085,20 +2093,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         autoPrint: true,
         createdAt: nowIso,
       };
-
-      const patToSave = createdPathologyPatient;
-      setPatients((prev) => {
-        // Match only if there is an existing record for the EXACT same invoiceNo
-        const sameInvoiceIdx = prev.findIndex(
-          (p) => p.invoiceNo && p.invoiceNo === newInv.invoiceNo
-        );
-        if (sameInvoiceIdx >= 0) {
-          const updated = [...prev];
-          updated[sameInvoiceIdx] = { ...updated[sameInvoiceIdx], ...patToSave, id: updated[sameInvoiceIdx].id };
-          return updated;
-        }
-        return [patToSave, ...prev];
-      });
     }
 
     // 2. AUTO-ROUTE TO DOCTOR VISIT / OPD QUEUE (if Doctor Consultation items exist on the bill)
@@ -2139,51 +2133,97 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         chiefComplaint: `Routed from Billing (#${newInv.invoiceNo})`,
         createdAt: nowIso,
       };
-
-      const apptToSave = createdOpdAppointment;
-      setOpdAppointments((prev) => [apptToSave, ...prev]);
     }
 
     // 3. Persist atomically to backend /api/billing/finalize with idempotency key
     const idempotencyKey = inv.idempotencyKey || `BILL-FIN-${newInv.invoiceNo}`;
-    fetch('/api/billing/finalize', {
-      method: 'POST',
-      headers: getActorHeaders(),
-      body: JSON.stringify({
-        idempotencyKey,
-        invoice: newInv,
-        initialPayment: initialPaymentTx,
-        departmentOrders: newOrders,
-        pathologyPatient: createdPathologyPatient,
-        opdAppointment: createdOpdAppointment,
-      }),
-    }).catch(() => {});
+    try {
+      const finalizeRes = await fetch('/api/billing/finalize', {
+        method: 'POST',
+        headers: getActorHeaders(),
+        body: JSON.stringify({
+          idempotencyKey,
+          invoice: newInv,
+          initialPayment: initialPaymentTx,
+          departmentOrders: newOrders,
+          pathologyPatient: createdPathologyPatient,
+          opdAppointment: createdOpdAppointment,
+        }),
+      });
+
+      const finalizeData = await finalizeRes.json();
+      if (!finalizeRes.ok || !finalizeData.success) {
+        const errorMsg = finalizeData.error || 'রসিদ ও বিল ব্যাকএন্ড ডাটাবেজে সংরক্ষণ করা সম্ভব হয়নি।';
+        addNotification(
+          lang === 'bn' ? 'বিল ও রসিদ সংরক্ষণ ব্যর্থ' : 'Save Failed',
+          errorMsg,
+          'error'
+        );
+        return { success: false, error: errorMsg };
+      }
+    } catch (saveErr: any) {
+      const errorMsg = saveErr?.message || 'সার্ভার সংযোগ বিচ্ছিন্ন - রসিদ সংরক্ষণ ব্যর্থ হয়েছে।';
+      addNotification(
+        lang === 'bn' ? 'বিল ও রসিদ সংরক্ষণ ব্যর্থ' : 'Save Failed',
+        errorMsg,
+        'error'
+      );
+      return { success: false, error: errorMsg };
+    }
+
+    // Update local state ONLY after backend persistence is verified
+    setInvoices((prev) => [newInv, ...prev.filter((i) => i.id !== newInv.id && i.invoiceNo !== newInv.invoiceNo)]);
+    if (initialPaymentTx) {
+      setPaymentTransactions((prev) => [initialPaymentTx, ...prev.filter((p) => p.id !== initialPaymentTx.id)]);
+    }
+    if (newOrders.length > 0) {
+      const newOrderIds = new Set(newOrders.map((o) => o.id));
+      setDepartmentOrders((prev) => [...newOrders, ...prev.filter((o) => !newOrderIds.has(o.id))]);
+    }
+    if (createdPathologyPatient) {
+      const patToSave = createdPathologyPatient;
+      setPatients((prev) => {
+        const sameInvoiceIdx = prev.findIndex(
+          (p) => p.invoiceNo && p.invoiceNo === newInv.invoiceNo
+        );
+        if (sameInvoiceIdx >= 0) {
+          const updated = [...prev];
+          updated[sameInvoiceIdx] = { ...updated[sameInvoiceIdx], ...patToSave, id: updated[sameInvoiceIdx].id };
+          return updated;
+        }
+        return [patToSave, ...prev];
+      });
+    }
+    if (createdOpdAppointment) {
+      const apptToSave = createdOpdAppointment;
+      setOpdAppointments((prev) => [apptToSave, ...prev.filter((a) => a.id !== apptToSave.id)]);
+    }
 
     const routedDeptNames = newOrders.map((o) => o.departmentName).join(', ');
     addNotification(
-      lang === 'bn' ? 'বিল সম্পন্ন ও ডিপার্টমেন্টে প্রেরণ' : 'Bill Finalized & Routed',
+      lang === 'bn' ? 'বিল ও রসিদ স্থায়ীভাবে সংরক্ষিত' : 'Bill & Receipt Saved',
       lang === 'bn'
-        ? `বিল #${newInv.invoiceNo} (মেমো #${cashMemoNo}) সম্পন্ন। স্বয়ংক্রিয়ভাবে প্রেরিত বিভাগ: ${routedDeptNames || 'Billing'}।`
-        : `Invoice ${newInv.invoiceNo} (Memo ${cashMemoNo}) issued. Auto-routed to: ${routedDeptNames || 'Billing'}.`,
+        ? `বিল #${newInv.invoiceNo} (মেমো #${cashMemoNo}, রসিদ #${receiptNo}) স্থায়ী ডাটাবেজে সংরক্ষিত ও বিভাগে প্রেরিত।`
+        : `Invoice ${newInv.invoiceNo} (Memo ${cashMemoNo}, Receipt ${receiptNo}) permanently saved in database.`,
       'success'
     );
     addLog(
       'info',
-      `Invoice ${newInv.invoiceNo} created for ${newInv.patientName} (${newInv.pId}). Routed to: ${routedDeptNames}`,
+      `Invoice ${newInv.invoiceNo} (Receipt ${receiptNo}) created for ${newInv.patientName} (${newInv.pId}).`,
       'Billing'
     );
 
-    // LAN Activity Audit & Real-time cross-workstation broadcast
     addAuditLog({
       actionType: 'INVOICE_CREATE',
       patientId: newInv.pId,
       patientName: newInv.patientName,
-      details: `ইনভয়েস ${newInv.invoiceNo} (ক্যাশ মেমো ${cashMemoNo}) তৈরি হয়েছে — পেশেন্ট: ${newInv.patientName} (PID: ${newInv.pId}), নিট বিল: ৳${newInv.netTotal}, পরিশোধ: ৳${newInv.paidAmount}, বকেয়া: ৳${newInv.dueAmount}। স্বয়ংক্রিয়ভাবে প্রেরিত বিভাগ: ${routedDeptNames}।`,
+      details: `ইনভয়েস ${newInv.invoiceNo} (ক্যাশ মেমো ${cashMemoNo}, রসিদ ${receiptNo}) স্থায়ীভাবে ডাটাবেজে সংরক্ষিত — পেশেন্ট: ${newInv.patientName} (PID: ${newInv.pId}), নিট বিল: ৳${newInv.netTotal}, পরিশোধ: ৳${newInv.paidAmount}, বকেয়া: ৳${newInv.dueAmount}।`,
     });
 
     broadcastLanEvent('INVOICE_CREATED', {
       invoiceNo: newInv.invoiceNo,
       cashMemoNo,
+      receiptNo,
       pId: newInv.pId,
       patientName: newInv.patientName,
       age: newInv.age,
@@ -2192,7 +2232,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       departmentOrders: newOrders,
     });
 
-    return newInv;
+    return { success: true, invoice: newInv };
   };
 
   const collectInvoiceDue = async (params: {
@@ -2507,6 +2547,73 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       dependencies: deps,
       originalData: target,
     });
+  };
+
+  const deleteReceipt = (idOrReceiptNo: string) => {
+    const target = paymentTransactions.find((p) => p.id === idOrReceiptNo || p.receiptNo === idOrReceiptNo);
+    if (!target) return;
+    const deps: string[] = [];
+    if (target.invoiceNo) deps.push(`সংযুক্ত বিল নং: ${target.invoiceNo}`);
+    if (target.pId) deps.push(`পেশেন্ট আইডি: ${target.pId}`);
+    if (target.amount) deps.push(`রসিদ মূল্য: ৳${target.amount}`);
+    requestDeleteRecord({
+      entityType: 'receipt',
+      entityLabel: 'পেমেন্ট রসিদ (Payment Receipt)',
+      recordId: target.id,
+      recordTitle: `Receipt #${target.receiptNo || target.id} — ${target.patientName || 'Patient'}`,
+      recordSubtitle: `Bill #${target.invoiceNo || 'N/A'} · Amount: ৳${target.amount} · Method: ${target.paymentMethod}`,
+      dependencies: deps,
+      originalData: target,
+    });
+  };
+
+  const searchReceiptsAndInvoices = async (params: {
+    q?: string;
+    startDate?: string;
+    endDate?: string;
+    status?: string;
+    paymentMethod?: string;
+    page?: number;
+    limit?: number;
+  }): Promise<{ success: boolean; total: number; receipts: any[]; invoices: any[]; error?: string }> => {
+    try {
+      const searchParams = new URLSearchParams();
+      if (params.q) searchParams.set('q', params.q);
+      if (params.startDate) searchParams.set('startDate', params.startDate);
+      if (params.endDate) searchParams.set('endDate', params.endDate);
+      if (params.status) searchParams.set('status', params.status);
+      if (params.paymentMethod) searchParams.set('paymentMethod', params.paymentMethod);
+      if (params.page) searchParams.set('page', String(params.page));
+      if (params.limit) searchParams.set('limit', String(params.limit));
+
+      const res = await fetch(`/api/billing/receipts/search?${searchParams.toString()}`, {
+        headers: getActorHeaders(),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        return {
+          success: false,
+          total: 0,
+          receipts: [],
+          invoices: [],
+          error: data.error || 'Failed to search receipts',
+        };
+      }
+      return {
+        success: true,
+        total: data.total || 0,
+        receipts: data.receipts || [],
+        invoices: data.invoices || [],
+      };
+    } catch (err: any) {
+      return {
+        success: false,
+        total: 0,
+        receipts: [],
+        invoices: [],
+        error: err?.message || 'Network error while searching receipts',
+      };
+    }
   };
 
   const addPrescription = (rx: Omit<Prescription, 'id'>): Prescription => {
@@ -3769,6 +3876,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setPatients((prev) => prev.filter((p) => p.id !== recordId && p.pId !== recordId));
       } else if (entityType === 'invoice') {
         setInvoices((prev) => prev.filter((i) => i.id !== recordId && i.invoiceNo !== recordId));
+      } else if (entityType === 'receipt') {
+        setPaymentTransactions((prev) => prev.filter((p) => p.id !== recordId && p.receiptNo !== recordId));
+        if (data.updatedInvoice) {
+          setInvoices((prev) =>
+            prev.map((i) =>
+              i.id === data.updatedInvoice.id || i.invoiceNo === data.updatedInvoice.invoiceNo
+                ? data.updatedInvoice
+                : i
+            )
+          );
+        }
       } else if (entityType === 'doctor') {
         setDoctors((prev) => prev.filter((d) => d.id !== recordId));
       } else if (entityType === 'labTest') {
@@ -3859,6 +3977,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           setPatients((prev) => [orig, ...prev.filter((p) => p.id !== orig.id)]);
         } else if (restored.entityType === 'invoice') {
           setInvoices((prev) => [orig, ...prev.filter((i) => i.id !== orig.id)]);
+        } else if (restored.entityType === 'receipt') {
+          setPaymentTransactions((prev) => [orig, ...prev.filter((p) => p.id !== orig.id)]);
+          if (data.updatedInvoice) {
+            setInvoices((prev) =>
+              prev.map((i) =>
+                i.id === data.updatedInvoice.id || i.invoiceNo === data.updatedInvoice.invoiceNo
+                  ? data.updatedInvoice
+                  : i
+              )
+            );
+          }
         } else if (restored.entityType === 'doctor') {
           setDoctors((prev) => [orig, ...prev.filter((d) => d.id !== orig.id)]);
         } else if (restored.entityType === 'labTest') {
@@ -4047,6 +4176,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         addInvoice,
         updateInvoice,
         deleteInvoice,
+        deleteReceipt,
+        searchReceiptsAndInvoices,
         collectInvoiceDue,
         cancelOrRefundInvoice,
         departmentOrders,

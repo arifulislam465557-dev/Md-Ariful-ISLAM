@@ -1,9 +1,10 @@
 {
-  "dbVersion": 7,
+  "dbVersion": 9,
   "isInitialized": true,
-  "lastSavedAt": "2026-10-24T17:22:50.483Z",
-  "lastSavedBy": "à¦à¦¦à¦¿à¦¬à¦¾ à¦à§à¦¯à¦¾à¦¡à¦®à¦¿à¦¨ (Super Admin) (Staff)",
+  "lastSavedAt": "2026-10-25T04:51:19.127Z",
+  "lastSavedBy": "Super Admin (Admin)",
   "processedMutationIds": [
+    "TEST-BILL-1001",
     "test-nonascii",
     "mut-test",
     "test-2",
@@ -145,6 +146,8 @@
         "createdAt": "2026-10-15T09:30:00"
       }
     ],
+    "departmentOrders": [],
+    "paymentTransactions": [],
     "doctors": [
       {
         "id": "doc-1",
@@ -5162,8 +5165,120 @@
       }
     ],
     "printRecords": [],
-    "trashRecords": [],
+    "trashRecords": [
+      {
+        "id": "TRASH-1792903879127-865",
+        "recordId": "inv-test-1001",
+        "entityType": "invoice",
+        "entityLabel": "invoice",
+        "recordTitle": "Invoice #INV-2026-9999",
+        "recordSubtitle": "",
+        "deletedAt": "2026-10-25T04:51:19.127Z",
+        "deletedByUserId": "unknown",
+        "deletedByUsername": "unknown",
+        "deletedByFullName": "Super Admin",
+        "deletedByRole": "Admin",
+        "deletionReason": "Test cleanup",
+        "dependenciesSummary": [
+          "আদায়কৃত পেমেন্ট ৳400 (মোট বিল ৳400)",
+          "1টি Payment Receipt Voucher (RCP-2026-9999)"
+        ],
+        "originalData": {
+          "id": "inv-test-1001",
+          "invoiceNo": "INV-2026-9999",
+          "cashMemoNo": "CM-2026-9999",
+          "receiptNo": "RCP-2026-9999",
+          "pId": "26100999",
+          "patientName": "Test Patient",
+          "age": "30 Y",
+          "sex": "Female",
+          "phone": "+880 1711223344",
+          "drCode": "DR01",
+          "date": "2026-10-25",
+          "items": [
+            {
+              "testId": "t1",
+              "testName": "Complete Blood Count (CBC)",
+              "category": "Pathology",
+              "price": 400
+            }
+          ],
+          "subtotal": 400,
+          "discountPercent": 0,
+          "discountAmount": 0,
+          "netTotal": 400,
+          "paidAmount": 400,
+          "dueAmount": 0,
+          "paymentMethod": "bKash",
+          "status": "Paid",
+          "payments": [
+            {
+              "id": "PAY-TEST-9999",
+              "receiptNo": "RCP-2026-9999",
+              "invoiceId": "inv-test-1001",
+              "invoiceNo": "INV-2026-9999",
+              "cashMemoNo": "CM-2026-9999",
+              "pId": "26100999",
+              "patientName": "Test Patient",
+              "phone": "+880 1711223344",
+              "date": "2026-10-25",
+              "amount": 400,
+              "type": "INITIAL_PAYMENT",
+              "paymentMethod": "bKash",
+              "receivedBy": "Billing Staff",
+              "receivedByRole": "Billing",
+              "workstationCode": "PC-01",
+              "timestamp": "2026-10-25 10:00:00"
+            }
+          ]
+        }
+      }
+    ],
     "auditLogs": [
+      {
+        "id": "AUD-DEL-1792903879127",
+        "timestamp": "2026-10-25 04:51:19",
+        "ipAddress": "127.0.0.1",
+        "workstationCode": "PC-01",
+        "username": "unknown",
+        "userFullName": "Super Admin",
+        "role": "Admin",
+        "department": "Administration",
+        "actionType": "SOFT_DELETE",
+        "entityType": "invoice",
+        "recordId": "inv-test-1001",
+        "targetTitle": "Invoice #INV-2026-9999",
+        "deletionReason": "Test cleanup",
+        "details": "[SOFT DELETE -> RECYCLE BIN] invoice: \"Invoice #INV-2026-9999\" deleted by Admin Super Admin. Reason: \"Test cleanup\""
+      },
+      {
+        "id": "AUD-UNAUTH-1792903879112-536",
+        "timestamp": "2026-10-25 04:51:19",
+        "ipAddress": "127.0.0.1",
+        "workstationCode": "PC-01",
+        "username": "unknown",
+        "userFullName": "Receptionist User",
+        "role": "Reception",
+        "department": "Reception",
+        "actionType": "UNAUTHORIZED_DELETE_ATTEMPT",
+        "details": "[SECURITY BLOCK 403] Non-Admin user \"Receptionist User\" (@unknown, Role: Reception) attempted restricted action: Delete invoice (inv-test-1001)"
+      },
+      {
+        "id": "AUD-BILL-1792903870887-972",
+        "timestamp": "2026-10-25 04:51:10",
+        "ipAddress": "127.0.0.1",
+        "workstationCode": "PC-01",
+        "username": "unknown",
+        "userFullName": "Billing Staff",
+        "role": "Billing",
+        "department": "Billing",
+        "actionType": "INVOICE_CREATE",
+        "patientId": "26100999",
+        "patientName": "Test Patient",
+        "entityType": "invoice",
+        "recordId": "inv-test-1001",
+        "details": "[BILL FINALIZED & ROUTED] Bill #INV-2026-9999 (Receipt #RCP-2026-9999, Memo #CM-2026-9999) for Test Patient (26100999) — Net: ৳400, Paid: ৳400, Due: ৳0 (bKash). Auto-routed to: General Billing."
+      },
       {
         "id": "AUD-UNAUTH-1792844127311-462",
         "timestamp": "2026-10-24 12:15:27",

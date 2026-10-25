@@ -669,6 +669,7 @@ interface PermanentHospitalDatabase {
     patients: any[];
     invoices: any[];
     departmentOrders: any[];
+    pathologyOrders: any[];
     paymentTransactions: any[];
     doctors: any[];
     labTests: any[];
@@ -703,6 +704,7 @@ function createDefaultPermanentDb(): PermanentHospitalDatabase {
       patients: Array.isArray(seed.patients) ? seed.patients : [],
       invoices: Array.isArray(seed.invoices) ? seed.invoices : [],
       departmentOrders: Array.isArray(seed.departmentOrders) ? seed.departmentOrders : [],
+      pathologyOrders: Array.isArray(seed.pathologyOrders) ? seed.pathologyOrders : [],
       paymentTransactions: Array.isArray(seed.paymentTransactions) ? seed.paymentTransactions : [],
       doctors: Array.isArray(seed.doctors) ? seed.doctors : [],
       labTests: Array.isArray(seed.labTests) ? seed.labTests : [],
@@ -737,6 +739,9 @@ function loadPermanentDb(): PermanentHospitalDatabase {
         collections: {
           ...defaults.collections,
           ...(parsed.collections || {}),
+          pathologyOrders: Array.isArray(parsed.collections?.pathologyOrders)
+            ? parsed.collections.pathologyOrders
+            : [],
         },
       };
     }
@@ -766,6 +771,390 @@ function savePermanentDb() {
   } catch (err) {
     console.error('Failed to persist hospital-permanent-db.json:', err);
   }
+}
+
+function classifyDepartment(item: any): string {
+  if (item?.departmentId) {
+    const d = String(item.departmentId).trim().toLowerCase();
+    if (['pathology', 'xray', 'ultrasound', 'ecg', 'doctorvisit', 'pharmacy', 'other'].includes(d)) {
+      return d === 'doctorvisit' ? 'doctorVisit' : d;
+    }
+  }
+
+  const cat = String(item?.category || '').toLowerCase();
+  const sub = String(item?.subcategory || '').toLowerCase();
+  const code = String(item?.code || item?.testId || '').toLowerCase();
+  const name = String(item?.name || item?.testName || '').toLowerCase();
+
+  // 1. Digital X-Ray & Radiology
+  if (
+    cat.includes('x-ray') ||
+    cat.includes('xray') ||
+    cat === 'radiology' ||
+    sub.includes('x-ray') ||
+    sub.includes('radiology') ||
+    code.startsWith('xr-') ||
+    code.startsWith('xr_') ||
+    name.includes('x-ray') ||
+    name.includes('xray')
+  ) {
+    return 'xray';
+  }
+
+  // 2. Ultrasound & Doppler
+  if (
+    cat.includes('ultrasound') ||
+    cat.includes('usg') ||
+    cat.includes('doppler') ||
+    sub.includes('usg') ||
+    sub.includes('doppler') ||
+    code.startsWith('usg-') ||
+    code.startsWith('usg_') ||
+    code.startsWith('dop-') ||
+    name.includes('ultrasound') ||
+    name.includes('usg') ||
+    name.includes('doppler')
+  ) {
+    return 'ultrasound';
+  }
+
+  // 3. ECG & Cardiology Diagnostics
+  if (
+    cat.includes('ecg') ||
+    cat.includes('cardiology') ||
+    cat === 'cardiology diagnostics' ||
+    cat === 'cardiac' ||
+    sub.includes('ecg') ||
+    code.startsWith('ecg-') ||
+    code.startsWith('ecg_') ||
+    name.includes('electrocardiogram') ||
+    name.includes('ecg') ||
+    name.includes('echocardiogram') ||
+    name.includes('echo')
+  ) {
+    return 'ecg';
+  }
+
+  // 4. Doctor Visit / OPD Consultation
+  if (
+    cat.includes('doctor visit') ||
+    cat.includes('consultation') ||
+    cat.includes('opd consultation') ||
+    cat.includes('doctor fee') ||
+    cat.includes('opd') ||
+    sub.includes('consultation') ||
+    code.startsWith('doc-') ||
+    code.startsWith('drv-') ||
+    code.startsWith('opd-') ||
+    name.includes('doctor visit') ||
+    name.includes('consultation') ||
+    name.includes('opd ticket')
+  ) {
+    return 'doctorVisit';
+  }
+
+  // 5. Pharmacy & Medicine
+  if (
+    cat.includes('pharmacy') ||
+    cat.includes('medicine') ||
+    cat.includes('drug') ||
+    cat.includes('injection') ||
+    sub.includes('tablet') ||
+    sub.includes('syrup') ||
+    code.startsWith('med-') ||
+    code.startsWith('phr-')
+  ) {
+    return 'pharmacy';
+  }
+
+  // 6. Pathology Laboratory Investigations
+  const pathologyKeywords = [
+    'hematology',
+    'haematology',
+    'biochemistry',
+    'clinical pathology',
+    'microbiology',
+    'serology',
+    'immunology',
+    'hormone',
+    'endocrinology',
+    'histopathology',
+    'cytopathology',
+    'stool',
+    'urine',
+    'blood',
+    'pathology',
+    'lipid',
+    'electrolyte',
+    'coagulation',
+    'culture',
+  ];
+
+  if (
+    pathologyKeywords.some(
+      (kw) => cat.includes(kw) || sub.includes(kw) || name.includes(kw)
+    )
+  ) {
+    return 'pathology';
+  }
+
+  const commonPathologyCodes = [
+    'cbc', 'creatinine', 'fbs', 'rbs', 'hba1c', 'wbc', 'esr', 'urea', 'sgpt', 'sgot',
+    'alt', 'ast', 'bilirubin', 'crp', 'tsh', 'ft4', 'ft3', 'lipid', 'urine', 'stool',
+    'pt', 'inr', 'aptt', 'vdrl', 'hbsag', 'widal', 'dengue', 'troponin', 'calcium',
+    'sodium', 'potassium', 'cholesterol', 'triglyceride', 'hdl', 'ldl', 'uric', 'afb', 'gram',
+  ];
+
+  if (commonPathologyCodes.some((codeKw) => code.includes(codeKw) || name.includes(codeKw))) {
+    return 'pathology';
+  }
+
+  return 'pathology';
+}
+
+function reconcileMissingPathologyOrders(): {
+  recoveredCount: number;
+  invoicesProcessed: number;
+  totalPathologyOrders: number;
+} {
+  if (!Array.isArray(hospitalDb.collections.pathologyOrders)) {
+    hospitalDb.collections.pathologyOrders = [];
+  }
+  if (!Array.isArray(hospitalDb.collections.departmentOrders)) {
+    hospitalDb.collections.departmentOrders = [];
+  }
+  if (!Array.isArray(hospitalDb.collections.patients)) {
+    hospitalDb.collections.patients = [];
+  }
+
+  const existingOrders = hospitalDb.collections.pathologyOrders;
+  const existingOrderMap = new Map<string, any>();
+  for (const o of existingOrders) {
+    if (o && o.id) existingOrderMap.set(String(o.id), o);
+  }
+
+  const existingPatients = hospitalDb.collections.patients;
+  const patientByInvoiceNo = new Map<string, any>();
+  const patientByPid = new Map<string, any>();
+  for (const p of existingPatients) {
+    if (p.invoiceNo) patientByInvoiceNo.set(String(p.invoiceNo).toLowerCase(), p);
+    if (p.pId) patientByPid.set(String(p.pId), p);
+  }
+
+  const existingDeptOrders = hospitalDb.collections.departmentOrders;
+  const deptOrderByInvAndDept = new Set<string>();
+  for (const d of existingDeptOrders) {
+    if (d && d.invoiceNo && d.departmentId) {
+      deptOrderByInvAndDept.add(`${String(d.invoiceNo).toLowerCase()}:${d.departmentId}`);
+    }
+  }
+
+  const invoices = hospitalDb.collections.invoices || [];
+  let recoveredCount = 0;
+  let changed = false;
+
+  for (const inv of invoices) {
+    if (!inv || !inv.invoiceNo) continue;
+    const invNo = String(inv.invoiceNo);
+    const suffix = invNo.replace(/^INV-/i, '');
+    const cashMemoNo = inv.cashMemoNo || `CM-${suffix}`;
+    const receiptNo = inv.receiptNo || `RCP-${suffix}`;
+    const pId = inv.pId || `P-${suffix}`;
+    const patientName = inv.patientName || 'Unknown Patient';
+    const items = Array.isArray(inv.items) ? inv.items : [];
+    const date = inv.date || new Date().toISOString().slice(0, 10);
+    const timestamp = inv.createdAt || `${date}T09:00:00.000Z`;
+    const paymentStatus = inv.status || 'Paid';
+
+    const itemsByDept: Record<string, any[]> = {};
+    const pathologyItems: Array<{ item: any; idx: number }> = [];
+
+    items.forEach((item: any, idx: number) => {
+      const dept = classifyDepartment(item);
+      if (!itemsByDept[dept]) itemsByDept[dept] = [];
+      itemsByDept[dept].push(item);
+
+      if (dept === 'pathology') {
+        pathologyItems.push({ item, idx });
+      }
+    });
+
+    // 1. Process individual pathology test orders
+    for (const { item, idx } of pathologyItems) {
+      const rawCode = item.code || item.testId || item.testName || `t-${idx}`;
+      const safeCode = String(rawCode).replace(/[^a-zA-Z0-9_-]/g, '_').toLowerCase();
+      const orderId = `ord-path-${invNo.toLowerCase()}-${safeCode}-${idx}`;
+
+      if (!existingOrderMap.has(orderId)) {
+        const newOrder = {
+          id: orderId,
+          orderNo: `ORD-PATH-${suffix}-${idx + 1}`,
+          invoiceId: inv.id || `inv-${invNo}`,
+          invoiceNo: invNo,
+          cashMemoNo,
+          receiptNo,
+          pId,
+          patientId: pId,
+          patientName,
+          age: inv.age || 'N/A',
+          sex: inv.sex || 'Other',
+          phone: inv.phone || '',
+          address: inv.address || '',
+          drCode: inv.drCode || 'DR01',
+          drName: inv.drName || 'Self / Hospital',
+          testId: item.testId || item.code || `t-${idx}`,
+          testCode: item.code || item.testId || `TC-${idx + 1}`,
+          testName: item.testName || item.name || 'Pathology Test',
+          nameBn: item.nameBn || '',
+          category: item.category || 'Pathology',
+          price: Number(item.price) || 0,
+          orderDate: date,
+          orderTimestamp: timestamp,
+          paymentStatus,
+          sampleType: item.sampleType || 'Blood',
+          sampleStatus: 'Pending',
+          reportStatus: 'Pending',
+          createdAt: timestamp,
+          updatedAt: timestamp,
+        };
+
+        existingOrders.unshift(newOrder);
+        existingOrderMap.set(orderId, newOrder);
+        recoveredCount++;
+        changed = true;
+      }
+    }
+
+    // 2. Ensure consolidated Patient record exists for Pathology Worklist
+    if (pathologyItems.length > 0) {
+      let patient = patientByInvoiceNo.get(invNo.toLowerCase()) || patientByPid.get(String(pId));
+      if (!patient) {
+        patient = {
+          id: `pat-${invNo.toLowerCase()}`,
+          pId,
+          accessionNo: `ACC-${suffix}`,
+          invoiceNo: invNo,
+          cashMemoNo,
+          invDate: date,
+          billDate: date,
+          patientName,
+          age: inv.age || 'N/A',
+          sex: inv.sex || 'Other',
+          phone: inv.phone || '',
+          address: inv.address || '',
+          drCode: inv.drCode || 'DR01',
+          drName: inv.drName || 'Self / Hospital',
+          status: 'Pending',
+          workflowStatus: 'Pending',
+          paymentStatus,
+          department: 'Pathology',
+          testResults: pathologyItems.map(({ item }) => ({
+            testName: item.testName || item.name,
+            result: '',
+            unit: item.unit || '',
+            normalRange: item.normalRange || '',
+            status: 'Normal',
+            category: item.category || 'Pathology',
+          })),
+          createdAt: timestamp,
+        };
+        existingPatients.unshift(patient);
+        patientByInvoiceNo.set(invNo.toLowerCase(), patient);
+        patientByPid.set(String(pId), patient);
+        changed = true;
+      } else {
+        const existingResults = Array.isArray(patient.testResults) ? patient.testResults : [];
+        const existingNames = new Set(existingResults.map((r: any) => String(r.testName || '').trim().toLowerCase()));
+        let resultsAppended = false;
+
+        for (const { item } of pathologyItems) {
+          const tName = String(item.testName || item.name || '').trim();
+          if (tName && !existingNames.has(tName.toLowerCase())) {
+            existingResults.push({
+              testName: tName,
+              result: '',
+              unit: item.unit || '',
+              normalRange: item.normalRange || '',
+              status: 'Normal',
+              category: item.category || 'Pathology',
+            });
+            existingNames.add(tName.toLowerCase());
+            resultsAppended = true;
+          }
+        }
+
+        if (resultsAppended) {
+          patient.testResults = existingResults;
+          if (!patient.invoiceNo) patient.invoiceNo = invNo;
+          if (!patient.cashMemoNo) patient.cashMemoNo = cashMemoNo;
+          changed = true;
+        }
+      }
+    }
+
+    // 3. Ensure departmentOrders entry for each department on the invoice
+    for (const [deptId, deptItems] of Object.entries(itemsByDept)) {
+      const key = `${invNo.toLowerCase()}:${deptId}`;
+      if (!deptOrderByInvAndDept.has(key)) {
+        const deptNames: Record<string, string> = {
+          pathology: 'Pathology Laboratory',
+          xray: 'Digital X-Ray & Radiology',
+          ultrasound: 'Ultrasound (USG) & Doppler',
+          ecg: 'ECG & Cardiology Diagnostics',
+          doctorVisit: 'Doctor Visit / OPD Consultation',
+          pharmacy: 'Pharmacy & Medicine',
+          other: 'Other Hospital Services',
+        };
+        const newDeptOrder = {
+          id: `ord-dept-${invNo.toLowerCase()}-${deptId}`,
+          orderNo: `ORD-${deptId.toUpperCase().slice(0, 4)}-${suffix}`,
+          invoiceId: inv.id || `inv-${invNo}`,
+          invoiceNo: invNo,
+          cashMemoNo,
+          pId,
+          patientName,
+          age: inv.age || 'N/A',
+          sex: inv.sex || 'Other',
+          phone: inv.phone || '',
+          address: inv.address || '',
+          drCode: inv.drCode || 'DR01',
+          drName: inv.drName || 'Self / Hospital',
+          departmentId: deptId,
+          departmentName: deptNames[deptId] || deptId,
+          items: deptItems,
+          orderDate: date,
+          paymentStatus,
+          orderStatus: 'Ordered',
+          createdAt: timestamp,
+          updatedAt: timestamp,
+        };
+        existingDeptOrders.unshift(newDeptOrder);
+        deptOrderByInvAndDept.add(key);
+        changed = true;
+      }
+    }
+  }
+
+  if (changed) {
+    hospitalDb.dbVersion += 1;
+    hospitalDb.lastSavedAt = new Date().toISOString();
+    hospitalDb.lastSavedBy = 'Pathology Reconciliation Engine';
+    savePermanentDb();
+  }
+
+  return {
+    recoveredCount,
+    invoicesProcessed: invoices.length,
+    totalPathologyOrders: existingOrders.length,
+  };
+}
+
+// Initial automatic reconciliation on server boot
+try {
+  const initSync = reconcileMissingPathologyOrders();
+  console.log(`[Pathology Engine] Boot reconciliation complete: ${initSync.recoveredCount} missing orders recovered, total orders: ${initSync.totalPathologyOrders}`);
+} catch (err) {
+  console.error('[Pathology Engine] Boot reconciliation error:', err);
 }
 
 interface ActorIdentity {
@@ -869,6 +1258,12 @@ function getCollectionKeyForEntity(entityType: string): keyof PermanentHospitalD
       return 'patients';
     case 'invoice':
       return 'invoices';
+    case 'receipt':
+    case 'paymentTransaction':
+      return 'paymentTransactions';
+    case 'pathologyOrder':
+    case 'pathologyOrders':
+      return 'pathologyOrders';
     case 'doctor':
       return 'doctors';
     case 'labTest':
@@ -890,6 +1285,32 @@ function getCollectionKeyForEntity(entityType: string): keyof PermanentHospitalD
     default:
       return null;
   }
+}
+
+function getRecordUniqueKey(item: any, collectionKey: string): string {
+  if (!item || typeof item !== 'object') return String(item);
+  if (collectionKey === 'invoices') {
+    return String(item.invoiceNo || item.id || '');
+  }
+  if (collectionKey === 'paymentTransactions') {
+    return String(item.receiptNo || item.id || '');
+  }
+  if (collectionKey === 'patients') {
+    return String(item.pId || item.id || '');
+  }
+  if (collectionKey === 'departmentOrders') {
+    return String(item.orderNo || item.id || '');
+  }
+  if (collectionKey === 'pathologyOrders') {
+    return String(item.id || item.orderNo || '');
+  }
+  if (collectionKey === 'users') {
+    return String(item.username || item.id || '');
+  }
+  if (collectionKey === 'workstations') {
+    return String(item.terminalCode || item.id || '');
+  }
+  return String(item.id ?? item.code ?? item.filename ?? JSON.stringify(item));
 }
 
 function computeRecordDependencies(entityType: string, recordId: string): string[] {
@@ -928,11 +1349,21 @@ function computeRecordDependencies(entityType: string, recordId: string): string
     const inv = (cols.invoices || []).find((i: any) => i.id === recordId || i.invoiceNo === recordId);
     if (inv) {
       if (Number(inv.paidAmount) > 0) {
-        deps.push(`আদায়কৃত পেমেন্ট ৳${inv.paidAmount} (মোট বিল ৳${inv.totalAmount})`);
+        deps.push(`আদায়কৃত পেমেন্ট ৳${inv.paidAmount} (মোট বিল ৳${inv.netTotal || inv.totalAmount || 0})`);
       }
       if (Number(inv.dueAmount) > 0) {
         deps.push(`বকেয়া (Due) ৳${inv.dueAmount}`);
       }
+      const linkedPays = (cols.paymentTransactions || []).filter((p: any) => p.invoiceId === inv.id || p.invoiceNo === inv.invoiceNo);
+      if (linkedPays.length > 0) {
+        deps.push(`${linkedPays.length}টি Payment Receipt Voucher (${linkedPays.map((p: any) => p.receiptNo).slice(0, 3).join(', ')})`);
+      }
+    }
+  } else if (entityType === 'receipt') {
+    const pay = (cols.paymentTransactions || []).find((p: any) => p.id === recordId || p.receiptNo === recordId);
+    if (pay) {
+      deps.push(`Receipt #${pay.receiptNo} — Amount: ৳${pay.amount} (${pay.paymentMethod})`);
+      deps.push(`সংশ্লিষ্ট বিল #${pay.invoiceNo || 'N/A'} (PID: ${pay.pId || 'N/A'})`);
     }
   }
 
@@ -1003,6 +1434,7 @@ app.post('/api/db/auto-save', (req, res) => {
         'patients',
         'invoices',
         'departmentOrders',
+        'pathologyOrders',
         'paymentTransactions',
         'doctors',
         'labTests',
@@ -1031,25 +1463,45 @@ app.post('/api/db/auto-save', (req, res) => {
               })
             : incomingArr;
 
-          if (conflictMerged && Array.isArray(hospitalDb.collections[key])) {
+          const isProtectedFinancialCollection = [
+            'invoices',
+            'paymentTransactions',
+            'patients',
+            'departmentOrders',
+            'pathologyOrders',
+            'auditLogs',
+            'users',
+          ].includes(key);
+
+          if ((conflictMerged || isProtectedFinancialCollection) && Array.isArray(hospitalDb.collections[key])) {
             // Safe conflict merge: merge by record ID, preferring newer updatedAt/createdAt or incoming edits while keeping server-only records
             const existingArr = hospitalDb.collections[key] as any[];
             const mergedMap = new Map<string, any>();
             for (const existingItem of existingArr) {
-              const idKey = String(existingItem?.id ?? existingItem?.pId ?? existingItem?.invoiceNo ?? JSON.stringify(existingItem));
+              const idKey = getRecordUniqueKey(existingItem, key);
               if (!deletedSet || !deletedSet.has(idKey)) {
                 mergedMap.set(idKey, existingItem);
               }
             }
             for (const incItem of filteredIncoming) {
-              const idKey = String(incItem?.id ?? incItem?.pId ?? incItem?.invoiceNo ?? JSON.stringify(incItem));
+              const idKey = getRecordUniqueKey(incItem, key);
               const prevItem = mergedMap.get(idKey);
               if (!prevItem) {
                 mergedMap.set(idKey, incItem);
               } else {
-                const prevTime = prevItem.updatedAt ? new Date(prevItem.updatedAt).getTime() : 0;
-                const incTime = incItem.updatedAt ? new Date(incItem.updatedAt).getTime() : Date.now();
-                mergedMap.set(idKey, incTime >= prevTime ? { ...prevItem, ...incItem } : { ...incItem, ...prevItem });
+                if (key === 'invoices') {
+                  const mergedPayments = Array.isArray(incItem.payments) && incItem.payments.length > 0
+                    ? incItem.payments
+                    : Array.isArray(prevItem.payments) ? prevItem.payments : [];
+                  const prevTime = prevItem.updatedAt ? new Date(prevItem.updatedAt).getTime() : 0;
+                  const incTime = incItem.updatedAt ? new Date(incItem.updatedAt).getTime() : Date.now();
+                  const newerObj = incTime >= prevTime ? { ...prevItem, ...incItem } : { ...incItem, ...prevItem };
+                  mergedMap.set(idKey, { ...newerObj, payments: mergedPayments });
+                } else {
+                  const prevTime = prevItem.updatedAt ? new Date(prevItem.updatedAt).getTime() : 0;
+                  const incTime = incItem.updatedAt ? new Date(incItem.updatedAt).getTime() : Date.now();
+                  mergedMap.set(idKey, incTime >= prevTime ? { ...prevItem, ...incItem } : { ...incItem, ...prevItem });
+                }
               }
             }
             (hospitalDb.collections as any)[key] = Array.from(mergedMap.values());
@@ -1207,6 +1659,59 @@ app.post('/api/db/delete', (req, res) => {
           String(item?.filename) !== String(recordId)
       );
     }
+    if (entityType === 'invoice') {
+      const invId = String(recordId);
+      // Clean linked paymentTransactions from active list
+      const linkedPayments = (hospitalDb.collections.paymentTransactions || []).filter(
+        (p: any) => p.invoiceId === invId || p.invoiceNo === invId
+      );
+      if (linkedPayments.length > 0) {
+        hospitalDb.collections.paymentTransactions = (hospitalDb.collections.paymentTransactions || []).filter(
+          (p: any) => p.invoiceId !== invId && p.invoiceNo !== invId
+        );
+      }
+      // Cancel linked department orders
+      hospitalDb.collections.departmentOrders = (hospitalDb.collections.departmentOrders || []).map((ord: any) => {
+        if (ord.invoiceId === invId || ord.invoiceNo === invId) {
+          return { ...ord, orderStatus: 'Cancelled', cancelReason: `Invoice deleted: ${trimmedReason}` };
+        }
+        return ord;
+      });
+    } else if (entityType === 'receipt') {
+      const payId = String(recordId);
+      const targetPay = (hospitalDb.collections.paymentTransactions || []).find(
+        (p: any) => p.id === payId || p.receiptNo === payId
+      );
+      if (targetPay) {
+        capturedOriginal = targetPay;
+        hospitalDb.collections.paymentTransactions = (hospitalDb.collections.paymentTransactions || []).filter(
+          (p: any) => p.id !== payId && p.receiptNo !== payId
+        );
+        // Adjust corresponding invoice paidAmount and dueAmount
+        if (targetPay.invoiceNo || targetPay.invoiceId) {
+          hospitalDb.collections.invoices = (hospitalDb.collections.invoices || []).map((inv: any) => {
+            if (inv.id === targetPay.invoiceId || inv.invoiceNo === targetPay.invoiceNo) {
+              const currentPaid = Math.max(0, Number(inv.paidAmount) || 0);
+              const deduct = Math.max(0, Number(targetPay.amount) || 0);
+              const newPaid = Math.max(0, currentPaid - deduct);
+              const newDue = Math.max(0, (Number(inv.netTotal) || 0) - newPaid);
+              const newStatus = newDue <= 0 ? 'Paid' : newPaid > 0 ? 'Partial' : 'Due';
+              const updatedPayments = (inv.payments || []).filter(
+                (p: any) => p.id !== payId && p.receiptNo !== payId
+              );
+              return {
+                ...inv,
+                paidAmount: newPaid,
+                dueAmount: newDue,
+                status: newStatus,
+                payments: updatedPayments,
+              };
+            }
+            return inv;
+          });
+        }
+      }
+    }
     if (entityType === 'backupHistory') {
       const candidateFilename = path.basename(String(originalData?.filename || recordId || ''));
       if (candidateFilename && candidateFilename.endsWith('.zip')) {
@@ -1351,10 +1856,44 @@ app.post('/api/db/restore', (req, res) => {
     const exists = list.some(
       (item: any) =>
         String(item?.id) === String(recordId) ||
-        String(item?.pId) === String(recordId)
+        String(item?.pId) === String(recordId) ||
+        String(item?.invoiceNo) === String(recordId) ||
+        String(item?.receiptNo) === String(recordId)
     );
     if (!exists) {
       (hospitalDb.collections as any)[colKey] = [originalData, ...list];
+    }
+    if (entityType === 'invoice' && Array.isArray(originalData.payments)) {
+      const existingPayIds = new Set((hospitalDb.collections.paymentTransactions || []).map((p: any) => p.id));
+      const toRestore = originalData.payments.filter((p: any) => !existingPayIds.has(p.id));
+      if (toRestore.length > 0) {
+        hospitalDb.collections.paymentTransactions = [
+          ...toRestore,
+          ...(hospitalDb.collections.paymentTransactions || []),
+        ];
+      }
+    } else if (entityType === 'receipt') {
+      if (originalData.invoiceNo || originalData.invoiceId) {
+        hospitalDb.collections.invoices = (hospitalDb.collections.invoices || []).map((inv: any) => {
+          if (inv.id === originalData.invoiceId || inv.invoiceNo === originalData.invoiceNo) {
+            const currentPaid = Math.max(0, Number(inv.paidAmount) || 0);
+            const addBack = Math.max(0, Number(originalData.amount) || 0);
+            const newPaid = currentPaid + addBack;
+            const newDue = Math.max(0, (Number(inv.netTotal) || 0) - newPaid);
+            const newStatus = newDue <= 0 ? 'Paid' : 'Partial';
+            const existingPayments = Array.isArray(inv.payments) ? inv.payments : [];
+            const hasP = existingPayments.some((p: any) => p.id === originalData.id);
+            return {
+              ...inv,
+              paidAmount: newPaid,
+              dueAmount: newDue,
+              status: newStatus,
+              payments: hasP ? existingPayments : [...existingPayments, originalData],
+            };
+          }
+          return inv;
+        });
+      }
     }
   } else if (
     originalData &&
@@ -1606,15 +2145,47 @@ app.post('/api/billing/finalize', (req, res) => {
     }
 
     const nowIso = new Date().toISOString();
+    const suffix = invoice.invoiceNo
+      ? String(invoice.invoiceNo).replace(/^INV-/i, '')
+      : `${new Date().getFullYear()}-${Date.now().toString().slice(-4)}`;
+    const cashMemoNo = invoice.cashMemoNo || `CM-${suffix}`;
+    const receiptNo = invoice.receiptNo || (initialPayment?.receiptNo) || `RCP-${suffix}`;
+    invoice.cashMemoNo = cashMemoNo;
+    invoice.receiptNo = receiptNo;
 
-    // 1. Save Invoice
-    hospitalDb.collections.invoices = [invoice, ...(hospitalDb.collections.invoices || [])];
-
-    // 2. Save Initial Payment Transaction (if paidAmount > 0)
+    let savedPaymentTx = initialPayment;
     if (initialPayment && Number(initialPayment.amount) > 0) {
+      savedPaymentTx = {
+        ...initialPayment,
+        receiptNo: initialPayment.receiptNo || receiptNo,
+        cashMemoNo: initialPayment.cashMemoNo || cashMemoNo,
+        phone: initialPayment.phone || invoice.phone,
+        pId: initialPayment.pId || invoice.pId,
+        patientName: initialPayment.patientName || invoice.patientName,
+        date: initialPayment.date || invoice.date,
+        invoiceNo: invoice.invoiceNo,
+        invoiceId: invoice.id,
+      };
+      invoice.payments = [savedPaymentTx];
+    } else {
+      invoice.payments = Array.isArray(invoice.payments) ? invoice.payments : [];
+    }
+
+    // 1. Save Invoice (prepend or update)
+    hospitalDb.collections.invoices = [
+      invoice,
+      ...(hospitalDb.collections.invoices || []).filter(
+        (i: any) => i.id !== invoice.id && i.invoiceNo !== invoice.invoiceNo
+      ),
+    ];
+
+    // 2. Save Initial Payment Transaction
+    if (savedPaymentTx && Number(savedPaymentTx.amount) > 0) {
       hospitalDb.collections.paymentTransactions = [
-        initialPayment,
-        ...(hospitalDb.collections.paymentTransactions || []),
+        savedPaymentTx,
+        ...(hospitalDb.collections.paymentTransactions || []).filter(
+          (p: any) => p.id !== savedPaymentTx.id && p.receiptNo !== savedPaymentTx.receiptNo
+        ),
       ];
     }
 
@@ -1622,7 +2193,9 @@ app.post('/api/billing/finalize', (req, res) => {
     if (Array.isArray(departmentOrders) && departmentOrders.length > 0) {
       hospitalDb.collections.departmentOrders = [
         ...departmentOrders,
-        ...(hospitalDb.collections.departmentOrders || []),
+        ...(hospitalDb.collections.departmentOrders || []).filter(
+          (o: any) => !departmentOrders.some((no: any) => no.id === o.id || no.orderNo === o.orderNo)
+        ),
       ];
     }
 
@@ -1630,7 +2203,9 @@ app.post('/api/billing/finalize', (req, res) => {
     if (pathologyPatient && pathologyPatient.id) {
       hospitalDb.collections.patients = [
         pathologyPatient,
-        ...(hospitalDb.collections.patients || []),
+        ...(hospitalDb.collections.patients || []).filter(
+          (p: any) => p.id !== pathologyPatient.id && p.invoiceNo !== invoice.invoiceNo
+        ),
       ];
     }
 
@@ -1638,7 +2213,9 @@ app.post('/api/billing/finalize', (req, res) => {
     if (opdAppointment && opdAppointment.id) {
       hospitalDb.collections.opdAppointments = [
         opdAppointment,
-        ...(hospitalDb.collections.opdAppointments || []),
+        ...(hospitalDb.collections.opdAppointments || []).filter(
+          (a: any) => a.id !== opdAppointment.id && a.invoiceNo !== invoice.invoiceNo
+        ),
       ];
     }
 
@@ -1661,7 +2238,7 @@ app.post('/api/billing/finalize', (req, res) => {
       patientName: invoice.patientName,
       entityType: 'invoice',
       recordId: invoice.id,
-      details: `[BILL FINALIZED & ROUTED] Bill #${invoice.invoiceNo} (Memo #${invoice.cashMemoNo || invoice.invoiceNo}) for ${invoice.patientName} (${invoice.pId}) — Net: ৳${invoice.netTotal}, Paid: ৳${invoice.paidAmount}, Due: ৳${invoice.dueAmount} (${invoice.paymentMethod}). Auto-routed to: ${routedDeptsSummary || 'General Billing'}.`,
+      details: `[BILL FINALIZED & ROUTED] Bill #${invoice.invoiceNo} (Receipt #${receiptNo}, Memo #${cashMemoNo}) for ${invoice.patientName} (${invoice.pId}) — Net: ৳${invoice.netTotal}, Paid: ৳${invoice.paidAmount}, Due: ৳${invoice.dueAmount} (${invoice.paymentMethod}). Auto-routed to: ${routedDeptsSummary || 'General Billing'}.`,
     };
 
     hospitalDb.collections.auditLogs.unshift(auditEntry);
@@ -1677,6 +2254,7 @@ app.post('/api/billing/finalize', (req, res) => {
       success: true,
       dbVersion: hospitalDb.dbVersion,
       invoice,
+      paymentTransaction: savedPaymentTx || null,
       departmentOrders,
       auditLog: auditEntry,
     });
@@ -1684,6 +2262,217 @@ app.post('/api/billing/finalize', (req, res) => {
     res.status(500).json({
       success: false,
       error: err?.message || 'Failed to finalize bill and route department orders.',
+    });
+  }
+});
+
+// ============================================================================
+// 8. UNIFIED SEARCH & QUERY API FOR RECEIPTS, CASH MEMOS & INVOICES
+// ============================================================================
+
+app.get('/api/billing/receipts/search', (req, res) => {
+  try {
+    const rawQ = String(req.query.q || req.query.query || '').trim();
+    const q = rawQ.toLowerCase();
+    const startDate = String(req.query.startDate || req.query.from || '').trim();
+    const endDate = String(req.query.endDate || req.query.to || '').trim();
+    const statusFilter = String(req.query.status || 'all').trim();
+    const paymentMethodFilter = String(req.query.paymentMethod || 'all').trim();
+    const page = Math.max(1, parseInt(String(req.query.page || '1'), 10) || 1);
+    const limit = Math.max(1, Math.min(100, parseInt(String(req.query.limit || '25'), 10) || 25));
+
+    const invoices = hospitalDb.collections.invoices || [];
+    const paymentTransactions = hospitalDb.collections.paymentTransactions || [];
+
+    const invoiceByNo = new Map<string, any>();
+    const invoiceById = new Map<string, any>();
+    for (const inv of invoices) {
+      if (inv.invoiceNo) invoiceByNo.set(String(inv.invoiceNo).toLowerCase(), inv);
+      if (inv.id) invoiceById.set(String(inv.id), inv);
+    }
+
+    const cleanPhone = (ph: string | undefined): string => {
+      if (!ph) return '';
+      return String(ph).replace(/[^0-9]/g, '');
+    };
+
+    const qCleanPhone = cleanPhone(q);
+    const unifiedReceipts: any[] = [];
+    const seenPaymentIds = new Set<string>();
+
+    for (const pt of paymentTransactions) {
+      if (!pt) continue;
+      const linkedInv =
+        (pt.invoiceId && invoiceById.get(String(pt.invoiceId))) ||
+        (pt.invoiceNo && invoiceByNo.get(String(pt.invoiceNo).toLowerCase())) ||
+        null;
+
+      const pId = pt.pId || linkedInv?.pId || '';
+      const patientName = pt.patientName || linkedInv?.patientName || 'Unknown Patient';
+      const phone = pt.phone || linkedInv?.phone || '';
+      const invoiceNo = pt.invoiceNo || linkedInv?.invoiceNo || '';
+      const cashMemoNo =
+        pt.cashMemoNo || linkedInv?.cashMemoNo || (invoiceNo ? `CM-${invoiceNo.replace(/^INV-/i, '')}` : '');
+      const receiptNo = pt.receiptNo || `RCP-${pt.id ? pt.id.slice(-6) : '000000'}`;
+      const amount = Number(pt.amount) || 0;
+      const date = pt.date || linkedInv?.date || (pt.timestamp ? pt.timestamp.slice(0, 10) : '');
+      const paymentMethod = pt.paymentMethod || linkedInv?.paymentMethod || 'Cash';
+      const status = linkedInv?.status || (amount > 0 ? 'Paid' : 'Due');
+
+      seenPaymentIds.add(String(pt.id));
+
+      unifiedReceipts.push({
+        id: pt.id,
+        receiptNo,
+        cashMemoNo,
+        invoiceNo,
+        invoiceId: pt.invoiceId || linkedInv?.id || '',
+        pId,
+        patientName,
+        phone,
+        date,
+        timestamp: pt.timestamp || linkedInv?.createdAt || '',
+        amount,
+        type: pt.type || 'PAYMENT',
+        paymentMethod,
+        transactionReference: pt.transactionReference || '',
+        receivedBy: pt.receivedBy || 'Cashier',
+        receivedByRole: pt.receivedByRole || 'Billing',
+        workstationCode: pt.workstationCode || 'PC-01',
+        note: pt.note || '',
+        status,
+        netTotal: linkedInv?.netTotal ?? amount,
+        paidAmount: linkedInv?.paidAmount ?? amount,
+        dueAmount: linkedInv?.dueAmount ?? 0,
+        invoice: linkedInv,
+      });
+    }
+
+    // Include invoices that don't have separate payment transactions (e.g. Due/Credit cash memos)
+    for (const inv of invoices) {
+      if (!inv) continue;
+      const hasPt = paymentTransactions.some(
+        (pt: any) => pt.invoiceId === inv.id || pt.invoiceNo === inv.invoiceNo
+      );
+      if (!hasPt) {
+        const invoiceNo = inv.invoiceNo || '';
+        const suffix = invoiceNo ? invoiceNo.replace(/^INV-/i, '') : String(inv.id).slice(-6);
+        const cashMemoNo = inv.cashMemoNo || `CM-${suffix}`;
+        const receiptNo = inv.receiptNo || `RCP-${suffix}`;
+        unifiedReceipts.push({
+          id: `memo-${inv.id}`,
+          receiptNo,
+          cashMemoNo,
+          invoiceNo,
+          invoiceId: inv.id,
+          pId: inv.pId,
+          patientName: inv.patientName,
+          phone: inv.phone,
+          date: inv.date,
+          timestamp: inv.createdAt || inv.date,
+          amount: Number(inv.paidAmount) || 0,
+          type: (Number(inv.paidAmount) || 0) > 0 ? 'INITIAL_PAYMENT' : 'DUE_BILL',
+          paymentMethod: inv.paymentMethod || 'Cash',
+          transactionReference: inv.transactionReference || '',
+          receivedBy: inv.cashierName || 'Billing',
+          receivedByRole: 'Billing',
+          workstationCode: inv.workstationCode || 'PC-01',
+          note: `Cash Memo / Bill #${invoiceNo}`,
+          status: inv.status || 'Due',
+          netTotal: Number(inv.netTotal) || 0,
+          paidAmount: Number(inv.paidAmount) || 0,
+          dueAmount: Number(inv.dueAmount) || 0,
+          invoice: inv,
+        });
+      }
+    }
+
+    const filtered = unifiedReceipts.filter((item) => {
+      if (q) {
+        const itemPhoneClean = cleanPhone(item.phone);
+        const matchReceiptNo = item.receiptNo && item.receiptNo.toLowerCase().includes(q);
+        const matchMemoNo = item.cashMemoNo && item.cashMemoNo.toLowerCase().includes(q);
+        const matchInvoiceNo = item.invoiceNo && item.invoiceNo.toLowerCase().includes(q);
+        const matchPid = item.pId && (item.pId.toLowerCase().includes(q) || `pid:${item.pId}`.toLowerCase().includes(q));
+        const matchName = item.patientName && item.patientName.toLowerCase().includes(q);
+        const matchPhone = item.phone && item.phone.toLowerCase().includes(q);
+        const matchCleanPhone = qCleanPhone && itemPhoneClean && itemPhoneClean.includes(qCleanPhone);
+        const matchTxId = item.id && item.id.toLowerCase().includes(q);
+        const matchRef = item.transactionReference && item.transactionReference.toLowerCase().includes(q);
+
+        if (
+          !matchReceiptNo &&
+          !matchMemoNo &&
+          !matchInvoiceNo &&
+          !matchPid &&
+          !matchName &&
+          !matchPhone &&
+          !matchCleanPhone &&
+          !matchTxId &&
+          !matchRef
+        ) {
+          return false;
+        }
+      }
+
+      if (statusFilter && statusFilter !== 'all') {
+        const itemStatus = String(item.status || '').toLowerCase();
+        if (itemStatus !== statusFilter.toLowerCase()) {
+          return false;
+        }
+      }
+
+      if (paymentMethodFilter && paymentMethodFilter !== 'all') {
+        const itemMethod = String(item.paymentMethod || '').toLowerCase();
+        if (itemMethod !== paymentMethodFilter.toLowerCase()) {
+          return false;
+        }
+      }
+
+      if (startDate) {
+        const itemDate = item.date || item.timestamp?.slice(0, 10) || '';
+        if (itemDate && itemDate < startDate) return false;
+      }
+      if (endDate) {
+        const itemDate = item.date || item.timestamp?.slice(0, 10) || '';
+        if (itemDate && itemDate > endDate) return false;
+      }
+
+      return true;
+    });
+
+    filtered.sort((a, b) => {
+      const timeA = new Date(a.timestamp || a.date || 0).getTime();
+      const timeB = new Date(b.timestamp || b.date || 0).getTime();
+      return timeB - timeA;
+    });
+
+    const total = filtered.length;
+    const totalPages = Math.max(1, Math.ceil(total / limit));
+    const paginated = filtered.slice((page - 1) * limit, page * limit);
+
+    const matchedInvoicesMap = new Map<string, any>();
+    for (const r of filtered) {
+      if (r.invoice && !matchedInvoicesMap.has(r.invoice.id)) {
+        matchedInvoicesMap.set(r.invoice.id, r.invoice);
+      }
+    }
+
+    res.json({
+      success: true,
+      total,
+      page,
+      limit,
+      totalPages,
+      receipts: paginated,
+      invoices: Array.from(matchedInvoicesMap.values()).slice((page - 1) * limit, page * limit),
+      dbVersion: hospitalDb.dbVersion,
+      lastSavedAt: hospitalDb.lastSavedAt,
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      error: err?.message || 'Receipt search failed.',
     });
   }
 });

@@ -278,15 +278,35 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ isOpen, on
     }
     return invoices
       .filter((inv) => {
+        const cleanQ = q.replace(/[\s-]/g, '');
         const matchNo = inv.invoiceNo?.toLowerCase().includes(q);
-        const matchPid = inv.pId?.toLowerCase().includes(q);
+        const matchMemo = inv.cashMemoNo?.toLowerCase().includes(q);
+        const matchReceipt = inv.receiptNo?.toLowerCase().includes(q);
+        const matchPid = inv.pId?.toLowerCase().includes(q) || `pid:${inv.pId}`.toLowerCase().includes(q);
         const matchName = inv.patientName?.toLowerCase().includes(q);
-        const matchPhone = inv.phone?.toLowerCase().includes(q);
+        const matchPhone = inv.phone?.replace(/[\s-]/g, '').toLowerCase().includes(cleanQ);
+        const matchId = inv.id?.toLowerCase().includes(q);
+        const matchPayments = inv.payments?.some((p) =>
+          p.id?.toLowerCase().includes(q) ||
+          p.receiptNo?.toLowerCase().includes(q) ||
+          p.transactionReference?.toLowerCase().includes(q)
+        );
         const matchItems = inv.items?.some((item) =>
           item.testName.toLowerCase().includes(q)
         );
         const matchStatus = inv.status?.toLowerCase().includes(q);
-        return matchNo || matchPid || matchName || matchPhone || matchItems || matchStatus;
+        return (
+          matchNo ||
+          matchMemo ||
+          matchReceipt ||
+          matchPid ||
+          matchName ||
+          matchPhone ||
+          matchId ||
+          matchPayments ||
+          matchItems ||
+          matchStatus
+        );
       })
       .slice(0, 10);
   }, [invoices, query]);

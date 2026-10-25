@@ -79,18 +79,22 @@ export function resolveItemDepartment(
   const code = String(item.code || '').toLowerCase();
   const name = String(item.name || item.testName || '').toLowerCase();
 
+  // 1. Digital X-Ray & Radiology
   if (
     cat.includes('x-ray') ||
     cat.includes('xray') ||
     cat === 'radiology' ||
     sub.includes('x-ray') ||
+    sub.includes('radiology') ||
     code.startsWith('xr-') ||
+    code.startsWith('xr_') ||
     name.includes('x-ray') ||
     name.includes('xray')
   ) {
     return 'xray';
   }
 
+  // 2. Ultrasound & Doppler
   if (
     cat.includes('ultrasound') ||
     cat.includes('usg') ||
@@ -98,6 +102,7 @@ export function resolveItemDepartment(
     sub.includes('usg') ||
     sub.includes('doppler') ||
     code.startsWith('usg-') ||
+    code.startsWith('usg_') ||
     code.startsWith('dop-') ||
     name.includes('ultrasound') ||
     name.includes('usg') ||
@@ -106,17 +111,22 @@ export function resolveItemDepartment(
     return 'ultrasound';
   }
 
+  // 3. ECG & Cardiology / Neuro Diagnostics
   if (
     cat.includes('ecg') ||
     cat.includes('cardiology') ||
-    cat.includes('diagnostic') ||
+    cat === 'cardiology diagnostics' ||
+    cat === 'cardiac' ||
     sub.includes('ecg') ||
     sub.includes('echo') ||
     code.startsWith('ecg-') ||
+    code.startsWith('ecg_') ||
     code.startsWith('crd-') ||
     name.includes('ecg') ||
+    name.includes('electrocardiogram') ||
     name.includes('echocardiogram') ||
     name.includes('2d echo') ||
+    name.includes('color doppler echo') ||
     name.includes('holter') ||
     name.includes('tmt') ||
     name.includes('spirometry') ||
@@ -125,6 +135,7 @@ export function resolveItemDepartment(
     return 'ecg';
   }
 
+  // 4. Doctor Visit / OPD Consultation
   if (
     cat.includes('doctor') ||
     cat.includes('consultation') ||
@@ -137,15 +148,43 @@ export function resolveItemDepartment(
     return 'doctorVisit';
   }
 
+  // 5. Pharmacy & Medicine
   if (
     cat.includes('pharmacy') ||
     cat.includes('medicine') ||
     code.startsWith('phm-') ||
-    sub.includes('pharmacy')
+    sub.includes('pharmacy') ||
+    sub.includes('medicine')
   ) {
     return 'pharmacy';
   }
 
+  // 6. Explicit Pathology Categories & Terms
+  if (
+    cat.includes('patholog') ||
+    cat.includes('hematolog') ||
+    cat.includes('biochem') ||
+    cat.includes('hormone') ||
+    cat.includes('serolog') ||
+    cat.includes('immunolog') ||
+    cat.includes('microbiolog') ||
+    cat.includes('urine') ||
+    cat.includes('stool') ||
+    cat.includes('blood') ||
+    cat.includes('culture') ||
+    cat.includes('coagulation') ||
+    cat.includes('electrolyt') ||
+    cat.includes('clinical') ||
+    sub.includes('patholog') ||
+    sub.includes('lab') ||
+    code.startsWith('t-') ||
+    code.startsWith('lab-') ||
+    code.startsWith('pat-')
+  ) {
+    return 'pathology';
+  }
+
+  // 7. Other Hospital Services
   if (
     cat.includes('other') ||
     cat.includes('procedure') ||
