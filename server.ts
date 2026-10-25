@@ -668,6 +668,8 @@ interface PermanentHospitalDatabase {
   collections: {
     patients: any[];
     invoices: any[];
+    departmentOrders: any[];
+    paymentTransactions: any[];
     doctors: any[];
     labTests: any[];
     medicines: any[];
@@ -700,6 +702,8 @@ function createDefaultPermanentDb(): PermanentHospitalDatabase {
     collections: {
       patients: Array.isArray(seed.patients) ? seed.patients : [],
       invoices: Array.isArray(seed.invoices) ? seed.invoices : [],
+      departmentOrders: Array.isArray(seed.departmentOrders) ? seed.departmentOrders : [],
+      paymentTransactions: Array.isArray(seed.paymentTransactions) ? seed.paymentTransactions : [],
       doctors: Array.isArray(seed.doctors) ? seed.doctors : [],
       labTests: Array.isArray(seed.labTests) ? seed.labTests : [],
       medicines: Array.isArray(seed.medicines) ? seed.medicines : [],
@@ -998,6 +1002,8 @@ app.post('/api/db/auto-save', (req, res) => {
       const arrayKeys: Array<keyof PermanentHospitalDatabase['collections']> = [
         'patients',
         'invoices',
+        'departmentOrders',
+        'paymentTransactions',
         'doctors',
         'labTests',
         'medicines',
@@ -1552,6 +1558,503 @@ app.post('/api/db/print-records', (req, res) => {
     res.status(500).json({
       success: false,
       error: err?.message || 'Failed to record print/PDF history.',
+    });
+  }
+});
+
+// ============================================================================
+// 7. ATOMIC BILLING, PAYMENT PROCESSING & AUTOMATIC DEPARTMENT ROUTING API
+// ============================================================================
+
+app.post('/api/billing/finalize', (req, res) => {
+  try {
+    const {
+      idempotencyKey,
+      invoice,
+      initialPayment,
+      departmentOrders = [],
+      pathologyPatient,
+      opdAppointment,
+    } = req.body || {};
+
+    if (!invoice || !invoice.invoiceNo || !invoice.pId) {
+      res.status(400).json({
+        success: false,
+        error: 'Invalid invoice payload: invoiceNo and pId are required.',
+      });
+      return;
+    }
+
+    const actor = extractActorFromRequest(req);
+    const dedupKey = idempotencyKey || `BILL-FIN-${invoice.invoiceNo}`;
+
+    // Idempotency protection: prevent duplicate bills/orders on network retry or double-click
+    if (
+      hospitalDb.processedMutationIds.includes(dedupKey) ||
+      (hospitalDb.collections.invoices || []).some((inv: any) => inv.invoiceNo === invoice.invoiceNo)
+    ) {
+      const existingInv = (hospitalDb.collections.invoices || []).find(
+        (inv: any) => inv.invoiceNo === invoice.invoiceNo
+      );
+      res.json({
+        success: true,
+        deduplicated: true,
+        invoice: existingInv || invoice,
+        dbVersion: hospitalDb.dbVersion,
+      });
+      return;
+    }
+
+    const nowIso = new Date().toISOString();
+
+    // 1. Save Invoice
+    hospitalDb.collections.invoices = [invoice, ...(hospitalDb.collections.invoices || [])];
+
+    // 2. Save Initial Payment Transaction (if paidAmount > 0)
+    if (initialPayment && Number(initialPayment.amount) > 0) {
+      hospitalDb.collections.paymentTransactions = [
+        initialPayment,
+        ...(hospitalDb.collections.paymentTransactions || []),
+      ];
+    }
+
+    // 3. Save Routed Department Orders (Pathology, X-Ray, USG, ECG, OPD, Pharmacy, Other)
+    if (Array.isArray(departmentOrders) && departmentOrders.length > 0) {
+      hospitalDb.collections.departmentOrders = [
+        ...departmentOrders,
+        ...(hospitalDb.collections.departmentOrders || []),
+      ];
+    }
+
+    // 4. Save Pathology Worklist Record if routed to Pathology
+    if (pathologyPatient && pathologyPatient.id) {
+      hospitalDb.collections.patients = [
+        pathologyPatient,
+        ...(hospitalDb.collections.patients || []),
+      ];
+    }
+
+    // 5. Save OPD Appointment Record if routed to Doctor Visit
+    if (opdAppointment && opdAppointment.id) {
+      hospitalDb.collections.opdAppointments = [
+        opdAppointment,
+        ...(hospitalDb.collections.opdAppointments || []),
+      ];
+    }
+
+    // 6. Immutable Audit Log
+    const routedDeptsSummary = (departmentOrders || [])
+      .map((o: any) => `${o.departmentName} (${(o.items || []).length})`)
+      .join(', ');
+
+    const auditEntry = {
+      id: `AUD-BILL-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      timestamp: nowIso.replace('T', ' ').slice(0, 19),
+      ipAddress: actor.ipAddress,
+      workstationCode: actor.workstationCode,
+      username: actor.username,
+      userFullName: actor.fullName,
+      role: actor.role,
+      department: 'Billing',
+      actionType: 'INVOICE_CREATE',
+      patientId: invoice.pId,
+      patientName: invoice.patientName,
+      entityType: 'invoice',
+      recordId: invoice.id,
+      details: `[BILL FINALIZED & ROUTED] Bill #${invoice.invoiceNo} (Memo #${invoice.cashMemoNo || invoice.invoiceNo}) for ${invoice.patientName} (${invoice.pId}) — Net: ৳${invoice.netTotal}, Paid: ৳${invoice.paidAmount}, Due: ৳${invoice.dueAmount} (${invoice.paymentMethod}). Auto-routed to: ${routedDeptsSummary || 'General Billing'}.`,
+    };
+
+    hospitalDb.collections.auditLogs.unshift(auditEntry);
+    hospitalDb.processedMutationIds.unshift(dedupKey);
+    hospitalDb.isInitialized = true;
+    hospitalDb.dbVersion += 1;
+    hospitalDb.lastSavedAt = nowIso;
+    hospitalDb.lastSavedBy = `${actor.fullName} (${actor.role})`;
+
+    savePermanentDb();
+
+    res.json({
+      success: true,
+      dbVersion: hospitalDb.dbVersion,
+      invoice,
+      departmentOrders,
+      auditLog: auditEntry,
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      error: err?.message || 'Failed to finalize bill and route department orders.',
+    });
+  }
+});
+
+app.post('/api/billing/collect-due', (req, res) => {
+  try {
+    const {
+      invoiceId,
+      invoiceNo,
+      amount,
+      paymentMethod = 'Cash',
+      transactionReference = '',
+      note = '',
+      receiptNo,
+    } = req.body || {};
+
+    const collectAmt = Number(amount);
+    if ((!invoiceId && !invoiceNo) || !Number.isFinite(collectAmt) || collectAmt <= 0) {
+      res.status(400).json({
+        success: false,
+        error: 'Valid invoice identifier and positive collection amount are required.',
+      });
+      return;
+    }
+
+    const actor = extractActorFromRequest(req);
+    const nowIso = new Date().toISOString();
+    const targetInv = (hospitalDb.collections.invoices || []).find(
+      (i: any) => i.id === invoiceId || i.invoiceNo === invoiceNo
+    );
+
+    if (!targetInv) {
+      res.status(404).json({
+        success: false,
+        error: 'Invoice not found in permanent database.',
+      });
+      return;
+    }
+
+    const currentDue = Math.max(0, Number(targetInv.dueAmount) || 0);
+    const actualCollected = Math.min(collectAmt, currentDue);
+    const newPaid = (Number(targetInv.paidAmount) || 0) + actualCollected;
+    const newDue = Math.max(0, (Number(targetInv.netTotal) || 0) - newPaid);
+    const newStatus: 'Paid' | 'Partial' | 'Due' =
+      newDue <= 0 ? 'Paid' : newPaid > 0 ? 'Partial' : 'Due';
+
+    const paymentTx = {
+      id: `PAY-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      receiptNo: receiptNo || `RCP-${Date.now().toString().slice(-6)}`,
+      invoiceId: targetInv.id,
+      invoiceNo: targetInv.invoiceNo,
+      cashMemoNo: targetInv.cashMemoNo,
+      pId: targetInv.pId,
+      patientName: targetInv.patientName,
+      amount: actualCollected,
+      type: 'DUE_COLLECTION',
+      paymentMethod,
+      transactionReference,
+      receivedBy: actor.fullName,
+      receivedByRole: actor.role,
+      workstationCode: actor.workstationCode,
+      timestamp: nowIso.replace('T', ' ').slice(0, 19),
+      note: note || `Due collection against Bill #${targetInv.invoiceNo}`,
+    };
+
+    hospitalDb.collections.invoices = (hospitalDb.collections.invoices || []).map((inv: any) => {
+      if (inv.id !== targetInv.id && inv.invoiceNo !== targetInv.invoiceNo) return inv;
+      const existingPayments = Array.isArray(inv.payments) ? inv.payments : [];
+      return {
+        ...inv,
+        paidAmount: newPaid,
+        dueAmount: newDue,
+        status: newStatus,
+        payments: [...existingPayments, paymentTx],
+        updatedAt: nowIso,
+      };
+    });
+
+    hospitalDb.collections.paymentTransactions = [
+      paymentTx,
+      ...(hospitalDb.collections.paymentTransactions || []),
+    ];
+
+    // Update linked Department Orders paymentStatus & promote 'Payment Pending' orders to 'Ready for Processing'
+    hospitalDb.collections.departmentOrders = (hospitalDb.collections.departmentOrders || []).map(
+      (ord: any) => {
+        if (ord.invoiceId !== targetInv.id && ord.invoiceNo !== targetInv.invoiceNo) return ord;
+        const promotedOrderStatus =
+          ord.orderStatus === 'Payment Pending' && (newStatus === 'Paid' || newStatus === 'Partial')
+            ? 'Ready for Processing'
+            : ord.orderStatus;
+        return {
+          ...ord,
+          paymentStatus: newStatus,
+          orderStatus: promotedOrderStatus,
+          updatedAt: nowIso,
+        };
+      }
+    );
+
+    // Update Pathology Patient paymentStatus if matched
+    hospitalDb.collections.patients = (hospitalDb.collections.patients || []).map((p: any) => {
+      if (p.invoiceNo !== targetInv.invoiceNo) return p;
+      return { ...p, paymentStatus: newStatus };
+    });
+
+    // Update OPD Appointment paymentStatus if matched
+    hospitalDb.collections.opdAppointments = (hospitalDb.collections.opdAppointments || []).map(
+      (apt: any) => {
+        if (apt.invoiceNo !== targetInv.invoiceNo) return apt;
+        return { ...apt, paymentStatus: newStatus === 'Paid' ? 'Paid' : 'Partial' };
+      }
+    );
+
+    const auditEntry = {
+      id: `AUD-DUE-${Date.now()}`,
+      timestamp: nowIso.replace('T', ' ').slice(0, 19),
+      ipAddress: actor.ipAddress,
+      workstationCode: actor.workstationCode,
+      username: actor.username,
+      userFullName: actor.fullName,
+      role: actor.role,
+      department: 'Billing',
+      actionType: 'PAYMENT_RECEIVED',
+      patientId: targetInv.pId,
+      patientName: targetInv.patientName,
+      entityType: 'invoice',
+      recordId: targetInv.id,
+      details: `[DUE COLLECTION] Received ৳${actualCollected} via ${paymentMethod} for Bill #${targetInv.invoiceNo} (Receipt #${paymentTx.receiptNo}). Remaining Due: ৳${newDue}.`,
+    };
+
+    hospitalDb.collections.auditLogs.unshift(auditEntry);
+    hospitalDb.dbVersion += 1;
+    hospitalDb.lastSavedAt = nowIso;
+    hospitalDb.lastSavedBy = `${actor.fullName} (${actor.role})`;
+    savePermanentDb();
+
+    res.json({
+      success: true,
+      dbVersion: hospitalDb.dbVersion,
+      paymentTransaction: paymentTx,
+      paidAmount: newPaid,
+      dueAmount: newDue,
+      status: newStatus,
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      error: err?.message || 'Failed to collect due payment.',
+    });
+  }
+});
+
+app.post('/api/billing/refund-or-cancel', (req, res) => {
+  try {
+    const {
+      invoiceId,
+      invoiceNo,
+      actionType = 'CANCEL', // 'CANCEL' | 'REFUND'
+      refundAmount = 0,
+      paymentMethod = 'Cash',
+      reason = '',
+    } = req.body || {};
+
+    const trimmedReason = String(reason || '').trim();
+    if (!trimmedReason) {
+      res.status(400).json({
+        success: false,
+        error: 'Cancellation or refund reason is mandatory.',
+      });
+      return;
+    }
+
+    const actor = extractActorFromRequest(req);
+    const nowIso = new Date().toISOString();
+    const targetInv = (hospitalDb.collections.invoices || []).find(
+      (i: any) => i.id === invoiceId || i.invoiceNo === invoiceNo
+    );
+
+    if (!targetInv) {
+      res.status(404).json({
+        success: false,
+        error: 'Invoice not found.',
+      });
+      return;
+    }
+
+    const refAmt = Math.min(Math.max(0, Number(refundAmount) || 0), Number(targetInv.paidAmount) || 0);
+    const newPaid = Math.max(0, (Number(targetInv.paidAmount) || 0) - refAmt);
+    const isCancel = actionType === 'CANCEL';
+    const newStatus: 'Cancelled' | 'Refunded' | 'Paid' | 'Partial' | 'Due' = isCancel
+      ? 'Cancelled'
+      : refAmt > 0 && newPaid === 0
+      ? 'Refunded'
+      : newPaid >= targetInv.netTotal
+      ? 'Paid'
+      : newPaid > 0
+      ? 'Partial'
+      : 'Due';
+
+    const refundTx =
+      refAmt > 0
+        ? {
+            id: `REF-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+            receiptNo: `RFN-${Date.now().toString().slice(-6)}`,
+            invoiceId: targetInv.id,
+            invoiceNo: targetInv.invoiceNo,
+            cashMemoNo: targetInv.cashMemoNo,
+            pId: targetInv.pId,
+            patientName: targetInv.patientName,
+            amount: -refAmt,
+            type: 'REFUND',
+            paymentMethod,
+            receivedBy: actor.fullName,
+            receivedByRole: actor.role,
+            workstationCode: actor.workstationCode,
+            timestamp: nowIso.replace('T', ' ').slice(0, 19),
+            note: `${actionType}: ${trimmedReason}`,
+          }
+        : null;
+
+    hospitalDb.collections.invoices = (hospitalDb.collections.invoices || []).map((inv: any) => {
+      if (inv.id !== targetInv.id && inv.invoiceNo !== targetInv.invoiceNo) return inv;
+      const existingPayments = Array.isArray(inv.payments) ? inv.payments : [];
+      return {
+        ...inv,
+        paidAmount: newPaid,
+        dueAmount: isCancel ? 0 : Math.max(0, (Number(inv.netTotal) || 0) - newPaid),
+        refundAmount: (Number(inv.refundAmount) || 0) + refAmt,
+        status: newStatus,
+        isCancelled: isCancel ? true : inv.isCancelled,
+        cancelledAt: isCancel ? nowIso.replace('T', ' ').slice(0, 19) : inv.cancelledAt,
+        cancelledBy: isCancel ? actor.fullName : inv.cancelledBy,
+        cancelReason: trimmedReason,
+        payments: refundTx ? [...existingPayments, refundTx] : existingPayments,
+        updatedAt: nowIso,
+      };
+    });
+
+    if (refundTx) {
+      hospitalDb.collections.paymentTransactions = [
+        refundTx,
+        ...(hospitalDb.collections.paymentTransactions || []),
+      ];
+    }
+
+    // Update linked Department Orders so cancelled bills never silently vanish—they show as Cancelled
+    hospitalDb.collections.departmentOrders = (hospitalDb.collections.departmentOrders || []).map(
+      (ord: any) => {
+        if (ord.invoiceId !== targetInv.id && ord.invoiceNo !== targetInv.invoiceNo) return ord;
+        return {
+          ...ord,
+          paymentStatus: newStatus,
+          orderStatus: isCancel ? 'Cancelled' : ord.orderStatus,
+          cancelledAt: isCancel ? nowIso.replace('T', ' ').slice(0, 19) : ord.cancelledAt,
+          cancelReason: isCancel ? trimmedReason : ord.cancelReason,
+          updatedAt: nowIso,
+        };
+      }
+    );
+
+    if (isCancel) {
+      hospitalDb.collections.patients = (hospitalDb.collections.patients || []).map((p: any) => {
+        if (p.invoiceNo !== targetInv.invoiceNo) return p;
+        return {
+          ...p,
+          workflowStatus: 'Cancelled',
+          paymentStatus: 'Cancelled',
+          comments: `${p.comments ? p.comments + ' | ' : ''}[Bill Cancelled: ${trimmedReason}]`,
+        };
+      });
+
+      hospitalDb.collections.opdAppointments = (
+        hospitalDb.collections.opdAppointments || []
+      ).map((apt: any) => {
+        if (apt.invoiceNo !== targetInv.invoiceNo) return apt;
+        return { ...apt, status: 'Cancelled', updatedAt: nowIso };
+      });
+    }
+
+    const auditEntry = {
+      id: `AUD-REF-${Date.now()}`,
+      timestamp: nowIso.replace('T', ' ').slice(0, 19),
+      ipAddress: actor.ipAddress,
+      workstationCode: actor.workstationCode,
+      username: actor.username,
+      userFullName: actor.fullName,
+      role: actor.role,
+      department: 'Billing',
+      actionType: 'RECORD_UPDATE',
+      patientId: targetInv.pId,
+      patientName: targetInv.patientName,
+      entityType: 'invoice',
+      recordId: targetInv.id,
+      details: `[BILL ${actionType}] Bill #${targetInv.invoiceNo} (${targetInv.patientName}, ${targetInv.pId}) — Refunded: ৳${refAmt}. Reason: "${trimmedReason}" by ${actor.fullName}.`,
+    };
+
+    hospitalDb.collections.auditLogs.unshift(auditEntry);
+    hospitalDb.dbVersion += 1;
+    hospitalDb.lastSavedAt = nowIso;
+    hospitalDb.lastSavedBy = `${actor.fullName} (${actor.role})`;
+    savePermanentDb();
+
+    res.json({
+      success: true,
+      dbVersion: hospitalDb.dbVersion,
+      status: newStatus,
+      paidAmount: newPaid,
+      refundAmount: refAmt,
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      error: err?.message || 'Failed to process refund or cancellation.',
+    });
+  }
+});
+
+app.post('/api/orders/update-status', (req, res) => {
+  try {
+    const { orderId, orderNo, orderStatus, reportId, notes } = req.body || {};
+    if ((!orderId && !orderNo) || !orderStatus) {
+      res.status(400).json({
+        success: false,
+        error: 'orderId/orderNo and orderStatus are required.',
+      });
+      return;
+    }
+
+    const actor = extractActorFromRequest(req);
+    const nowIso = new Date().toISOString();
+    const nowReadable = nowIso.replace('T', ' ').slice(0, 19);
+
+    hospitalDb.collections.departmentOrders = (hospitalDb.collections.departmentOrders || []).map(
+      (ord: any) => {
+        if (ord.id !== orderId && ord.orderNo !== orderNo) return ord;
+        return {
+          ...ord,
+          orderStatus,
+          sampleCollectedAt:
+            orderStatus === 'Sample Collected'
+              ? ord.sampleCollectedAt || nowReadable
+              : ord.sampleCollectedAt,
+          sampleCollectedBy:
+            orderStatus === 'Sample Collected'
+              ? ord.sampleCollectedBy || actor.fullName
+              : ord.sampleCollectedBy,
+          resultEnteredAt:
+            orderStatus === 'Result Entered' || orderStatus === 'Completed'
+              ? ord.resultEnteredAt || nowReadable
+              : ord.resultEnteredAt,
+          completedAt: orderStatus === 'Completed' ? nowReadable : ord.completedAt,
+          reportId: reportId || ord.reportId,
+          notes: notes !== undefined ? notes : ord.notes,
+          updatedAt: nowIso,
+        };
+      }
+    );
+
+    hospitalDb.dbVersion += 1;
+    hospitalDb.lastSavedAt = nowIso;
+    savePermanentDb();
+
+    res.json({
+      success: true,
+      dbVersion: hospitalDb.dbVersion,
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      error: err?.message || 'Failed to update department order status.',
     });
   }
 });

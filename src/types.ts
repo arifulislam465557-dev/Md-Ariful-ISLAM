@@ -48,14 +48,43 @@ export interface SubTest {
   referenceRanges?: ReferenceRangeRule[];
 }
 
+export type ServiceDepartmentId =
+  | 'pathology'
+  | 'xray'
+  | 'ultrasound'
+  | 'ecg'
+  | 'doctorVisit'
+  | 'pharmacy'
+  | 'other';
+
+export type DepartmentOrderStatus =
+  | 'Ordered'
+  | 'Payment Pending'
+  | 'Ready for Processing'
+  | 'Sample Collected'
+  | 'Processing'
+  | 'Result Entered'
+  | 'Under Verification'
+  | 'Completed'
+  | 'Cancelled';
+
 export interface LabTest {
   id: string;
   code: string;
   name: string;
+  nameBn?: string;
   category: string;
+  subcategory?: string;
+  departmentId?: ServiceDepartmentId;
   unit: string;
   normalRange: string;
   price: number;
+  costPrice?: number;
+  discountEligible?: boolean;
+  maxDiscountPercent?: number;
+  priceVerified?: boolean;
+  synonyms?: string[];
+  doctorId?: string;
   sampleType?: string;
   method?: string;
   turnaroundTime?: string;
@@ -128,8 +157,10 @@ export interface PathologyAuditTrailEntry {
 export interface Patient {
   id: string;
   pId: string;
+  oldRegNo?: string;
   accessionNo?: string;
   invoiceNo?: string;
+  cashMemoNo?: string;
   invDate: string;
   billDate: string;
   patientName: string;
@@ -143,6 +174,7 @@ export interface Patient {
   drName: string;
   status: 'Printed' | 'Completed' | 'Pending';
   workflowStatus?: PathologyWorkflowStatus;
+  paymentStatus?: 'Paid' | 'Partial' | 'Due' | 'Cancelled' | 'Refunded';
   department: string;
   sampleType?: string;
   sampleCollectionTime?: string;
@@ -171,33 +203,125 @@ export interface Patient {
 
 export interface InvoiceItem {
   testId: string;
+  code?: string;
   testName: string;
+  nameBn?: string;
   category: string;
-  price: number;
+  subcategory?: string;
+  departmentId?: ServiceDepartmentId;
+  quantity?: number;
+  unitPrice?: number;
+  discountPercent?: number;
+  discountAmount?: number;
+  price: number; // Net line total or unit price snapshot
+  sampleType?: string;
+  turnaroundTime?: string;
+  doctorId?: string;
+  orderId?: string;
+}
+
+export interface PaymentTransaction {
+  id: string;
+  receiptNo: string;
+  invoiceId: string;
+  invoiceNo: string;
+  cashMemoNo?: string;
+  pId: string;
+  patientName?: string;
+  amount: number;
+  type: 'INITIAL_PAYMENT' | 'DUE_COLLECTION' | 'ADVANCE_ADJUSTMENT' | 'REFUND';
+  paymentMethod: string;
+  transactionReference?: string;
+  receivedBy: string;
+  receivedByRole?: string;
+  workstationCode?: string;
+  timestamp: string;
+  note?: string;
+}
+
+export interface DepartmentOrder {
+  id: string;
+  orderNo: string;
+  invoiceId: string;
+  invoiceNo: string;
+  cashMemoNo?: string;
+  pId: string;
+  oldRegNo?: string;
+  patientName: string;
+  age: string;
+  sex: 'Male' | 'Female' | 'Other';
+  phone: string;
+  address?: string;
+  drCode: string;
+  drName: string;
+  doctorId?: string;
+  departmentId: ServiceDepartmentId;
+  departmentName: string;
+  items: InvoiceItem[];
+  orderDate: string;
+  paymentStatus: 'Paid' | 'Partial' | 'Due' | 'Refunded' | 'Cancelled';
+  orderStatus: DepartmentOrderStatus;
+  isCreditApproved?: boolean;
+  creditApprovedBy?: string;
+  sampleType?: string;
+  sampleCollectedAt?: string;
+  sampleCollectedBy?: string;
+  resultEnteredAt?: string;
+  completedAt?: string;
+  cancelledAt?: string;
+  cancelReason?: string;
+  reportId?: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt?: string;
 }
 
 export interface Invoice {
   id: string;
   invoiceNo: string;
+  cashMemoNo?: string;
   pId: string;
+  oldRegNo?: string;
+  appointmentId?: string;
   patientName: string;
   age: string;
   sex: 'Male' | 'Female' | 'Other';
   phone: string;
+  address?: string;
   drCode: string;
   drName: string;
   date: string;
   items: InvoiceItem[];
   subtotal: number;
+  itemDiscountTotal?: number;
+  billDiscountAmount?: number;
   discountPercent: number;
   discountAmount: number;
   discountBy?: string;
+  discountApprovedBy?: string;
+  advanceAdjustment?: number;
   netTotal: number;
   paidAmount: number;
   dueAmount: number;
+  refundAmount?: number;
   paymentMethod: string;
-  status: 'Paid' | 'Partial' | 'Due';
+  transactionReference?: string;
+  status: 'Paid' | 'Partial' | 'Due' | 'Cancelled' | 'Refunded';
+  payments?: PaymentTransaction[];
+  departmentOrderIds?: string[];
+  isCreditApproved?: boolean;
+  creditApprovedBy?: string;
+  cashierName?: string;
+  workstationCode?: string;
+  reprintCount?: number;
+  isCancelled?: boolean;
+  cancelledAt?: string;
+  cancelledBy?: string;
+  cancelReason?: string;
+  remarks?: string;
+  idempotencyKey?: string;
   createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface OpdAppointment {
@@ -339,6 +463,8 @@ export interface ShiftHandoverNote {
 export interface EcgReport {
   id: string;
   pId: string;
+  invoiceNo?: string;
+  orderId?: string;
   patientName: string;
   age: string;
   sex: string;
@@ -358,6 +484,8 @@ export interface EcgReport {
 export interface XrayReport {
   id: string;
   pId: string;
+  invoiceNo?: string;
+  orderId?: string;
   patientName: string;
   age: string;
   sex: string;
@@ -375,6 +503,8 @@ export interface XrayReport {
 export interface UsgReport {
   id: string;
   pId: string;
+  invoiceNo?: string;
+  orderId?: string;
   patientName: string;
   age: string;
   sex: string;
@@ -804,6 +934,8 @@ export interface OpdAppointmentRecord {
   id: string;
   tokenNo: string;
   pId: string;
+  invoiceNo?: string;
+  orderId?: string;
   patientName: string;
   age: string;
   gender: string;
@@ -814,11 +946,21 @@ export interface OpdAppointmentRecord {
   timeSlot: string;
   visitType: 'New Visit' | 'Follow-up' | 'Report Check' | 'Emergency';
   fee: number;
-  paymentStatus: 'Paid' | 'Unpaid';
+  paymentStatus: 'Paid' | 'Unpaid' | 'Partial';
   status: 'Waiting' | 'In Consultation' | 'Completed' | 'Cancelled';
   chiefComplaint?: string;
   createdAt: string;
   updatedAt?: string;
+}
+
+export interface BillingConfig {
+  invoicePrefix: string;
+  cashMemoPrefix: string;
+  maxStaffDiscountPercent: number;
+  allowPartialPaymentRouting: boolean;
+  defaultPrintFormat: 'a4-dual' | 'a4-single' | 'thermal-80mm';
+  termsAndConditionsBn: string;
+  termsAndConditionsEn: string;
 }
 
 export interface DeleteRequestPayload {
@@ -864,5 +1006,6 @@ export type DraftModuleKey =
   | 'employeeFormDraft'
   | 'expenseFormDraft'
   | 'settingsFormDraft';
+
 
 
