@@ -273,6 +273,8 @@ export interface DepartmentOrder {
   cancelledAt?: string;
   cancelReason?: string;
   reportId?: string;
+  notes?: string;
+  createdAt?: string;
   updatedAt?: string;
 }
 
