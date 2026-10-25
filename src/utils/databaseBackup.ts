@@ -18,9 +18,6 @@ import {
   EncryptedBackupPackage,
   ShiftHandoverNote,
   WorkstationNode,
-  PathologyOrderItem,
-  DepartmentOrder,
-  PaymentTransaction,
 } from '../types';
 
 export interface DetailedBackupScopes {
@@ -70,9 +67,6 @@ export interface FullHospitalDatabase {
   printLogs: InvoicePrintLog[];
   shiftHandovers?: ShiftHandoverNote[];
   workstations?: WorkstationNode[];
-  pathologyOrders?: PathologyOrderItem[];
-  departmentOrders?: DepartmentOrder[];
-  paymentTransactions?: PaymentTransaction[];
   pharmacyInventory?: Array<{
     id: string;
     code: string;

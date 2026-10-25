@@ -6,9 +6,6 @@ import {
   LabTest,
   PathologyWorkflowStatus,
   PathologyAuditTrailEntry,
-  PathologyOrderItem,
-  SampleCollectionStatus,
-  PathologyReportStatus,
 } from '../../types';
 import { PathologyReportModal } from './PathologyReportModal';
 import { AddCustomTestModal } from './AddCustomTestModal';
@@ -42,13 +39,6 @@ import {
   FileCheck2,
   Activity,
   ChevronDown,
-  RefreshCw,
-  SlidersHorizontal,
-  CheckSquare,
-  ListOrdered,
-  Check,
-  ExternalLink,
-  FileSpreadsheet,
 } from 'lucide-react';
 import {
   classifyTestItem,
@@ -102,9 +92,6 @@ export const PathologyModule: React.FC = () => {
     updateModuleDraft,
     isAdminUser,
     requestDeleteRecord,
-    pathologyOrders,
-    updatePathologyOrderStatus,
-    reconcileMissingPathologyOrders,
   } = useApp();
 
   // Top-level view mode: Lab Worklist & Report Entry vs Admin Test Master & Template Designer
@@ -222,14 +209,8 @@ export const PathologyModule: React.FC = () => {
   const [selectedPatientForReport, setSelectedPatientForReport] = useState<Patient | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Sidebar tab: 'ordersList' | 'receptionQueue' | 'savedReports'
-  const [sidebarTab, setSidebarTab] = useState<'ordersList' | 'receptionQueue' | 'savedReports'>('ordersList');
-  const [orderSampleFilter, setOrderSampleFilter] = useState<'ALL' | SampleCollectionStatus>('ALL');
-  const [orderReportFilter, setOrderReportFilter] = useState<'ALL' | PathologyReportStatus>('ALL');
-  const [isReconciling, setIsReconciling] = useState(false);
-  const [showFullOrdersModal, setShowFullOrdersModal] = useState(false);
-  const [orderModalSearch, setOrderModalSearch] = useState('');
-  const [orderModalDateFilter, setOrderModalDateFilter] = useState('');
+  // Sidebar tab
+  const [sidebarTab, setSidebarTab] = useState<'receptionQueue' | 'savedReports'>('receptionQueue');
 
   // Quick Select & Saved Patients Live Unified Queue state
   const [recentFilter, setRecentFilter] = useState<'all' | 'pathology' | 'billing'>('all');
@@ -356,211 +337,6 @@ export const PathologyModule: React.FC = () => {
     () => labTests.filter((t) => t.isActive !== false),
     [labTests]
   );
-
-  // Helper functions for order fields
-  const getOrderReceiptId = (o: PathologyOrderItem) => o.receiptId || o.invoiceNo || o.billId || o.receiptNo || '';
-  const getOrderPatientId = (o: PathologyOrderItem) => o.patientId || o.pId || '';
-  const getOrderSampleStatus = (o: PathologyOrderItem): SampleCollectionStatus =>
-    o.sampleCollectionStatus || o.sampleStatus || 'Pending';
-  const getOrderAge = (o: PathologyOrderItem) => o.patientAge || o.age || '';
-  const getOrderSex = (o: PathologyOrderItem) => o.patientSex || o.sex || '';
-
-  // Filtered orders for the right sidebar
-  const filteredOrders = useMemo(() => {
-    let list = Array.isArray(pathologyOrders) ? pathologyOrders : [];
-    if (patientSearchInput.trim()) {
-      const q = patientSearchInput.trim().toLowerCase();
-      list = list.filter(
-        (o) =>
-          o.patientName?.toLowerCase().includes(q) ||
-          getOrderPatientId(o).toLowerCase().includes(q) ||
-          getOrderReceiptId(o).toLowerCase().includes(q) ||
-          o.testName?.toLowerCase().includes(q) ||
-          (o.testCode && o.testCode.toLowerCase().includes(q))
-      );
-    }
-    if (orderSampleFilter !== 'ALL') {
-      list = list.filter((o) => getOrderSampleStatus(o) === orderSampleFilter);
-    }
-    if (orderReportFilter !== 'ALL') {
-      list = list.filter((o) => o.reportStatus === orderReportFilter);
-    }
-    return list;
-  }, [pathologyOrders, patientSearchInput, orderSampleFilter, orderReportFilter]);
-
-  // Filtered orders for the full modal
-  const modalFilteredOrders = useMemo(() => {
-    let list = Array.isArray(pathologyOrders) ? pathologyOrders : [];
-    if (orderModalSearch.trim()) {
-      const q = orderModalSearch.trim().toLowerCase();
-      list = list.filter(
-        (o) =>
-          o.patientName?.toLowerCase().includes(q) ||
-          getOrderPatientId(o).toLowerCase().includes(q) ||
-          getOrderReceiptId(o).toLowerCase().includes(q) ||
-          o.testName?.toLowerCase().includes(q) ||
-          (o.testCode && o.testCode.toLowerCase().includes(q))
-      );
-    }
-    if (orderModalDateFilter) {
-      list = list.filter((o) => (o.orderDate || '').includes(orderModalDateFilter));
-    }
-    return list;
-  }, [pathologyOrders, orderModalSearch, orderModalDateFilter]);
-
-  // Order metrics
-  const pendingSamplesCount = useMemo(
-    () => (Array.isArray(pathologyOrders) ? pathologyOrders.filter((o) => getOrderSampleStatus(o) === 'Pending').length : 0),
-    [pathologyOrders]
-  );
-  const pendingReportsCount = useMemo(
-    () =>
-      Array.isArray(pathologyOrders)
-        ? pathologyOrders.filter(
-            (o) => o.reportStatus === 'Pending' || o.reportStatus === 'In Progress' || o.reportStatus === 'Entered'
-          ).length
-        : 0,
-    [pathologyOrders]
-  );
-
-  // Load a single test order directly into workspace
-  const handleLoadOrderIntoForm = (order: PathologyOrderItem) => {
-    const rId = getOrderReceiptId(order);
-    const pId = getOrderPatientId(order);
-    const pAge = getOrderAge(order);
-    const pSex = getOrderSex(order);
-
-    setPatientId(pId);
-    setPatientName(order.patientName ? capitalize(order.patientName) : '');
-    setInvoiceNo(rId);
-    setBillDate(order.orderDate || getTodayDateStr(false));
-    setAccessionNo(`ACC-${(rId || Date.now().toString()).replace(/\D/g, '').slice(-6)}`);
-
-    if (pAge) setAge(pAge);
-    if (pSex) setSex(pSex as any);
-    if (order.sampleType) setSampleType(order.sampleType);
-
-    // Look up doctor code from invoice or existing patient
-    const matchingInv = invoices.find((inv) => inv.invoiceNo === rId || inv.id === rId);
-    if (matchingInv?.drCode) {
-      setDrCode(matchingInv.drCode);
-    }
-    const matchingPat = patients.find((p) => p.invoiceNo === rId || p.pId === pId);
-    if (matchingPat?.drCode && !matchingInv?.drCode) {
-      setDrCode(matchingPat.drCode);
-    }
-
-    // Match test in active lab tests catalog
-    const searchCode = (order.testCode || '').toUpperCase().trim();
-    const searchName = (order.testName || '').toLowerCase().trim();
-
-    const matchedTest = activeLabTests.find(
-      (lt) =>
-        (searchCode && lt.code.toUpperCase() === searchCode) ||
-        lt.name.toLowerCase() === searchName ||
-        lt.name.toLowerCase().includes(searchName) ||
-        searchName.includes(lt.name.toLowerCase())
-    );
-
-    if (matchedTest) {
-      const items = expandLabTestToResultItems(
-        matchedTest,
-        order.patientSex || sex,
-        order.patientAge || age,
-        pregnancyStatus
-      );
-      const alreadyHas = testResults.some(
-        (tr) => tr.testName.toLowerCase() === matchedTest.name.toLowerCase()
-      );
-      if (!alreadyHas) {
-        setTestResults((prev) => [...prev, ...items]);
-      }
-    } else {
-      const alreadyHas = testResults.some(
-        (tr) => tr.testName.toLowerCase() === order.testName.toLowerCase()
-      );
-      if (!alreadyHas) {
-        setTestResults((prev) => [
-          ...prev,
-          {
-            testName: order.testName,
-            result: '',
-            unit: '',
-            normalRange: '',
-            status: 'Normal',
-            inputType: 'text',
-            sampleType: order.sampleType || sampleType,
-          },
-        ]);
-      }
-    }
-
-    if (order.reportStatus === 'Pending') {
-      updatePathologyOrderStatus(order.id, { reportStatus: 'In Progress' });
-    }
-
-    showToast(
-      lang === 'bn'
-        ? `✓ ${order.testName} অর্ডার লোড করা হয়েছে (রসিদ #${rId})`
-        : `✓ Loaded order ${order.testName} (Receipt #${rId})`
-    );
-  };
-
-  // Quick update sample collection status
-  const handleUpdateSampleStatus = async (
-    orderId: string,
-    newStatus: SampleCollectionStatus
-  ) => {
-    const res = await updatePathologyOrderStatus(orderId, {
-      sampleStatus: newStatus,
-      sampleCollectedBy: newStatus === 'Collected' ? (currentUser?.fullName || 'Phlebotomist') : undefined,
-      sampleReceivedBy: newStatus === 'Received' ? (currentUser?.fullName || clinicConfig.labInCharge) : undefined,
-    });
-    if (res.success) {
-      showToast(
-        lang === 'bn'
-          ? `✓ স্যাম্পল স্ট্যাটাস আপডেট: ${newStatus}`
-          : `✓ Sample status updated: ${newStatus}`
-      );
-    } else {
-      showToast(`Error: ${res.error || 'Failed to update'}`);
-    }
-  };
-
-  // Run database recovery / reconcile missing pathology orders
-  const handleRunReconcile = async () => {
-    setIsReconciling(true);
-    try {
-      const res = await reconcileMissingPathologyOrders();
-      if (res.success) {
-        showToast(
-          lang === 'bn'
-            ? `✓ অর্ডার মেলানো সম্পন্ন! ${res.recoveredCount}টি বাদ পড়া অর্ডার রিকভার হয়েছে (মোট ${res.totalOrders}টি অর্ডার)।`
-            : `✓ Reconciliation complete! Recovered ${res.recoveredCount} missing orders (${res.totalOrders} total).`
-        );
-      } else {
-        showToast(`Reconciliation note: ${res.error || 'No changes made'}`);
-      }
-    } catch (err: any) {
-      showToast(`Error: ${err.message || 'Reconciliation failed'}`);
-    } finally {
-      setIsReconciling(false);
-    }
-  };
-
-  // Admin soft-delete order with audit trail
-  const handleDeleteOrder = (order: PathologyOrderItem) => {
-    const rId = getOrderReceiptId(order);
-    const sStatus = getOrderSampleStatus(order);
-    requestDeleteRecord({
-      entityType: 'pathologyOrder',
-      entityLabel: 'প্যাথলজি টেস্ট অর্ডার (Pathology Test Order)',
-      recordId: order.id,
-      recordTitle: `${order.testName} — ${order.patientName} (Receipt #${rId})`,
-      recordSubtitle: `Date: ${order.orderDate} · Status: ${sStatus}/${order.reportStatus}`,
-      originalData: order,
-    });
-  };
 
   // Role-based access check for Sensitive Tests (HIV, HBsAg, Anti-HCV, VDRL) and Report Verification
   const isAuthorizedRole = useMemo(() => {
@@ -1471,84 +1247,15 @@ export const PathologyModule: React.FC = () => {
         /* ===================================================================== */
         /* MODE 1: LAB WORKLIST & 10-STEP REPORT ENTRY WORKFLOW                  */
         /* ===================================================================== */
-        <>
-          {/* Top Operational Bar: Live Pathology Sync, Reconcile & Full Orders Board */}
-          <div className="mb-3 p-3 rounded-xl bg-gradient-to-r from-purple-900 via-indigo-900 to-purple-950 text-white shadow-lg border-2 border-purple-400 flex flex-col md:flex-row md:items-center justify-between gap-3">
-            <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-lg bg-white/10 text-pink-300">
-                <FlaskConical className="w-6 h-6" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="font-black text-sm sm:text-base tracking-wide text-white">
-                    {lang === 'bn' ? 'প্যাথলজি টেস্ট ওয়ার্কস্টেশন' : 'Pathology Test Workstation'}
-                  </h3>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/30 text-emerald-300 border border-emerald-400 flex items-center gap-1">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                    <span>{lang === 'bn' ? 'লাইভ সিঙ্ক চালু' : 'Live Sync Active'}</span>
-                  </span>
-                </div>
-                <div className="text-[11px] text-purple-200 flex items-center gap-2 flex-wrap mt-0.5">
-                  <span>
-                    {lang === 'bn' ? 'মোট টেস্ট অর্ডার:' : 'Total Orders:'}{' '}
-                    <strong className="text-white font-mono">{pathologyOrders.length}</strong>
-                  </span>
-                  <span>•</span>
-                  <span>
-                    {lang === 'bn' ? 'পেন্ডিং স্যাম্পল:' : 'Pending Samples:'}{' '}
-                    <strong className="text-amber-300 font-mono">{pendingSamplesCount}</strong>
-                  </span>
-                  <span>•</span>
-                  <span>
-                    {lang === 'bn' ? 'পেন্ডিং রিপোর্ট:' : 'Pending Reports:'}{' '}
-                    <strong className="text-cyan-300 font-mono">{pendingReportsCount}</strong>
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 flex-wrap">
-              <button
-                type="button"
-                onClick={() => setShowFullOrdersModal(true)}
-                className="px-3 py-1.5 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-bold rounded-lg text-xs flex items-center gap-1.5 shadow-md transition cursor-pointer active:scale-95"
-              >
-                <ListOrdered className="w-4 h-4" />
-                <span>{lang === 'bn' ? '📋 পূর্ণাঙ্গ টেস্ট অর্ডার বোর্ড' : '📋 All Pathology Orders Board'}</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={handleRunReconcile}
-                disabled={isReconciling}
-                className="px-3 py-1.5 bg-purple-700 hover:bg-purple-600 disabled:opacity-50 text-white font-bold rounded-lg text-xs flex items-center gap-1.5 shadow-md transition cursor-pointer active:scale-95"
-                title={lang === 'bn' ? 'ক্যাশ মেমো থেকে কোনো টেস্ট বাদ পড়লে স্বয়ংক্রিয়ভাবে উদ্ধার করুন' : 'Recover any missing orders from invoices'}
-              >
-                <RefreshCw className={`w-3.5 h-3.5 ${isReconciling ? 'animate-spin' : ''}`} />
-                <span>{isReconciling ? (lang === 'bn' ? 'অর্ডার মেলানো হচ্ছে...' : 'Reconciling...') : (lang === 'bn' ? 'অর্ডার মেলান (Sync)' : 'Reconcile Orders')}</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setModuleMode('testMaster')}
-                className="px-2.5 py-1.5 bg-white/10 hover:bg-white/20 text-purple-100 font-bold rounded-lg text-xs flex items-center gap-1 transition cursor-pointer"
-                title={lang === 'bn' ? 'টেস্ট মাস্টার ক্যাটালগ ও টেমপ্লেট ডিজাইনার' : 'Test Master Catalog'}
-              >
-                <Settings2 className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">{lang === 'bn' ? 'টেস্ট মাস্টার' : 'Test Master'}</span>
-              </button>
-            </div>
-          </div>
-
-          <div
-            className={`border-2 rounded-xl shadow-xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 gap-0 ${
-              isDark
-                ? 'bg-slate-900 border-slate-700'
-                : isClassic
-                ? 'bg-[#edddec] border-[#9f81a7]'
-                : 'bg-white border-slate-300'
-            }`}
-          >
+        <div
+          className={`border-2 rounded-xl shadow-xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 gap-0 ${
+            isDark
+              ? 'bg-slate-900 border-slate-700'
+              : isClassic
+              ? 'bg-[#edddec] border-[#9f81a7]'
+              : 'bg-white border-slate-300'
+          }`}
+        >
           {/* LEFT COLUMN: Data Entry Form & Test Table (8 COLS) */}
           <div
             className={`lg:col-span-8 p-3 sm:p-4 flex flex-col justify-between border-b lg:border-b-0 lg:border-r ${
@@ -2377,293 +2084,60 @@ export const PathologyModule: React.FC = () => {
             }`}
           >
             <div>
-              {/* Triple Tabs: Test Orders vs Billed Invoices vs Saved Pathology Reports */}
-              <div className="grid grid-cols-3 gap-1 mb-2 bg-slate-200 dark:bg-slate-800 p-1 rounded-xl">
-                <button
-                  type="button"
-                  onClick={() => setSidebarTab('ordersList')}
-                  className={`py-1.5 px-1.5 rounded-lg text-[11px] font-black transition flex items-center justify-center gap-1 cursor-pointer truncate ${
-                    sidebarTab === 'ordersList'
-                      ? 'bg-purple-900 text-white shadow-xs'
-                      : 'text-slate-700 dark:text-slate-300 hover:bg-slate-300/80 dark:hover:bg-slate-700'
-                  }`}
-                  title="Pathology Test Orders"
-                >
-                  <ListOrdered className="w-3.5 h-3.5 text-pink-300 shrink-0" />
-                  <span className="truncate">{lang === 'bn' ? 'টেস্ট অর্ডার' : 'Orders'}</span>
-                  <span className="px-1 py-0.2 rounded-full text-[9px] bg-pink-500 text-white font-mono font-bold shrink-0">
-                    {pathologyOrders.length}
-                  </span>
-                </button>
+              {/* Dual Tabs: Reception Queue (Billed Tests) vs Saved Pathology Reports */}
+              <div className="grid grid-cols-2 gap-1.5 mb-2 bg-slate-200 dark:bg-slate-800 p-1 rounded-xl">
                 <button
                   type="button"
                   onClick={() => setSidebarTab('receptionQueue')}
-                  className={`py-1.5 px-1.5 rounded-lg text-[11px] font-black transition flex items-center justify-center gap-1 cursor-pointer truncate ${
+                  className={`py-1.5 px-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
                     sidebarTab === 'receptionQueue'
                       ? 'bg-purple-900 text-white shadow-xs'
                       : 'text-slate-700 dark:text-slate-300 hover:bg-slate-300/80 dark:hover:bg-slate-700'
                   }`}
-                  title="Billed Invoices"
                 >
-                  <FlaskConical className="w-3.5 h-3.5 text-amber-300 shrink-0" />
-                  <span className="truncate">{lang === 'bn' ? 'ইনভয়েস' : 'Invoices'}</span>
-                  <span className="px-1 py-0.2 rounded-full text-[9px] bg-amber-600 text-white font-mono font-bold shrink-0">
+                  <FlaskConical className="w-3.5 h-3.5 text-pink-300" />
+                  <span>{lang === 'bn' ? 'রিসিপশন টেস্ট কিউ' : 'Reception Queue'}</span>
+                  <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-pink-500 text-white font-mono font-bold">
                     {invoices.length}
                   </span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setSidebarTab('savedReports')}
-                  className={`py-1.5 px-1.5 rounded-lg text-[11px] font-black transition flex items-center justify-center gap-1 cursor-pointer truncate ${
+                  className={`py-1.5 px-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
                     sidebarTab === 'savedReports'
                       ? 'bg-purple-900 text-white shadow-xs'
                       : 'text-slate-700 dark:text-slate-300 hover:bg-slate-300/80 dark:hover:bg-slate-700'
                   }`}
-                  title="Saved Reports"
                 >
-                  <FileText className="w-3.5 h-3.5 text-cyan-300 shrink-0" />
-                  <span className="truncate">{lang === 'bn' ? 'রিপোর্ট' : 'Reports'}</span>
-                  <span className="px-1 py-0.2 rounded-full text-[9px] bg-cyan-700 text-white font-mono font-bold shrink-0">
+                  <FileText className="w-3.5 h-3.5 text-cyan-300" />
+                  <span>{lang === 'bn' ? 'সেভ করা রিপোর্ট' : 'Saved Reports'}</span>
+                  <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-cyan-700 text-white font-mono font-bold">
                     {patients.length}
                   </span>
                 </button>
               </div>
 
-              {/* Search & Quick Filter Chips */}
-              <div className="mb-2 space-y-1.5">
-                <div className="relative">
-                  <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-500" />
-                  <input
-                    type="text"
-                    value={patientSearchInput}
-                    onChange={(e) => setPatientSearchInput(e.target.value)}
-                    placeholder={
-                      sidebarTab === 'ordersList'
-                        ? lang === 'bn'
-                          ? 'রসিদ, রোগী আইডি, নাম বা টেস্ট খুঁজুন...'
-                          : 'Search receipt, PID, name or test...'
-                        : sidebarTab === 'receptionQueue'
-                        ? lang === 'bn'
-                          ? 'রিসিপশন কিউ খুঁজুন (নাম, আইডি, রসিদ)...'
-                          : 'Search billed queue (name, PID, invoice)...'
-                        : t.searchPatients
-                    }
-                    className="w-full pl-9 pr-3 py-1.5 bg-white dark:bg-slate-800 border-2 border-slate-400 dark:border-slate-600 rounded-lg text-xs font-bold text-slate-950 dark:text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-purple-600 focus:outline-none"
-                  />
-                </div>
-
-                {sidebarTab === 'ordersList' && (
-                  <div className="flex items-center gap-1 overflow-x-auto pb-1 text-[10px]">
-                    <button
-                      type="button"
-                      onClick={() => setOrderSampleFilter('ALL')}
-                      className={`px-2 py-0.5 rounded-full font-bold shrink-0 cursor-pointer transition ${
-                        orderSampleFilter === 'ALL'
-                          ? 'bg-purple-900 text-white'
-                          : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-300'
-                      }`}
-                    >
-                      {lang === 'bn' ? 'সব' : 'All'} ({pathologyOrders.length})
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setOrderSampleFilter('Pending')}
-                      className={`px-2 py-0.5 rounded-full font-bold shrink-0 cursor-pointer transition ${
-                        orderSampleFilter === 'Pending'
-                          ? 'bg-amber-600 text-white'
-                          : 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-200'
-                      }`}
-                    >
-                      {lang === 'bn' ? 'স্যাম্পল বাকি' : 'Pending Sample'} ({pendingSamplesCount})
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setOrderSampleFilter('Collected')}
-                      className={`px-2 py-0.5 rounded-full font-bold shrink-0 cursor-pointer transition ${
-                        orderSampleFilter === 'Collected'
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-200'
-                      }`}
-                    >
-                      {lang === 'bn' ? 'সংগৃহীত' : 'Collected'}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setOrderSampleFilter('Received')}
-                      className={`px-2 py-0.5 rounded-full font-bold shrink-0 cursor-pointer transition ${
-                        orderSampleFilter === 'Received'
-                          ? 'bg-emerald-600 text-white'
-                          : 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-200'
-                      }`}
-                    >
-                      {lang === 'bn' ? 'ল্যাবে প্রাপ্ত' : 'Received'}
-                    </button>
-                  </div>
-                )}
+              {/* Search Input */}
+              <div className="mb-2 relative">
+                <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-500" />
+                <input
+                  type="text"
+                  value={patientSearchInput}
+                  onChange={(e) => setPatientSearchInput(e.target.value)}
+                  placeholder={
+                    sidebarTab === 'receptionQueue'
+                      ? lang === 'bn'
+                        ? 'রিসিপশন কিউ খুঁজুন (নাম, আইডি, রসিদ বা টেস্ট)...'
+                        : 'Search billed queue (name, PID, invoice or test)...'
+                      : t.searchPatients
+                  }
+                  className="w-full pl-9 pr-3 py-1.5 bg-white dark:bg-slate-800 border-2 border-slate-400 dark:border-slate-600 rounded-lg text-xs font-bold text-slate-950 dark:text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-purple-600 focus:outline-none"
+                />
               </div>
 
               {/* Content Area Based on Active Tab */}
-              {sidebarTab === 'ordersList' ? (
-                <div className="border-2 border-slate-400 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 overflow-hidden shadow-xs mb-3">
-                  <div className="bg-purple-950 text-white px-3 py-1.5 text-[11px] font-bold flex items-center justify-between">
-                    <span className="flex items-center gap-1.5">
-                      <ListOrdered className="w-3.5 h-3.5 text-pink-400" />
-                      <span>{lang === 'bn' ? 'রিসিপ্ট প্যাথলজি টেস্ট অর্ডার' : 'Billed Pathology Orders'}</span>
-                    </span>
-                    <span className="text-[10px] text-pink-300 font-mono">
-                      {filteredOrders.length}টি অর্ডার
-                    </span>
-                  </div>
-
-                  <div className="max-h-[260px] overflow-y-auto divide-y divide-slate-200 dark:divide-slate-800">
-                    {filteredOrders.length === 0 ? (
-                      <div className="p-6 text-center text-slate-400 text-xs space-y-2">
-                        <p className="italic">
-                          {lang === 'bn' ? 'কোনো প্যাথলজি টেস্ট অর্ডার পাওয়া যায়নি।' : 'No pathology orders found.'}
-                        </p>
-                        <button
-                          type="button"
-                          onClick={handleRunReconcile}
-                          disabled={isReconciling}
-                          className="px-2.5 py-1 bg-purple-700 hover:bg-purple-600 text-white rounded font-bold text-[11px] inline-flex items-center gap-1 cursor-pointer"
-                        >
-                          <RefreshCw className={`w-3 h-3 ${isReconciling ? 'animate-spin' : ''}`} />
-                          <span>{lang === 'bn' ? 'ইনভয়েস থেকে রিকভার করুন' : 'Reconcile from Invoices'}</span>
-                        </button>
-                      </div>
-                    ) : (
-                      filteredOrders.map((order) => {
-                        const rId = getOrderReceiptId(order);
-                        const pId = getOrderPatientId(order);
-                        const sStatus = getOrderSampleStatus(order);
-                        const isCurrent = invoiceNo === rId;
-                        const isPaid = (order.paymentStatus || '').toUpperCase() === 'PAID';
-                        const isDue = (order.paymentStatus || '').toUpperCase() === 'DUE';
-                        const isReportCompleted =
-                          order.reportStatus === 'Completed' ||
-                          order.reportStatus === 'Released' ||
-                          order.reportStatus === 'Verified';
-                        const isReportProgress =
-                          order.reportStatus === 'In Progress' || order.reportStatus === 'Entered';
-
-                        return (
-                          <div
-                            key={order.id}
-                            className={`p-2.5 hover:bg-purple-50/70 dark:hover:bg-slate-850 transition ${
-                              isCurrent ? 'bg-purple-100/80 dark:bg-purple-950/50 border-l-4 border-l-purple-800' : ''
-                            }`}
-                          >
-                            <div className="flex items-start justify-between gap-1.5">
-                              <div>
-                                <div className="flex items-center gap-1.5 flex-wrap">
-                                  <span className="font-mono font-black text-[10px] bg-purple-900 text-white px-1.5 py-0.2 rounded shadow-2xs">
-                                    #{rId}
-                                  </span>
-                                  <span className="font-mono font-bold text-[10px] text-purple-700 dark:text-purple-300">
-                                    PID:{pId}
-                                  </span>
-                                  <span className="font-black text-slate-900 dark:text-slate-100 text-xs">
-                                    {order.patientName}
-                                  </span>
-                                </div>
-                                <div className="mt-1 flex items-center gap-1.5 flex-wrap">
-                                  <span className="px-1.5 py-0.2 bg-purple-100 dark:bg-purple-950/80 text-purple-900 dark:text-purple-200 border border-purple-300 dark:border-purple-700 rounded text-[10px] font-black">
-                                    {order.testName}
-                                  </span>
-                                  {order.testCode && (
-                                    <span className="font-mono text-[9px] text-slate-500 font-bold">
-                                      ({order.testCode})
-                                    </span>
-                                  )}
-                                  <span
-                                    className={`px-1.5 py-0.2 rounded text-[9px] font-bold ${
-                                      isPaid
-                                        ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
-                                        : isDue
-                                        ? 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300'
-                                        : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
-                                    }`}
-                                  >
-                                    {order.paymentStatus}
-                                  </span>
-                                </div>
-                              </div>
-
-                              <div className="flex flex-col items-end gap-1 shrink-0">
-                                <button
-                                  type="button"
-                                  onClick={() => handleLoadOrderIntoForm(order)}
-                                  className="px-2 py-1 bg-gradient-to-r from-pink-600 to-purple-700 hover:from-pink-500 hover:to-purple-600 text-white rounded-md text-[10px] font-black transition cursor-pointer shadow-xs flex items-center gap-1"
-                                  title={lang === 'bn' ? 'টেস্ট প্যারামিটার লোড করুন' : 'Load test parameters into form'}
-                                >
-                                  <ArrowDownToLine className="w-3 h-3" />
-                                  <span>{lang === 'bn' ? 'লোড টেস্ট' : 'Load Test'}</span>
-                                </button>
-                                {isAdminUser && (
-                                  <button
-                                    type="button"
-                                    onClick={() => handleDeleteOrder(order)}
-                                    className="p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded transition cursor-pointer"
-                                    title={lang === 'bn' ? 'অর্ডার ডিলিট (Admin PIN প্রয়োজন)' : 'Soft Delete (Admin Required)'}
-                                  >
-                                    <Trash2 className="w-3 h-3" />
-                                  </button>
-                                )}
-                              </div>
-                            </div>
-
-                            <div className="mt-2 pt-1.5 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-[10px] gap-2">
-                              <div className="flex items-center gap-1">
-                                <span className="text-slate-500">স্যাম্পল:</span>
-                                <select
-                                  value={sStatus}
-                                  onChange={(e) =>
-                                    handleUpdateSampleStatus(
-                                      order.id,
-                                      e.target.value as SampleCollectionStatus
-                                    )
-                                  }
-                                  className={`px-1 py-0.5 rounded text-[9px] font-bold border cursor-pointer ${
-                                    sStatus === 'Collected'
-                                      ? 'bg-blue-100 text-blue-900 border-blue-300 dark:bg-blue-950 dark:text-blue-200'
-                                      : sStatus === 'Received'
-                                      ? 'bg-emerald-100 text-emerald-900 border-emerald-300 dark:bg-emerald-950 dark:text-emerald-200'
-                                      : sStatus === 'Rejected'
-                                      ? 'bg-rose-100 text-rose-900 border-rose-300 dark:bg-rose-950 dark:text-rose-200'
-                                      : 'bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-950 dark:text-amber-200'
-                                  }`}
-                                >
-                                  <option value="Pending">Pending (বাকি)</option>
-                                  <option value="Collected">Collected (সংগৃহীত)</option>
-                                  <option value="Received">Received (প্রাপ্ত)</option>
-                                  <option value="Rejected">Rejected (বাতিল)</option>
-                                </select>
-                              </div>
-
-                              <div className="flex items-center gap-2">
-                                <span
-                                  className={`px-1.5 py-0.2 rounded text-[9px] font-bold ${
-                                    isReportCompleted
-                                      ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
-                                      : isReportProgress
-                                      ? 'bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300'
-                                      : 'bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
-                                  }`}
-                                >
-                                  {isReportCompleted ? 'রিপোর্ট সম্পন্ন' : isReportProgress ? 'প্রসেসিং' : 'রিপোর্ট বাকি'}
-                                </span>
-                                <span className="text-slate-400 font-mono">
-                                  {order.orderDate}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })
-                    )}
-                  </div>
-                </div>
-              ) : sidebarTab === 'receptionQueue' ? (
+              {sidebarTab === 'receptionQueue' ? (
                 <div className="border-2 border-slate-400 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 overflow-hidden shadow-xs mb-3">
                   <div className="bg-purple-950 text-white px-3 py-1.5 text-[11px] font-bold flex items-center justify-between">
                     <span className="flex items-center gap-1.5">
@@ -3005,7 +2479,6 @@ export const PathologyModule: React.FC = () => {
             </div>
           </div>
         </div>
-        </>
       )}
 
       {/* Pathology Report A4 Modal */}
@@ -3205,345 +2678,6 @@ export const PathologyModule: React.FC = () => {
             );
           }}
         />
-      )}
-
-      {/* Full Pathology Test Orders Board Modal */}
-      {showFullOrdersModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-xs p-3 sm:p-5">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-6xl w-full max-h-[90vh] flex flex-col overflow-hidden border-2 border-purple-400 dark:border-purple-700 text-xs">
-            {/* Modal Header */}
-            <div className="p-3.5 bg-gradient-to-r from-purple-900 via-indigo-900 to-purple-950 text-white flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="p-1.5 rounded-lg bg-white/10 text-pink-300">
-                  <ListOrdered className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="font-black text-sm sm:text-base text-white">
-                    {lang === 'bn'
-                      ? 'ক্যাশ মেমো থেকে আসা সকল প্যাথলজি টেস্ট অর্ডার বোর্ড'
-                      : 'All Billed Pathology Test Orders Board'}
-                  </h3>
-                  <p className="text-[11px] text-purple-200">
-                    {lang === 'bn'
-                      ? `মোট ${pathologyOrders.length}টি টেস্ট অর্ডার ডেটাবেজে সংরক্ষিত আছে`
-                      : `${pathologyOrders.length} total test orders registered and synced`}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={handleRunReconcile}
-                  disabled={isReconciling}
-                  className="px-2.5 py-1 bg-purple-700 hover:bg-purple-600 disabled:opacity-50 text-white font-bold rounded-lg text-xs flex items-center gap-1 cursor-pointer transition"
-                  title="Reconcile missing orders"
-                >
-                  <RefreshCw className={`w-3.5 h-3.5 ${isReconciling ? 'animate-spin' : ''}`} />
-                  <span className="hidden sm:inline">
-                    {isReconciling ? 'মেলানো হচ্ছে...' : 'অর্ডার মেলান (Sync)'}
-                  </span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowFullOrdersModal(false)}
-                  className="p-1.5 text-white/80 hover:text-white hover:bg-white/10 rounded-lg text-base font-bold cursor-pointer"
-                >
-                  ✕
-                </button>
-              </div>
-            </div>
-
-            {/* Filter Bar */}
-            <div className="p-3 bg-purple-50/70 dark:bg-slate-800/60 border-b border-purple-200 dark:border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2">
-              <div className="relative flex-1">
-                <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-500" />
-                <input
-                  type="text"
-                  value={orderModalSearch}
-                  onChange={(e) => setOrderModalSearch(e.target.value)}
-                  placeholder={
-                    lang === 'bn'
-                      ? 'রসিদ নাম্বার, বিল আইডি, রোগী আইডি, রোগীর নাম বা টেস্ট দিয়ে খুঁজুন...'
-                      : 'Search receipt #, bill ID, patient ID, name, test name or code...'
-                  }
-                  className="w-full pl-9 pr-3 py-1.5 bg-white dark:bg-slate-900 border border-purple-300 dark:border-slate-700 rounded-lg text-xs font-bold text-slate-950 dark:text-slate-100 placeholder-slate-400 focus:ring-2 focus:ring-purple-600 focus:outline-none"
-                />
-              </div>
-
-              <div className="flex items-center gap-2">
-                <input
-                  type="date"
-                  value={orderModalDateFilter}
-                  onChange={(e) => setOrderModalDateFilter(e.target.value)}
-                  className="px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-purple-300 dark:border-slate-700 rounded-lg text-xs font-bold text-slate-800 dark:text-slate-200"
-                />
-                {orderModalDateFilter && (
-                  <button
-                    type="button"
-                    onClick={() => setOrderModalDateFilter('')}
-                    className="text-xs text-rose-600 hover:underline font-bold"
-                  >
-                    Clear Date
-                  </button>
-                )}
-                <button
-                  type="button"
-                  onClick={() => {
-                    const csvRows = [
-                      [
-                        'Receipt ID',
-                        'Patient ID',
-                        'Patient Name',
-                        'Test Name',
-                        'Test Code',
-                        'Order Date',
-                        'Payment Status',
-                        'Sample Status',
-                        'Report Status',
-                      ].join(','),
-                      ...modalFilteredOrders.map((o) =>
-                        [
-                          `"${getOrderReceiptId(o)}"`,
-                          `"${getOrderPatientId(o)}"`,
-                          `"${o.patientName}"`,
-                          `"${o.testName}"`,
-                          `"${o.testCode || ''}"`,
-                          `"${o.orderDate} ${o.orderTime || o.orderTimestamp || ''}"`,
-                          `"${o.paymentStatus}"`,
-                          `"${getOrderSampleStatus(o)}"`,
-                          `"${o.reportStatus}"`,
-                        ].join(',')
-                      ),
-                    ];
-                    const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `Pathology_Orders_${getTodayDateStr(false)}.csv`;
-                    a.click();
-                  }}
-                  className="px-2.5 py-1.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 font-bold rounded-lg text-xs flex items-center gap-1 cursor-pointer shrink-0"
-                  title="Export to CSV"
-                >
-                  <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>CSV</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Orders Table (8 Columns) */}
-            <div className="flex-1 overflow-y-auto">
-              {modalFilteredOrders.length === 0 ? (
-                <div className="p-12 text-center text-slate-400 text-sm space-y-2">
-                  <p className="italic">
-                    {lang === 'bn'
-                      ? 'কোনো প্যাথলজি টেস্ট অর্ডার পাওয়া যায়নি।'
-                      : 'No pathology test orders match your filter criteria.'}
-                  </p>
-                </div>
-              ) : (
-                <table className="w-full text-left text-xs border-collapse">
-                  <thead className="bg-purple-900 text-white sticky top-0 z-10 text-[11px]">
-                    <tr>
-                      <th className="py-2.5 px-3 font-black">1. Receipt / Bill ID</th>
-                      <th className="py-2.5 px-3 font-black">2. Patient ID & Name</th>
-                      <th className="py-2.5 px-3 font-black">3. Test Name & Code</th>
-                      <th className="py-2.5 px-3 font-black">4. Order Date / Time</th>
-                      <th className="py-2.5 px-2.5 font-black text-center">5. Payment</th>
-                      <th className="py-2.5 px-3 font-black">6. Sample Status</th>
-                      <th className="py-2.5 px-2.5 font-black text-center">7. Report Status</th>
-                      <th className="py-2.5 px-3 font-black text-center">8. Action</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-purple-100 dark:divide-slate-800">
-                    {modalFilteredOrders.map((o) => {
-                      const rId = getOrderReceiptId(o);
-                      const pId = getOrderPatientId(o);
-                      const sStatus = getOrderSampleStatus(o);
-                      const pAge = getOrderAge(o);
-                      const pSex = getOrderSex(o);
-                      const isPaid = (o.paymentStatus || '').toUpperCase() === 'PAID';
-                      const isDue = (o.paymentStatus || '').toUpperCase() === 'DUE';
-                      const isReportCompleted =
-                        o.reportStatus === 'Completed' ||
-                        o.reportStatus === 'Released' ||
-                        o.reportStatus === 'Verified';
-                      const isReportProgress =
-                        o.reportStatus === 'In Progress' || o.reportStatus === 'Entered';
-
-                      return (
-                        <tr
-                          key={o.id}
-                          className="hover:bg-purple-50/80 dark:hover:bg-slate-800/70 transition"
-                        >
-                          {/* 1. Receipt / Bill ID */}
-                          <td className="py-2 px-3 font-mono font-black text-purple-950 dark:text-purple-300">
-                            <span className="bg-purple-100 dark:bg-purple-950 px-2 py-0.5 rounded border border-purple-200 dark:border-purple-800">
-                              #{rId}
-                            </span>
-                          </td>
-
-                          {/* 2. Patient ID & Name */}
-                          <td className="py-2 px-3">
-                            <div className="font-black text-slate-900 dark:text-slate-100">
-                              {o.patientName}
-                            </div>
-                            <div className="text-[10px] text-slate-500 font-mono">
-                              PID: #{pId}
-                              {pAge && ` · ${pAge}`}
-                              {pSex && ` · ${pSex}`}
-                            </div>
-                          </td>
-
-                          {/* 3. Test Name & Code */}
-                          <td className="py-2 px-3">
-                            <div className="font-black text-purple-900 dark:text-purple-200">
-                              {o.testName}
-                            </div>
-                            <div className="text-[10px] text-slate-500 flex items-center gap-1.5 mt-0.5">
-                              {o.testCode && (
-                                <span className="font-mono bg-slate-100 dark:bg-slate-800 px-1 rounded font-bold">
-                                  {o.testCode}
-                                </span>
-                              )}
-                              {o.category && <span>{o.category}</span>}
-                            </div>
-                          </td>
-
-                          {/* 4. Order Date & Time */}
-                          <td className="py-2 px-3 text-slate-700 dark:text-slate-300 font-mono text-[11px]">
-                            <div>{o.orderDate}</div>
-                            {(o.orderTime || o.orderTimestamp) && (
-                              <div className="text-[10px] text-slate-400">
-                                {o.orderTime || o.orderTimestamp}
-                              </div>
-                            )}
-                          </td>
-
-                          {/* 5. Payment Status */}
-                          <td className="py-2 px-2.5 text-center">
-                            <span
-                              className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
-                                isPaid
-                                  ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
-                                  : isDue
-                                  ? 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300'
-                                  : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
-                              }`}
-                            >
-                              {o.paymentStatus}
-                            </span>
-                          </td>
-
-                          {/* 6. Sample Collection Status */}
-                          <td className="py-2 px-3">
-                            <select
-                              value={sStatus}
-                              onChange={(e) =>
-                                handleUpdateSampleStatus(
-                                  o.id,
-                                  e.target.value as SampleCollectionStatus
-                                )
-                              }
-                              className={`px-2 py-1 rounded text-xs font-bold border cursor-pointer ${
-                                sStatus === 'Collected'
-                                  ? 'bg-blue-100 text-blue-900 border-blue-300 dark:bg-blue-950 dark:text-blue-200'
-                                  : sStatus === 'Received'
-                                  ? 'bg-emerald-100 text-emerald-900 border-emerald-300 dark:bg-emerald-950 dark:text-emerald-200'
-                                  : sStatus === 'Rejected'
-                                  ? 'bg-rose-100 text-rose-900 border-rose-300 dark:bg-rose-950 dark:text-rose-200'
-                                  : 'bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-950 dark:text-amber-200'
-                              }`}
-                            >
-                              <option value="Pending">Pending (বাকি)</option>
-                              <option value="Collected">Collected (সংগৃহীত)</option>
-                              <option value="Received">Received (ল্যাবে প্রাপ্ত)</option>
-                              <option value="Rejected">Rejected (বাতিল)</option>
-                            </select>
-                          </td>
-
-                          {/* 7. Report Status */}
-                          <td className="py-2 px-2.5 text-center">
-                            <span
-                              className={`px-2 py-0.5 rounded text-[10px] font-black ${
-                                isReportCompleted
-                                  ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
-                                  : isReportProgress
-                                  ? 'bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300'
-                                  : 'bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
-                              }`}
-                            >
-                              {isReportCompleted
-                                ? 'সম্পন্ন'
-                                : isReportProgress
-                                ? 'প্রসেসিং'
-                                : 'বাকি'}
-                            </span>
-                          </td>
-
-                        {/* 8. Action */}
-                        <td className="py-2 px-3 text-center">
-                          <div className="flex items-center justify-center gap-1.5">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                handleLoadOrderIntoForm(o);
-                                setShowFullOrdersModal(false);
-                              }}
-                              className="px-2.5 py-1 bg-gradient-to-r from-pink-600 to-purple-700 hover:from-pink-500 hover:to-purple-600 text-white rounded-md text-[11px] font-black transition cursor-pointer shadow-xs flex items-center gap-1"
-                              title="Load this test into report workspace"
-                            >
-                              <ArrowDownToLine className="w-3.5 h-3.5" />
-                              <span>{lang === 'bn' ? 'লোড' : 'Load'}</span>
-                            </button>
-
-                            {isAdminUser && (
-                              <button
-                                type="button"
-                                onClick={() => handleDeleteOrder(o)}
-                                className="p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded transition cursor-pointer"
-                                title="Delete Order (Admin Required)"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                  </tbody>
-                </table>
-              )}
-            </div>
-
-            {/* Footer Summary Bar */}
-            <div className="p-3 bg-purple-950 text-purple-200 flex flex-col sm:flex-row items-start sm:items-center justify-between text-xs gap-2">
-              <div className="flex items-center gap-4 flex-wrap">
-                <span>
-                  {lang === 'bn' ? 'মোট দেখানো হয়েছে:' : 'Displayed Orders:'}{' '}
-                  <strong className="text-white font-mono">{modalFilteredOrders.length}</strong>
-                </span>
-                <span>
-                  {lang === 'bn' ? 'স্যাম্পল বাকি:' : 'Pending Samples:'}{' '}
-                  <strong className="text-amber-300 font-mono">{pendingSamplesCount}</strong>
-                </span>
-                <span>
-                  {lang === 'bn' ? 'রিপোর্ট পেন্ডিং:' : 'Pending Reports:'}{' '}
-                  <strong className="text-cyan-300 font-mono">{pendingReportsCount}</strong>
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowFullOrdersModal(false)}
-                className="px-4 py-1.5 bg-white/20 hover:bg-white/30 text-white rounded-lg font-bold text-xs cursor-pointer"
-              >
-                {lang === 'bn' ? 'বন্ধ করুন' : 'Close'}
-              </button>
-            </div>
-          </div>
-        </div>
       )}
     </div>
   );

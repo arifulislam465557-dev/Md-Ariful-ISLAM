@@ -36,15 +36,6 @@ import {
   OpdAppointmentRecord,
   DeleteRequestPayload,
   ActiveModuleDrafts,
-  DepartmentOrder,
-  DepartmentOrderStatus,
-  PathologyOrderItem,
-  SampleCollectionStatus,
-  PathologyReportStatus,
-  PaymentTransaction,
-  BillingConfig,
-  ServiceDepartmentId,
-  TestResultItem,
 } from '../types';
 import {
   initialClinicConfig,
@@ -64,11 +55,6 @@ import {
 } from '../data/initialData';
 import { convertInvoiceItemsToTestResults, getMergedPathologyCatalog } from '../utils/pathologyUtils';
 import { PATHOLOGY_MASTER_TEMPLATES } from '../data/pathologyMasterCatalog';
-import {
-  mergeServiceCatalogWithDoctors,
-  resolveItemDepartment,
-  getDepartmentLabel,
-} from '../data/bangladeshServiceMaster';
 import {
   evaluateLicenseState,
   validateAndRenewLicense,
@@ -148,64 +134,9 @@ interface AppContextType {
   setSelectedPatientForReport: (p: Patient | null) => void;
 
   invoices: Invoice[];
-  addInvoice: (inv: Omit<Invoice, 'id'>) => Promise<{ success: boolean; invoice?: Invoice; error?: string }>;
+  addInvoice: (inv: Omit<Invoice, 'id'>) => Invoice;
   updateInvoice: (id: string, inv: Partial<Invoice>) => void;
   deleteInvoice: (id: string) => void;
-  deleteReceipt: (idOrReceiptNo: string) => void;
-  searchReceiptsAndInvoices: (params: {
-    q?: string;
-    startDate?: string;
-    endDate?: string;
-    status?: string;
-    paymentMethod?: string;
-    page?: number;
-    limit?: number;
-  }) => Promise<{ success: boolean; total: number; receipts: any[]; invoices: any[]; error?: string }>;
-  collectInvoiceDue: (params: {
-    invoiceId: string;
-    amount: number;
-    paymentMethod: string;
-    transactionReference?: string;
-    note?: string;
-  }) => Promise<{ success: boolean; receiptNo?: string; error?: string }>;
-  cancelOrRefundInvoice: (params: {
-    invoiceId: string;
-    actionType: 'CANCEL' | 'REFUND';
-    refundAmount: number;
-    paymentMethod?: string;
-    reason: string;
-  }) => Promise<{ success: boolean; error?: string }>;
-
-  departmentOrders: DepartmentOrder[];
-  updateDepartmentOrderStatus: (
-    orderId: string,
-    orderStatus: DepartmentOrderStatus,
-    extra?: { reportId?: string; notes?: string }
-  ) => Promise<void>;
-
-  pathologyOrders: PathologyOrderItem[];
-  setPathologyOrders: React.Dispatch<React.SetStateAction<PathologyOrderItem[]>>;
-  updatePathologyOrderStatus: (
-    orderId: string,
-    updates: {
-      sampleStatus?: SampleCollectionStatus;
-      reportStatus?: PathologyReportStatus;
-      notes?: string;
-      sampleCollectedBy?: string;
-      sampleReceivedBy?: string;
-    }
-  ) => Promise<{ success: boolean; error?: string }>;
-  reconcileMissingPathologyOrders: () => Promise<{
-    success: boolean;
-    recoveredCount: number;
-    invoicesProcessed: number;
-    totalOrders: number;
-    error?: string;
-  }>;
-
-  paymentTransactions: PaymentTransaction[];
-  billingConfig: BillingConfig;
-  updateBillingConfig: (updates: Partial<BillingConfig>) => void;
 
   prescriptions: Prescription[];
   addPrescription: (rx: Omit<Prescription, 'id'>) => Prescription;
@@ -795,34 +726,27 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   });
 
   const [labTests, setLabTests] = useState<LabTest[]>(() => {
-    const savedDocsRaw = localStorage.getItem(`${PREFIX}doctors`);
-    const activeDocs: Doctor[] = savedDocsRaw ? JSON.parse(savedDocsRaw) : initialDoctors;
-    const baseCatalog = mergeServiceCatalogWithDoctors(
-      getMergedPathologyCatalog(initialLabTests),
-      activeDocs
-    );
+    const baseCatalog = getMergedPathologyCatalog(initialLabTests);
     const saved = localStorage.getItem(`${PREFIX}tests`);
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          const merged = mergeServiceCatalogWithDoctors(
-            getMergedPathologyCatalog(parsed),
-            activeDocs
-          );
+          const merged = getMergedPathologyCatalog(parsed);
+          // Also ensure any non-pathology items from initialLabTests (e.g. X-Ray) are included
+          const existingCodes = new Set(merged.map((t: LabTest) => t.code?.toUpperCase()));
+          initialLabTests.forEach((t) => {
+            if (!existingCodes.has(t.code?.toUpperCase())) {
+              merged.push(t);
+            }
+          });
           localStorage.setItem(`${PREFIX}tests`, JSON.stringify(merged));
           return merged;
         }
       } catch (e) {}
     }
-    localStorage.setItem(`${PREFIX}tests`, JSON.stringify(baseCatalog));
     return baseCatalog;
   });
-
-  // Synchronize Doctor Master consultation fees with Service Master whenever doctors list updates
-  useEffect(() => {
-    setLabTests((prev) => mergeServiceCatalogWithDoctors(prev, doctors));
-  }, [doctors]);
 
   const [patients, setPatients] = useState<Patient[]>(() => {
     const saved = localStorage.getItem(`${PREFIX}patients`);
@@ -833,145 +757,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const saved = localStorage.getItem(`${PREFIX}invoices`);
     return saved ? JSON.parse(saved) : initialInvoices;
   });
-
-  const buildOrdersFromInvoices = useCallback((invList: Invoice[], existingOrders: DepartmentOrder[] = []): DepartmentOrder[] => {
-    const mapByKey = new Map<string, DepartmentOrder>();
-    existingOrders.forEach((o) => {
-      mapByKey.set(`${o.invoiceNo}_${o.departmentId}`, o);
-    });
-
-    for (const inv of invList) {
-      if (!inv || !Array.isArray(inv.items)) continue;
-      const byDept = new Map<ServiceDepartmentId, typeof inv.items>();
-      for (const item of inv.items) {
-        const deptId = resolveItemDepartment(item);
-        const list = byDept.get(deptId) || [];
-        list.push({ ...item, departmentId: deptId });
-        byDept.set(deptId, list);
-      }
-
-      byDept.forEach((deptItems, deptId) => {
-        const key = `${inv.invoiceNo}_${deptId}`;
-        if (!mapByKey.has(key)) {
-          const isPaidOrPartial = inv.status === 'Paid' || inv.status === 'Partial' || inv.isCreditApproved;
-          const initialOrderStatus: DepartmentOrderStatus =
-            inv.status === 'Cancelled'
-              ? 'Cancelled'
-              : isPaidOrPartial
-              ? 'Ready for Processing'
-              : 'Payment Pending';
-
-          mapByKey.set(key, {
-            id: `ord-${inv.id}-${deptId}`,
-            orderNo: `ORD-${String(inv.invoiceNo).replace(/^INV-/i, '')}-${deptId.slice(0, 3).toUpperCase()}`,
-            invoiceId: inv.id,
-            invoiceNo: inv.invoiceNo,
-            cashMemoNo: inv.cashMemoNo || `CM-${String(inv.invoiceNo).replace(/^INV-/i, '')}`,
-            pId: inv.pId,
-            oldRegNo: inv.oldRegNo,
-            patientName: inv.patientName,
-            age: inv.age,
-            sex: inv.sex,
-            phone: inv.phone,
-            address: inv.address,
-            drCode: inv.drCode,
-            drName: inv.drName,
-            departmentId: deptId,
-            departmentName: getDepartmentLabel(deptId, 'en'),
-            items: deptItems,
-            orderDate: inv.date,
-            paymentStatus: inv.status,
-            orderStatus: initialOrderStatus,
-            isCreditApproved: inv.isCreditApproved,
-            creditApprovedBy: inv.creditApprovedBy,
-            sampleType: deptItems.map((i) => i.sampleType).filter(Boolean).join(', ') || undefined,
-            createdAt: inv.createdAt || new Date().toISOString(),
-          });
-        }
-      });
-    }
-
-    return Array.from(mapByKey.values());
-  }, []);
-
-  const [departmentOrders, setDepartmentOrders] = useState<DepartmentOrder[]>(() => {
-    const saved = localStorage.getItem(`${PREFIX}department_orders`);
-    const savedInvsRaw = localStorage.getItem(`${PREFIX}invoices`);
-    const activeInvs: Invoice[] = savedInvsRaw ? JSON.parse(savedInvsRaw) : initialInvoices;
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) {
-          return buildOrdersFromInvoices(activeInvs, parsed);
-        }
-      } catch {}
-    }
-    return buildOrdersFromInvoices(activeInvs, []);
-  });
-
-  const [pathologyOrders, setPathologyOrders] = useState<PathologyOrderItem[]>(() => {
-    const saved = localStorage.getItem(`${PREFIX}pathology_orders`);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) return parsed;
-      } catch {}
-    }
-    return [];
-  });
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(`${PREFIX}pathology_orders`, JSON.stringify(pathologyOrders));
-    } catch {}
-  }, [pathologyOrders]);
-
-  const [paymentTransactions, setPaymentTransactions] = useState<PaymentTransaction[]>(() => {
-    const saved = localStorage.getItem(`${PREFIX}payment_transactions`);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) return parsed;
-      } catch {}
-    }
-    return [];
-  });
-
-  const defaultBillingConfig: BillingConfig = {
-    invoicePrefix: 'INV',
-    cashMemoPrefix: 'CM',
-    maxStaffDiscountPercent: 15,
-    allowPartialPaymentRouting: true,
-    defaultPrintFormat: 'a4-dual',
-    termsAndConditionsBn: '১. রিপোর্ট ডেলিভারির সময় অবশ্যই ক্যাশ মেমো সঙ্গে আনতে হবে। ২. স্যাম্পল প্রদানের পর টেস্ট বাতিল বা রিফান্ডের জন্য কর্তৃপক্ষের অনুমোদন প্রয়োজন।',
-    termsAndConditionsEn: '1. Please bring this Cash Memo when collecting reports. 2. Test cancellation or refund after sample collection requires Admin authorization.',
-  };
-
-  const [billingConfig, setBillingConfig] = useState<BillingConfig>(() => {
-    const saved = localStorage.getItem(`${PREFIX}billing_config`);
-    if (saved) {
-      try {
-        return { ...defaultBillingConfig, ...JSON.parse(saved) };
-      } catch {}
-    }
-    return defaultBillingConfig;
-  });
-
-  const updateBillingConfig = (updates: Partial<BillingConfig>) => {
-    setBillingConfig((prev) => {
-      const next = { ...prev, ...updates };
-      localStorage.setItem(`${PREFIX}billing_config`, JSON.stringify(next));
-      return next;
-    });
-  };
-
-  useEffect(() => {
-    localStorage.setItem(`${PREFIX}department_orders`, JSON.stringify(departmentOrders));
-  }, [departmentOrders]);
-
-  useEffect(() => {
-    localStorage.setItem(`${PREFIX}payment_transactions`, JSON.stringify(paymentTransactions));
-  }, [paymentTransactions]);
 
   const [prescriptions, setPrescriptions] = useState<Prescription[]>(() => {
     const saved = localStorage.getItem(`${PREFIX}rx`);
@@ -1921,17 +1706,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const resetLabTestsToDefault = () => {
-    const baseCatalog = mergeServiceCatalogWithDoctors(
-      getMergedPathologyCatalog(initialLabTests),
-      doctors
-    );
+    const baseCatalog = getMergedPathologyCatalog(initialLabTests);
     setLabTests(baseCatalog);
     localStorage.setItem(`${PREFIX}tests`, JSON.stringify(baseCatalog));
     addNotification(
-      lang === 'bn' ? 'টেস্ট ও সার্ভিস ডাটাবেজ পুনরুদ্ধার' : 'Service Master Restored',
+      lang === 'bn' ? 'টেস্ট ডাটাবেজ পুনরুদ্ধার' : 'Test Database Restored',
       lang === 'bn'
-        ? 'বাংলাদেশের স্ট্যান্ডার্ড প্যাথলজি, এক্স-রে, আল্ট্রাসনোগ্রাফি, ইসিজি ও ডাক্তার কনসালটেশন মাস্টার ক্যাটালগ সফলভাবে রিস্টোর হয়েছে।'
-        : 'Comprehensive Bangladesh diagnostic & hospital service master catalog restored.',
+        ? `${PATHOLOGY_MASTER_TEMPLATES.length}+ স্ট্যান্ডার্ড প্যাথলজি টেস্ট টেমপ্লেট সফলভাবে রিস্টোর হয়েছে।`
+        : `Comprehensive diagnostic test database (${PATHOLOGY_MASTER_TEMPLATES.length}+ pathology templates) restored.`,
       'success'
     );
   };
@@ -1970,655 +1752,112 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
   };
 
-  const addInvoice = async (
-    inv: Omit<Invoice, 'id'>
-  ): Promise<{ success: boolean; invoice?: Invoice; error?: string }> => {
-    const nowIso = new Date().toISOString();
-    const nowReadable = nowIso.replace('T', ' ').slice(0, 19);
-    const invId = `inv-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-    const suffix = inv.invoiceNo ? inv.invoiceNo.replace(/^INV-/i, '') : `${new Date().getFullYear()}-${Date.now().toString().slice(-4)}`;
-    const cashMemoNo = inv.cashMemoNo || `${billingConfig.cashMemoPrefix || 'CM'}-${suffix}`;
-    const receiptNo = inv.receiptNo || `RCP-${suffix}`;
+  const addInvoice = (inv: Omit<Invoice, 'id'>): Invoice => {
+    const newInv: Invoice = { ...inv, id: `inv-${Date.now()}`, createdAt: new Date().toISOString() };
+    setInvoices((prev) => [newInv, ...prev]);
 
-    // Enrich items with resolved departmentId and snapshot pricing
-    const enrichedItems = (inv.items || []).map((it) => {
-      const deptId = resolveItemDepartment(it);
-      const qty = Math.max(1, Number(it.quantity) || 1);
-      const unitPrice = Number(it.unitPrice ?? it.price) || 0;
-      const discAmt = Math.max(0, Number(it.discountAmount) || 0);
-      const lineTotal = Math.max(0, qty * unitPrice - discAmt);
-      return {
-        ...it,
-        departmentId: deptId,
-        quantity: qty,
-        unitPrice,
-        discountAmount: discAmt,
-        price: lineTotal,
-      };
-    });
+    // AUTO-SYNC: Format billed test items into ready-to-fill Pathology parameters with age/sex reference ranges
+    const formattedTests = convertInvoiceItemsToTestResults(newInv.items, labTests, newInv.sex, newInv.age);
+    const accessionNo = `ACC-${newInv.invoiceNo ? newInv.invoiceNo.replace(/^INV-/i, '') : Date.now().toString().slice(-6)}`;
 
-    const initialPaymentTx: PaymentTransaction | undefined =
-      inv.paidAmount > 0
-        ? {
-            id: `PAY-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-            receiptNo,
-            invoiceId: invId,
-            invoiceNo: inv.invoiceNo,
-            cashMemoNo,
-            pId: inv.pId,
-            patientName: inv.patientName,
-            phone: inv.phone,
-            date: inv.date,
-            amount: inv.paidAmount,
-            type: 'INITIAL_PAYMENT',
-            paymentMethod: inv.paymentMethod || 'Cash',
-            transactionReference: inv.transactionReference,
-            receivedBy: currentUser?.fullName || inv.cashierName || 'Billing Counter',
-            receivedByRole: currentUser?.role || 'Billing',
-            workstationCode: currentWorkstation?.terminalCode || 'PC-01',
-            timestamp: nowReadable,
-            note: `Initial payment for Bill #${inv.invoiceNo}`,
-          }
-        : undefined;
+    const fallbackTests: TestResultItem[] =
+      newInv.items && newInv.items.length > 0
+        ? newInv.items.map((it) => ({
+            testName: it.testName || (it as any).name || 'Lab Investigation',
+            result: '',
+            unit: '',
+            normalRange: '',
+            status: 'Normal' as const,
+            inputType: 'text' as const,
+          }))
+        : [
+            {
+              testName: 'General Investigation',
+              result: '',
+              unit: '',
+              normalRange: '',
+              status: 'Normal' as const,
+              inputType: 'text' as const,
+            },
+          ];
 
-    // Group items by performing department and generate DepartmentOrder records
-    const itemsByDept = new Map<ServiceDepartmentId, typeof enrichedItems>();
-    for (const item of enrichedItems) {
-      const dId = item.departmentId || 'pathology';
-      const arr = itemsByDept.get(dId) || [];
-      arr.push(item);
-      itemsByDept.set(dId, arr);
-    }
+    const effectiveTests = formattedTests.length > 0 ? formattedTests : fallbackTests;
 
-    const canProcessImmediately =
-      inv.status === 'Paid' ||
-      inv.isCreditApproved ||
-      (inv.status === 'Partial' && billingConfig.allowPartialPaymentRouting);
-
-    const newOrders: DepartmentOrder[] = [];
-    itemsByDept.forEach((deptItems, deptId) => {
-      const orderId = `ord-${Date.now()}-${deptId}-${Math.floor(Math.random() * 1000)}`;
-      const orderNo = `ORD-${suffix}-${deptId.slice(0, 3).toUpperCase()}`;
-      const orderStatus: DepartmentOrderStatus = canProcessImmediately
-        ? 'Ready for Processing'
-        : 'Payment Pending';
-
-      newOrders.push({
-        id: orderId,
-        orderNo,
-        invoiceId: invId,
-        invoiceNo: inv.invoiceNo,
-        cashMemoNo,
-        pId: inv.pId,
-        oldRegNo: inv.oldRegNo,
-        patientName: inv.patientName,
-        age: inv.age,
-        sex: inv.sex,
-        phone: inv.phone,
-        address: inv.address,
-        drCode: inv.drCode,
-        drName: inv.drName,
-        doctorId: deptItems.find((i) => i.doctorId)?.doctorId,
-        departmentId: deptId,
-        departmentName: getDepartmentLabel(deptId, 'en'),
-        items: deptItems.map((i) => ({ ...i, orderId })),
-        orderDate: inv.date,
-        paymentStatus: inv.status,
-        orderStatus,
-        isCreditApproved: inv.isCreditApproved,
-        creditApprovedBy: inv.creditApprovedBy,
-        sampleType: deptItems.map((i) => i.sampleType).filter(Boolean).join(', ') || undefined,
-        createdAt: nowIso,
-      });
-    });
-
-    const newInv: Invoice = {
-      ...inv,
-      id: invId,
-      receiptNo,
-      cashMemoNo,
-      items: enrichedItems,
-      payments: initialPaymentTx ? [initialPaymentTx] : [],
-      departmentOrderIds: newOrders.map((o) => o.id),
-      cashierName: currentUser?.fullName || inv.cashierName || 'Billing Officer',
-      workstationCode: currentWorkstation?.terminalCode || 'PC-01',
-      reprintCount: 0,
-      createdAt: nowIso,
-    };
-
-    // 1. AUTO-ROUTE TO PATHOLOGY WORKLIST (if Pathology items exist on the bill)
-    const pathologyItems = itemsByDept.get('pathology') || [];
-    let createdPathologyPatient: Patient | undefined;
-
-    const newPathologyOrders: PathologyOrderItem[] = pathologyItems.map((item, idx) => {
-      const rawCode = item.code || item.testId || item.testName || `t-${idx}`;
-      const safeCode = String(rawCode).replace(/[^a-zA-Z0-9_-]/g, '_').toLowerCase();
-      const orderId = `ord-path-${newInv.invoiceNo.toLowerCase()}-${safeCode}-${idx}`;
-      const orderNo = `ORD-PATH-${suffix}-${idx + 1}`;
-      return {
-        id: orderId,
-        orderNo,
-        invoiceId: invId,
-        invoiceNo: newInv.invoiceNo,
-        cashMemoNo,
-        receiptNo,
-        pId: newInv.pId,
-        patientId: newInv.pId,
-        oldRegNo: newInv.oldRegNo,
-        patientName: newInv.patientName,
-        age: newInv.age,
-        sex: newInv.sex,
-        phone: newInv.phone,
-        address: newInv.address,
-        drCode: newInv.drCode,
-        drName: newInv.drName,
-        testId: item.testId || item.code || `t-${idx}`,
-        testCode: item.code || item.testId || `TC-${idx + 1}`,
-        testName: item.testName || (item as any).name || 'Pathology Test',
-        nameBn: item.nameBn,
-        category: item.category || 'Pathology',
-        price: Number(item.price) || 0,
-        orderDate: newInv.date,
-        orderTimestamp: nowIso,
-        paymentStatus: newInv.status,
-        sampleType: item.sampleType || 'Whole Blood',
-        sampleStatus: 'Pending',
-        reportStatus: 'Pending',
-        createdAt: nowIso,
-        updatedAt: nowIso,
-      };
-    });
-
-    if (pathologyItems.length > 0) {
-      const formattedTests = convertInvoiceItemsToTestResults(
-        pathologyItems,
-        labTests,
-        newInv.sex,
-        newInv.age
+    setPatients((prev) => {
+      // Match only if there is an uncompleted Pending order with same PID or invoiceNo
+      const existingPendingIdx = prev.findIndex(
+        (p) =>
+          (p.pId === newInv.pId && (!p.invoiceNo || p.invoiceNo === newInv.invoiceNo)) ||
+          (p.invoiceNo && p.invoiceNo === newInv.invoiceNo)
       );
-      const accessionNo = `ACC-${suffix}`;
-      const fallbackTests: TestResultItem[] = pathologyItems.map((it) => ({
-        testName: it.testName || (it as any).name || 'Lab Investigation',
-        result: '',
-        unit: '',
-        normalRange: '',
-        status: 'Normal' as const,
-        inputType: 'text' as const,
-      }));
-      const effectiveTests = formattedTests.length > 0 ? formattedTests : fallbackTests;
-
-      createdPathologyPatient = {
-        id: `pat-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-        pId: newInv.pId,
-        oldRegNo: newInv.oldRegNo,
-        accessionNo,
-        invoiceNo: newInv.invoiceNo,
-        cashMemoNo,
-        invDate: newInv.date,
-        billDate: newInv.date,
-        patientName: newInv.patientName,
-        age: newInv.age,
-        sex: newInv.sex,
-        phone: newInv.phone,
-        address: newInv.address,
-        drCode: newInv.drCode,
-        drName: newInv.drName,
-        status: 'Pending',
-        workflowStatus: 'Pending',
-        paymentStatus: newInv.status,
-        department: 'Pathology',
-        sampleType: pathologyItems.map((i) => i.sampleType).filter(Boolean).join(', ') || 'Blood / Urine',
-        testResults: effectiveTests,
-        autoPrint: true,
-        createdAt: nowIso,
-      };
-    }
-
-    // 2. AUTO-ROUTE TO DOCTOR VISIT / OPD QUEUE (if Doctor Consultation items exist on the bill)
-    const doctorVisitItems = itemsByDept.get('doctorVisit') || [];
-    let createdOpdAppointment: OpdAppointmentRecord | undefined;
-
-    if (doctorVisitItems.length > 0) {
-      const firstDocItem = doctorVisitItems[0];
-      const matchedDoctor =
-        doctors.find(
-          (d) =>
-            d.id === firstDocItem.doctorId ||
-            d.code === newInv.drCode ||
-            firstDocItem.testName.toLowerCase().includes(d.name.toLowerCase())
-        ) || doctors[0];
-
-      const todayApptsCount = opdAppointments.filter((a) => a.date === newInv.date).length;
-      const tokenNo = `T-${String(todayApptsCount + 1).padStart(2, '0')}`;
-
-      createdOpdAppointment = {
-        id: `opd-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-        tokenNo,
-        pId: newInv.pId,
-        invoiceNo: newInv.invoiceNo,
-        orderId: newOrders.find((o) => o.departmentId === 'doctorVisit')?.id,
-        patientName: newInv.patientName,
-        age: newInv.age,
-        gender: newInv.sex,
-        phone: newInv.phone,
-        doctorId: matchedDoctor?.id || '1',
-        doctorName: matchedDoctor?.name || newInv.drName || 'Consultant Doctor',
-        date: newInv.date,
-        timeSlot: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        visitType: 'New Visit',
-        fee: firstDocItem.price,
-        paymentStatus: newInv.status === 'Paid' ? 'Paid' : newInv.status === 'Partial' ? 'Partial' : 'Unpaid',
-        status: 'Waiting',
-        chiefComplaint: `Routed from Billing (#${newInv.invoiceNo})`,
-        createdAt: nowIso,
-      };
-    }
-
-    // 3. Persist atomically to backend /api/billing/finalize with idempotency key
-    const idempotencyKey = inv.idempotencyKey || `BILL-FIN-${newInv.invoiceNo}`;
-    try {
-      const finalizeRes = await fetch('/api/billing/finalize', {
-        method: 'POST',
-        headers: getActorHeaders(),
-        body: JSON.stringify({
-          idempotencyKey,
-          invoice: newInv,
-          initialPayment: initialPaymentTx,
-          departmentOrders: newOrders,
-          pathologyOrders: newPathologyOrders,
-          pathologyPatient: createdPathologyPatient,
-          opdAppointment: createdOpdAppointment,
-        }),
-      });
-
-      const finalizeData = await finalizeRes.json();
-      if (!finalizeRes.ok || !finalizeData.success) {
-        const errorMsg = finalizeData.error || 'রসিদ ও বিল ব্যাকএন্ড ডাটাবেজে সংরক্ষণ করা সম্ভব হয়নি।';
-        addNotification(
-          lang === 'bn' ? 'বিল ও রসিদ সংরক্ষণ ব্যর্থ' : 'Save Failed',
-          errorMsg,
-          'error'
-        );
-        return { success: false, error: errorMsg };
+      if (existingPendingIdx >= 0) {
+        const existing = prev[existingPendingIdx];
+        const updated = [...prev];
+        updated[existingPendingIdx] = {
+          ...existing,
+          accessionNo: existing.accessionNo || accessionNo,
+          invoiceNo: newInv.invoiceNo,
+          patientName: newInv.patientName || existing.patientName,
+          age: newInv.age || existing.age,
+          sex: newInv.sex || existing.sex,
+          drCode: newInv.drCode || existing.drCode,
+          drName: newInv.drName || existing.drName,
+          billDate: newInv.date || existing.billDate,
+          phone: newInv.phone || existing.phone,
+          workflowStatus: existing.workflowStatus || 'Pending',
+          testResults:
+            existing.testResults && existing.testResults.length > 0 && existing.testResults.some((r) => r.result.trim())
+              ? existing.testResults
+              : effectiveTests,
+        };
+        return updated;
+      } else {
+        // Unconditionally create separate Accession / Order record for Lab Worklist & Pathology
+        const newPat: Patient = {
+          id: `pat-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+          pId: newInv.pId,
+          accessionNo,
+          invoiceNo: newInv.invoiceNo,
+          invDate: newInv.date,
+          billDate: newInv.date,
+          patientName: newInv.patientName,
+          age: newInv.age,
+          sex: newInv.sex,
+          phone: newInv.phone,
+          drCode: newInv.drCode,
+          drName: newInv.drName,
+          status: 'Pending',
+          workflowStatus: 'Pending',
+          department: 'Pathology',
+          testResults: effectiveTests,
+          autoPrint: true,
+          createdAt: new Date().toISOString(),
+        };
+        return [newPat, ...prev];
       }
-    } catch (saveErr: any) {
-      const errorMsg = saveErr?.message || 'সার্ভার সংযোগ বিচ্ছিন্ন - রসিদ সংরক্ষণ ব্যর্থ হয়েছে।';
-      addNotification(
-        lang === 'bn' ? 'বিল ও রসিদ সংরক্ষণ ব্যর্থ' : 'Save Failed',
-        errorMsg,
-        'error'
-      );
-      return { success: false, error: errorMsg };
-    }
+    });
 
-    // Update local state ONLY after backend persistence is verified
-    setInvoices((prev) => [newInv, ...prev.filter((i) => i.id !== newInv.id && i.invoiceNo !== newInv.invoiceNo)]);
-    if (initialPaymentTx) {
-      setPaymentTransactions((prev) => [initialPaymentTx, ...prev.filter((p) => p.id !== initialPaymentTx.id)]);
-    }
-    if (newOrders.length > 0) {
-      const newOrderIds = new Set(newOrders.map((o) => o.id));
-      setDepartmentOrders((prev) => [...newOrders, ...prev.filter((o) => !newOrderIds.has(o.id))]);
-    }
-    if (newPathologyOrders.length > 0) {
-      const newPathOrderIds = new Set(newPathologyOrders.map((o) => o.id));
-      setPathologyOrders((prev) => [
-        ...newPathologyOrders,
-        ...prev.filter((o) => !newPathOrderIds.has(o.id)),
-      ]);
-    }
-    if (createdPathologyPatient) {
-      const patToSave = createdPathologyPatient;
-      setPatients((prev) => {
-        const sameInvoiceIdx = prev.findIndex(
-          (p) => p.invoiceNo && p.invoiceNo === newInv.invoiceNo
-        );
-        if (sameInvoiceIdx >= 0) {
-          const updated = [...prev];
-          updated[sameInvoiceIdx] = { ...updated[sameInvoiceIdx], ...patToSave, id: updated[sameInvoiceIdx].id };
-          return updated;
-        }
-        return [patToSave, ...prev];
-      });
-    }
-    if (createdOpdAppointment) {
-      const apptToSave = createdOpdAppointment;
-      setOpdAppointments((prev) => [apptToSave, ...prev.filter((a) => a.id !== apptToSave.id)]);
-    }
+    addNotification('Payment Recorded', `Invoice ${newInv.invoiceNo} issued for ৳${newInv.paidAmount}. Tests sent to Pathology.`, 'success');
+    addLog('info', `Invoice ${newInv.invoiceNo} created for ${newInv.patientName}. Formatted tests queued for Pathology.`, 'Billing');
 
-    const hasPathology = newPathologyOrders.length > 0;
-    addNotification(
-      lang === 'bn' ? 'বিল ও রসিদ স্থায়ীভাবে সংরক্ষিত' : 'Bill & Receipt Saved',
-      lang === 'bn'
-        ? `বিল #${newInv.invoiceNo} (মেমো #${cashMemoNo}, রসিদ #${receiptNo}) স্থায়ী ডাটাবেজে সংরক্ষিত। ${
-            hasPathology
-              ? `প্যাথলজির ${newPathologyOrders.length}টি টেস্ট সফলভাবে প্যাথলজি মডিউলে প্রেরিত ও সিঙ্ক হয়েছে ✓`
-              : ''
-          }`
-        : `Invoice ${newInv.invoiceNo} (Memo ${cashMemoNo}, Receipt ${receiptNo}) permanently saved in database. ${
-            hasPathology
-              ? `All ${newPathologyOrders.length} pathology tests synced to Pathology module.`
-              : ''
-          }`,
-      'success'
-    );
-    addLog(
-      'info',
-      `Invoice ${newInv.invoiceNo} (Receipt ${receiptNo}) created for ${newInv.patientName} (${newInv.pId}) with ${newPathologyOrders.length} pathology tests.`,
-      'Billing'
-    );
-
+    // LAN Activity Audit & Real-time cross-workstation broadcast
     addAuditLog({
       actionType: 'INVOICE_CREATE',
       patientId: newInv.pId,
       patientName: newInv.patientName,
-      details: `ইনভয়েস ${newInv.invoiceNo} (ক্যাশ মেমো ${cashMemoNo}, রসিদ ${receiptNo}) স্থায়ীভাবে ডাটাবেজে সংরক্ষিত — পেশেন্ট: ${newInv.patientName} (PID: ${newInv.pId}), নিট বিল: ৳${newInv.netTotal}, পরিশোধ: ৳${newInv.paidAmount}, বকেয়া: ৳${newInv.dueAmount}।`,
+      details: `ইনভয়েস ${newInv.invoiceNo} তৈরি হয়েছে (পেশেন্ট: ${newInv.patientName}, আইডি: ${newInv.pId}, মোট ৳${newInv.netTotal}, পরিশোধ ৳${newInv.paidAmount})। টেস্টসমূহ প্যাথলজি ও ইমেজিং কিউতে প্রস্তুত।`,
     });
 
     broadcastLanEvent('INVOICE_CREATED', {
       invoiceNo: newInv.invoiceNo,
-      cashMemoNo,
-      receiptNo,
       pId: newInv.pId,
       patientName: newInv.patientName,
       age: newInv.age,
       sex: newInv.sex,
-      items: enrichedItems,
-      departmentOrders: newOrders,
+      items: newInv.items,
     });
 
-    return { success: true, invoice: newInv };
-  };
-
-  const collectInvoiceDue = async (params: {
-    invoiceId: string;
-    amount: number;
-    paymentMethod: string;
-    transactionReference?: string;
-    note?: string;
-  }): Promise<{ success: boolean; receiptNo?: string; error?: string }> => {
-    const targetInv = invoices.find(
-      (i) => i.id === params.invoiceId || i.invoiceNo === params.invoiceId
-    );
-    if (!targetInv) {
-      return { success: false, error: 'Invoice not found.' };
-    }
-    const collectAmt = Math.min(Math.max(0, Number(params.amount) || 0), targetInv.dueAmount);
-    if (collectAmt <= 0) {
-      return { success: false, error: 'Collection amount must be greater than zero.' };
-    }
-
-    const nowIso = new Date().toISOString();
-    const nowReadable = nowIso.replace('T', ' ').slice(0, 19);
-    const receiptNo = `RCP-${Date.now().toString().slice(-6)}`;
-    const newPaid = targetInv.paidAmount + collectAmt;
-    const newDue = Math.max(0, targetInv.netTotal - newPaid);
-    const newStatus: Invoice['status'] = newDue <= 0 ? 'Paid' : 'Partial';
-
-    const paymentTx: PaymentTransaction = {
-      id: `PAY-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-      receiptNo,
-      invoiceId: targetInv.id,
-      invoiceNo: targetInv.invoiceNo,
-      cashMemoNo: targetInv.cashMemoNo,
-      pId: targetInv.pId,
-      patientName: targetInv.patientName,
-      amount: collectAmt,
-      type: 'DUE_COLLECTION',
-      paymentMethod: params.paymentMethod || 'Cash',
-      transactionReference: params.transactionReference,
-      receivedBy: currentUser?.fullName || 'Cashier',
-      receivedByRole: currentUser?.role || 'Billing',
-      workstationCode: currentWorkstation?.terminalCode || 'PC-01',
-      timestamp: nowReadable,
-      note: params.note || `Due collection against Bill #${targetInv.invoiceNo}`,
-    };
-
-    setInvoices((prev) =>
-      prev.map((inv) => {
-        if (inv.id !== targetInv.id && inv.invoiceNo !== targetInv.invoiceNo) return inv;
-        const existingPayments = Array.isArray(inv.payments) ? inv.payments : [];
-        return {
-          ...inv,
-          paidAmount: newPaid,
-          dueAmount: newDue,
-          status: newStatus,
-          payments: [...existingPayments, paymentTx],
-          updatedAt: nowIso,
-        };
-      })
-    );
-
-    setPaymentTransactions((prev) => [paymentTx, ...prev]);
-
-    setDepartmentOrders((prev) =>
-      prev.map((ord) => {
-        if (ord.invoiceId !== targetInv.id && ord.invoiceNo !== targetInv.invoiceNo) return ord;
-        return {
-          ...ord,
-          paymentStatus: newStatus,
-          orderStatus:
-            ord.orderStatus === 'Payment Pending' ? 'Ready for Processing' : ord.orderStatus,
-          updatedAt: nowIso,
-        };
-      })
-    );
-
-    setPatients((prev) =>
-      prev.map((p) => (p.invoiceNo === targetInv.invoiceNo ? { ...p, paymentStatus: newStatus } : p))
-    );
-
-    try {
-      await fetch('/api/billing/collect-due', {
-        method: 'POST',
-        headers: getActorHeaders(),
-        body: JSON.stringify({
-          invoiceId: targetInv.id,
-          invoiceNo: targetInv.invoiceNo,
-          amount: collectAmt,
-          paymentMethod: params.paymentMethod,
-          transactionReference: params.transactionReference,
-          note: params.note,
-          receiptNo,
-        }),
-      });
-    } catch {}
-
-    addNotification(
-      lang === 'bn' ? 'বকেয়া বিল আদায় সম্পন্ন' : 'Due Payment Collected',
-      lang === 'bn'
-        ? `বিল #${targetInv.invoiceNo}-এর বিপরীতে ৳${collectAmt} আদায় হয়েছে (রসিদ #${receiptNo})। বর্তমান বকেয়া: ৳${newDue}।`
-        : `Collected ৳${collectAmt} for Bill #${targetInv.invoiceNo} (Receipt #${receiptNo}). Remaining Due: ৳${newDue}.`,
-      'success'
-    );
-
-    return { success: true, receiptNo };
-  };
-
-  const cancelOrRefundInvoice = async (params: {
-    invoiceId: string;
-    actionType: 'CANCEL' | 'REFUND';
-    refundAmount: number;
-    paymentMethod?: string;
-    reason: string;
-  }): Promise<{ success: boolean; error?: string }> => {
-    const trimmedReason = String(params.reason || '').trim();
-    if (!trimmedReason) {
-      return { success: false, error: 'Reason is mandatory for bill cancellation or refund.' };
-    }
-
-    const targetInv = invoices.find(
-      (i) => i.id === params.invoiceId || i.invoiceNo === params.invoiceId
-    );
-    if (!targetInv) {
-      return { success: false, error: 'Invoice not found.' };
-    }
-
-    const nowIso = new Date().toISOString();
-    const nowReadable = nowIso.replace('T', ' ').slice(0, 19);
-    const refAmt = Math.min(Math.max(0, Number(params.refundAmount) || 0), targetInv.paidAmount);
-    const newPaid = Math.max(0, targetInv.paidAmount - refAmt);
-    const isCancel = params.actionType === 'CANCEL';
-    const newStatus: Invoice['status'] = isCancel
-      ? 'Cancelled'
-      : refAmt > 0 && newPaid === 0
-      ? 'Refunded'
-      : newPaid >= targetInv.netTotal
-      ? 'Paid'
-      : newPaid > 0
-      ? 'Partial'
-      : 'Due';
-
-    const refundTx: PaymentTransaction | null =
-      refAmt > 0
-        ? {
-            id: `REF-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-            receiptNo: `RFN-${Date.now().toString().slice(-6)}`,
-            invoiceId: targetInv.id,
-            invoiceNo: targetInv.invoiceNo,
-            cashMemoNo: targetInv.cashMemoNo,
-            pId: targetInv.pId,
-            patientName: targetInv.patientName,
-            amount: -refAmt,
-            type: 'REFUND',
-            paymentMethod: params.paymentMethod || 'Cash',
-            receivedBy: currentUser?.fullName || 'Admin',
-            receivedByRole: currentUser?.role || 'Admin',
-            workstationCode: currentWorkstation?.terminalCode || 'PC-01',
-            timestamp: nowReadable,
-            note: `${params.actionType}: ${trimmedReason}`,
-          }
-        : null;
-
-    setInvoices((prev) =>
-      prev.map((inv) => {
-        if (inv.id !== targetInv.id && inv.invoiceNo !== targetInv.invoiceNo) return inv;
-        const existingPayments = Array.isArray(inv.payments) ? inv.payments : [];
-        return {
-          ...inv,
-          paidAmount: newPaid,
-          dueAmount: isCancel ? 0 : Math.max(0, inv.netTotal - newPaid),
-          refundAmount: (inv.refundAmount || 0) + refAmt,
-          status: newStatus,
-          isCancelled: isCancel ? true : inv.isCancelled,
-          cancelledAt: isCancel ? nowReadable : inv.cancelledAt,
-          cancelledBy: isCancel ? currentUser?.fullName || 'Admin' : inv.cancelledBy,
-          cancelReason: trimmedReason,
-          payments: refundTx ? [...existingPayments, refundTx] : existingPayments,
-          updatedAt: nowIso,
-        };
-      })
-    );
-
-    if (refundTx) {
-      setPaymentTransactions((prev) => [refundTx, ...prev]);
-    }
-
-    setDepartmentOrders((prev) =>
-      prev.map((ord) => {
-        if (ord.invoiceId !== targetInv.id && ord.invoiceNo !== targetInv.invoiceNo) return ord;
-        return {
-          ...ord,
-          paymentStatus: newStatus,
-          orderStatus: isCancel ? 'Cancelled' : ord.orderStatus,
-          cancelledAt: isCancel ? nowReadable : ord.cancelledAt,
-          cancelReason: isCancel ? trimmedReason : ord.cancelReason,
-          updatedAt: nowIso,
-        };
-      })
-    );
-
-    if (isCancel) {
-      setPatients((prev) =>
-        prev.map((p) =>
-          p.invoiceNo === targetInv.invoiceNo
-            ? { ...p, workflowStatus: 'Cancelled', paymentStatus: 'Cancelled' }
-            : p
-        )
-      );
-      setOpdAppointments((prev) =>
-        prev.map((a) =>
-          a.invoiceNo === targetInv.invoiceNo ? { ...a, status: 'Cancelled' } : a
-        )
-      );
-    }
-
-    try {
-      await fetch('/api/billing/refund-or-cancel', {
-        method: 'POST',
-        headers: getActorHeaders(),
-        body: JSON.stringify({
-          invoiceId: targetInv.id,
-          invoiceNo: targetInv.invoiceNo,
-          actionType: params.actionType,
-          refundAmount: refAmt,
-          paymentMethod: params.paymentMethod || 'Cash',
-          reason: trimmedReason,
-        }),
-      });
-    } catch {}
-
-    addNotification(
-      isCancel
-        ? lang === 'bn'
-          ? 'বিল বাতিল (Cancelled)'
-          : 'Bill Cancelled'
-        : lang === 'bn'
-        ? 'রিফান্ড সম্পন্ন (Refunded)'
-        : 'Refund Processed',
-      `Bill #${targetInv.invoiceNo} updated (${newStatus}). Refunded: ৳${refAmt}.`,
-      'warn'
-    );
-
-    return { success: true };
-  };
-
-  const updateDepartmentOrderStatus = async (
-    orderId: string,
-    orderStatus: DepartmentOrderStatus,
-    extra?: { reportId?: string; notes?: string }
-  ) => {
-    const nowIso = new Date().toISOString();
-    const nowReadable = nowIso.replace('T', ' ').slice(0, 19);
-
-    setDepartmentOrders((prev) =>
-      prev.map((ord) => {
-        if (ord.id !== orderId && ord.orderNo !== orderId) return ord;
-        return {
-          ...ord,
-          orderStatus,
-          sampleCollectedAt:
-            orderStatus === 'Sample Collected'
-              ? ord.sampleCollectedAt || nowReadable
-              : ord.sampleCollectedAt,
-          sampleCollectedBy:
-            orderStatus === 'Sample Collected'
-              ? ord.sampleCollectedBy || currentUser?.fullName || 'Staff'
-              : ord.sampleCollectedBy,
-          resultEnteredAt:
-            orderStatus === 'Result Entered' || orderStatus === 'Completed'
-              ? ord.resultEnteredAt || nowReadable
-              : ord.resultEnteredAt,
-          completedAt: orderStatus === 'Completed' ? nowReadable : ord.completedAt,
-          reportId: extra?.reportId || ord.reportId,
-          notes: extra?.notes !== undefined ? extra.notes : ord.notes,
-          updatedAt: nowIso,
-        };
-      })
-    );
-
-    try {
-      await fetch('/api/orders/update-status', {
-        method: 'POST',
-        headers: getActorHeaders(),
-        body: JSON.stringify({
-          orderId,
-          orderStatus,
-          reportId: extra?.reportId,
-          notes: extra?.notes,
-        }),
-      });
-    } catch {}
+    return newInv;
   };
 
   const updateInvoice = (id: string, updated: Partial<Invoice>) => {
@@ -2642,73 +1881,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       dependencies: deps,
       originalData: target,
     });
-  };
-
-  const deleteReceipt = (idOrReceiptNo: string) => {
-    const target = paymentTransactions.find((p) => p.id === idOrReceiptNo || p.receiptNo === idOrReceiptNo);
-    if (!target) return;
-    const deps: string[] = [];
-    if (target.invoiceNo) deps.push(`সংযুক্ত বিল নং: ${target.invoiceNo}`);
-    if (target.pId) deps.push(`পেশেন্ট আইডি: ${target.pId}`);
-    if (target.amount) deps.push(`রসিদ মূল্য: ৳${target.amount}`);
-    requestDeleteRecord({
-      entityType: 'receipt',
-      entityLabel: 'পেমেন্ট রসিদ (Payment Receipt)',
-      recordId: target.id,
-      recordTitle: `Receipt #${target.receiptNo || target.id} — ${target.patientName || 'Patient'}`,
-      recordSubtitle: `Bill #${target.invoiceNo || 'N/A'} · Amount: ৳${target.amount} · Method: ${target.paymentMethod}`,
-      dependencies: deps,
-      originalData: target,
-    });
-  };
-
-  const searchReceiptsAndInvoices = async (params: {
-    q?: string;
-    startDate?: string;
-    endDate?: string;
-    status?: string;
-    paymentMethod?: string;
-    page?: number;
-    limit?: number;
-  }): Promise<{ success: boolean; total: number; receipts: any[]; invoices: any[]; error?: string }> => {
-    try {
-      const searchParams = new URLSearchParams();
-      if (params.q) searchParams.set('q', params.q);
-      if (params.startDate) searchParams.set('startDate', params.startDate);
-      if (params.endDate) searchParams.set('endDate', params.endDate);
-      if (params.status) searchParams.set('status', params.status);
-      if (params.paymentMethod) searchParams.set('paymentMethod', params.paymentMethod);
-      if (params.page) searchParams.set('page', String(params.page));
-      if (params.limit) searchParams.set('limit', String(params.limit));
-
-      const res = await fetch(`/api/billing/receipts/search?${searchParams.toString()}`, {
-        headers: getActorHeaders(),
-      });
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        return {
-          success: false,
-          total: 0,
-          receipts: [],
-          invoices: [],
-          error: data.error || 'Failed to search receipts',
-        };
-      }
-      return {
-        success: true,
-        total: data.total || 0,
-        receipts: data.receipts || [],
-        invoices: data.invoices || [],
-      };
-    } catch (err: any) {
-      return {
-        success: false,
-        total: 0,
-        receipts: [],
-        invoices: [],
-        error: err?.message || 'Network error while searching receipts',
-      };
-    }
   };
 
   const addPrescription = (rx: Omit<Prescription, 'id'>): Prescription => {
@@ -2742,23 +1914,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const addEcgReport = (ecg: Omit<EcgReport, 'id'>) => {
     const newEcg: EcgReport = { ...ecg, id: `ecg-${Date.now()}` };
     setEcgReports((prev) => [newEcg, ...prev]);
-    // Automatically mark matching ECG department order as Completed
-    setDepartmentOrders((prev) =>
-      prev.map((ord) => {
-        const matchesOrder =
-          (newEcg.orderId && ord.id === newEcg.orderId) ||
-          (newEcg.invoiceNo && ord.invoiceNo === newEcg.invoiceNo && ord.departmentId === 'ecg') ||
-          (!newEcg.orderId && !newEcg.invoiceNo && ord.pId === newEcg.pId && ord.departmentId === 'ecg' && ord.orderStatus !== 'Completed');
-        if (!matchesOrder) return ord;
-        return {
-          ...ord,
-          orderStatus: 'Completed',
-          resultEnteredAt: new Date().toISOString().replace('T', ' ').slice(0, 19),
-          completedAt: new Date().toISOString().replace('T', ' ').slice(0, 19),
-          reportId: newEcg.id,
-        };
-      })
-    );
     addNotification('ECG Report Completed', `ECG interpretation saved for PId: ${newEcg.pId}`, 'info');
 
     addAuditLog({
@@ -2787,23 +1942,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const addXrayReport = (xray: Omit<XrayReport, 'id'>) => {
     const newXray: XrayReport = { ...xray, id: `xray-${Date.now()}` };
     setXrayReports((prev) => [newXray, ...prev]);
-    // Automatically mark matching X-Ray department order as Completed
-    setDepartmentOrders((prev) =>
-      prev.map((ord) => {
-        const matchesOrder =
-          (newXray.orderId && ord.id === newXray.orderId) ||
-          (newXray.invoiceNo && ord.invoiceNo === newXray.invoiceNo && ord.departmentId === 'xray') ||
-          (!newXray.orderId && !newXray.invoiceNo && ord.pId === newXray.pId && ord.departmentId === 'xray' && ord.orderStatus !== 'Completed');
-        if (!matchesOrder) return ord;
-        return {
-          ...ord,
-          orderStatus: 'Completed',
-          resultEnteredAt: new Date().toISOString().replace('T', ' ').slice(0, 19),
-          completedAt: new Date().toISOString().replace('T', ' ').slice(0, 19),
-          reportId: newXray.id,
-        };
-      })
-    );
     addNotification('X-Ray Report Ready', `X-Ray findings recorded for PId: ${newXray.pId}`, 'info');
 
     addAuditLog({
@@ -2832,23 +1970,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const addUsgReport = (usg: Omit<UsgReport, 'id'>) => {
     const newUsg: UsgReport = { ...usg, id: `usg-${Date.now()}` };
     setUsgReports((prev) => [newUsg, ...prev]);
-    // Automatically mark matching Ultrasound department order as Completed
-    setDepartmentOrders((prev) =>
-      prev.map((ord) => {
-        const matchesOrder =
-          (newUsg.orderId && ord.id === newUsg.orderId) ||
-          (newUsg.invoiceNo && ord.invoiceNo === newUsg.invoiceNo && ord.departmentId === 'ultrasound') ||
-          (!newUsg.orderId && !newUsg.invoiceNo && ord.pId === newUsg.pId && ord.departmentId === 'ultrasound' && ord.orderStatus !== 'Completed');
-        if (!matchesOrder) return ord;
-        return {
-          ...ord,
-          orderStatus: 'Completed',
-          resultEnteredAt: new Date().toISOString().replace('T', ' ').slice(0, 19),
-          completedAt: new Date().toISOString().replace('T', ' ').slice(0, 19),
-          reportId: newUsg.id,
-        };
-      })
-    );
     addNotification('Ultrasound Report Ready', `USG Scan recorded for PId: ${newUsg.pId}`, 'info');
 
     addAuditLog({
@@ -3573,9 +2694,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return {
       patients,
       invoices,
-      departmentOrders,
-      pathologyOrders,
-      paymentTransactions,
       doctors,
       labTests,
       medicines: [],
@@ -3594,9 +2712,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [
     patients,
     invoices,
-    departmentOrders,
-    pathologyOrders,
-    paymentTransactions,
     doctors,
     labTests,
     employees,
@@ -3713,28 +2828,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         if (data.isInitialized && data.collections) {
           isHydratingFromServerRef.current = true;
           const cols = data.collections;
-          const hydratedDocs = Array.isArray(cols.doctors) && cols.doctors.length > 0 ? cols.doctors : doctors;
           if (Array.isArray(cols.patients) && cols.patients.length > 0) setPatients(cols.patients);
           if (Array.isArray(cols.invoices) && cols.invoices.length > 0) setInvoices(cols.invoices);
-          if (Array.isArray(cols.departmentOrders) && cols.departmentOrders.length > 0) {
-            setDepartmentOrders(buildOrdersFromInvoices(cols.invoices || invoices, cols.departmentOrders));
-          } else if (Array.isArray(cols.invoices) && cols.invoices.length > 0) {
-            setDepartmentOrders((prev) => buildOrdersFromInvoices(cols.invoices, prev));
-          }
-          if (Array.isArray(cols.pathologyOrders)) {
-            setPathologyOrders(cols.pathologyOrders);
-          }
-          if (Array.isArray(cols.paymentTransactions) && cols.paymentTransactions.length > 0) {
-            setPaymentTransactions(cols.paymentTransactions);
-          }
           if (Array.isArray(cols.doctors) && cols.doctors.length > 0) setDoctors(cols.doctors);
           if (Array.isArray(cols.labTests) && cols.labTests.length > 0) {
-            setLabTests(
-              mergeServiceCatalogWithDoctors(
-                getMergedPathologyCatalog(cols.labTests),
-                hydratedDocs
-              )
-            );
+            setLabTests(getMergedPathologyCatalog(cols.labTests));
           }
           if (Array.isArray(cols.employees) && cols.employees.length > 0) setEmployees(cols.employees);
           if (Array.isArray(cols.expenses) && cols.expenses.length > 0) setExpenses(cols.expenses);
@@ -3814,8 +2912,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [
     patients,
     invoices,
-    departmentOrders,
-    paymentTransactions,
     doctors,
     labTests,
     prescriptions,
@@ -3976,17 +3072,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setPatients((prev) => prev.filter((p) => p.id !== recordId && p.pId !== recordId));
       } else if (entityType === 'invoice') {
         setInvoices((prev) => prev.filter((i) => i.id !== recordId && i.invoiceNo !== recordId));
-      } else if (entityType === 'receipt') {
-        setPaymentTransactions((prev) => prev.filter((p) => p.id !== recordId && p.receiptNo !== recordId));
-        if (data.updatedInvoice) {
-          setInvoices((prev) =>
-            prev.map((i) =>
-              i.id === data.updatedInvoice.id || i.invoiceNo === data.updatedInvoice.invoiceNo
-                ? data.updatedInvoice
-                : i
-            )
-          );
-        }
       } else if (entityType === 'doctor') {
         setDoctors((prev) => prev.filter((d) => d.id !== recordId));
       } else if (entityType === 'labTest') {
@@ -4016,8 +3101,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setXrayReports((prev) => prev.filter((x) => x.id !== recordId));
       } else if (entityType === 'usgReport') {
         setUsgReports((prev) => prev.filter((u) => u.id !== recordId));
-      } else if (entityType === 'pathologyOrder') {
-        setPathologyOrders((prev) => prev.filter((o) => o.id !== recordId && o.orderNo !== recordId));
       }
 
       if (Array.isArray(data.trashRecords)) {
@@ -4079,17 +3162,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           setPatients((prev) => [orig, ...prev.filter((p) => p.id !== orig.id)]);
         } else if (restored.entityType === 'invoice') {
           setInvoices((prev) => [orig, ...prev.filter((i) => i.id !== orig.id)]);
-        } else if (restored.entityType === 'receipt') {
-          setPaymentTransactions((prev) => [orig, ...prev.filter((p) => p.id !== orig.id)]);
-          if (data.updatedInvoice) {
-            setInvoices((prev) =>
-              prev.map((i) =>
-                i.id === data.updatedInvoice.id || i.invoiceNo === data.updatedInvoice.invoiceNo
-                  ? data.updatedInvoice
-                  : i
-              )
-            );
-          }
         } else if (restored.entityType === 'doctor') {
           setDoctors((prev) => [orig, ...prev.filter((d) => d.id !== orig.id)]);
         } else if (restored.entityType === 'labTest') {
@@ -4114,8 +3186,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           setXrayReports((prev) => [orig, ...prev.filter((x) => x.id !== orig.id)]);
         } else if (restored.entityType === 'usgReport') {
           setUsgReports((prev) => [orig, ...prev.filter((u) => u.id !== orig.id)]);
-        } else if (restored.entityType === 'pathologyOrder') {
-          setPathologyOrders((prev) => [orig, ...prev.filter((o) => o.id !== orig.id)]);
         }
       }
 
@@ -4229,123 +3299,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
-  const updatePathologyOrderStatus = async (
-    orderId: string,
-    updates: {
-      sampleStatus?: SampleCollectionStatus;
-      reportStatus?: PathologyReportStatus;
-      notes?: string;
-      sampleCollectedBy?: string;
-      sampleReceivedBy?: string;
-    }
-  ): Promise<{ success: boolean; error?: string }> => {
-    const nowIso = new Date().toISOString();
-    const nowReadable = nowIso.replace('T', ' ').slice(0, 19);
-
-    setPathologyOrders((prev) =>
-      prev.map((ord) => {
-        if (ord.id !== orderId && ord.orderNo !== orderId) return ord;
-        return {
-          ...ord,
-          sampleStatus: updates.sampleStatus || ord.sampleStatus,
-          reportStatus: updates.reportStatus || ord.reportStatus,
-          notes: updates.notes !== undefined ? updates.notes : ord.notes,
-          sampleCollectedBy:
-            updates.sampleStatus === 'Collected'
-              ? updates.sampleCollectedBy || currentUser?.fullName || 'Technologist'
-              : ord.sampleCollectedBy,
-          sampleCollectedAt:
-            updates.sampleStatus === 'Collected' ? nowReadable : ord.sampleCollectedAt,
-          sampleReceivedBy:
-            updates.sampleStatus === 'Received'
-              ? updates.sampleReceivedBy || currentUser?.fullName || 'Lab Staff'
-              : ord.sampleReceivedBy,
-          sampleReceivedAt:
-            updates.sampleStatus === 'Received' ? nowReadable : ord.sampleReceivedAt,
-          updatedAt: nowIso,
-        };
-      })
-    );
-
-    try {
-      const res = await fetch('/api/pathology/orders/update-status', {
-        method: 'POST',
-        headers: getActorHeaders(),
-        body: JSON.stringify({
-          orderId,
-          ...updates,
-          sampleCollectedBy: updates.sampleCollectedBy || currentUser?.fullName,
-          sampleReceivedBy: updates.sampleReceivedBy || currentUser?.fullName,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        return { success: false, error: data?.error || 'Failed to update order status' };
-      }
-      return { success: true };
-    } catch (err: any) {
-      return { success: false, error: err?.message || 'Network error updating order status' };
-    }
-  };
-
-  const reconcileMissingPathologyOrders = async (): Promise<{
-    success: boolean;
-    recoveredCount: number;
-    invoicesProcessed: number;
-    totalOrders: number;
-    error?: string;
-  }> => {
-    try {
-      const res = await fetch('/api/pathology/reconcile-missing-orders', {
-        method: 'POST',
-        headers: getActorHeaders(),
-      });
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        return {
-          success: false,
-          recoveredCount: 0,
-          invoicesProcessed: 0,
-          totalOrders: 0,
-          error: data?.error || 'Failed to reconcile orders',
-        };
-      }
-
-      if (Array.isArray(data.pathologyOrders)) {
-        setPathologyOrders(data.pathologyOrders);
-        try {
-          localStorage.setItem(`${PREFIX}pathology_orders`, JSON.stringify(data.pathologyOrders));
-        } catch {}
-      }
-      if (Array.isArray(data.patients)) {
-        setPatients(data.patients);
-      }
-
-      addNotification(
-        lang === 'bn' ? 'অর্ডার যাচাই ও রিকভারি সম্পন্ন' : 'Orders Reconciled',
-        lang === 'bn'
-          ? `মোট ${data.invoicesProcessed}টি ইনভয়েস যাচাই করে ${data.recoveredCount}টি মিসিং প্যাথলজি অর্ডার রিকভার করা হয়েছে (সর্বমোট অর্ডার: ${data.totalPathologyOrders}টি)।`
-          : `Reconciled ${data.invoicesProcessed} invoices: recovered ${data.recoveredCount} missing pathology orders (total: ${data.totalPathologyOrders}).`,
-        'success'
-      );
-
-      return {
-        success: true,
-        recoveredCount: data.recoveredCount,
-        invoicesProcessed: data.invoicesProcessed,
-        totalOrders: data.totalPathologyOrders,
-      };
-    } catch (err: any) {
-      return {
-        success: false,
-        recoveredCount: 0,
-        invoicesProcessed: 0,
-        totalOrders: 0,
-        error: err?.message || 'Network error while reconciling orders',
-      };
-    }
-  };
-
   return (
     <AppContext.Provider
       value={{
@@ -4397,19 +3350,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         addInvoice,
         updateInvoice,
         deleteInvoice,
-        deleteReceipt,
-        searchReceiptsAndInvoices,
-        collectInvoiceDue,
-        cancelOrRefundInvoice,
-        departmentOrders,
-        updateDepartmentOrderStatus,
-        pathologyOrders,
-        setPathologyOrders,
-        updatePathologyOrderStatus,
-        reconcileMissingPathologyOrders,
-        paymentTransactions,
-        billingConfig,
-        updateBillingConfig,
         prescriptions,
         addPrescription,
         deletePrescription,

@@ -50,9 +50,6 @@ export const BillingModule: React.FC = () => {
     openPatientOverviewModal,
     activeDrafts,
     updateModuleDraft,
-    isAdminUser,
-    searchReceiptsAndInvoices,
-    deleteReceipt,
   } = useApp();
 
   const savedDraft = activeDrafts?.billingFormDraft;
@@ -186,13 +183,6 @@ export const BillingModule: React.FC = () => {
   const [paidAmount, setPaidAmount] = useState<number>(0);
   const [paymentMethod, setPaymentMethod] = useState<string>('Cash');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [searchStatus, setSearchStatus] = useState<string>('ALL');
-  const [searchMethod, setSearchMethod] = useState<string>('ALL');
-  const [searchStartDate, setSearchStartDate] = useState<string>('');
-  const [searchEndDate, setSearchEndDate] = useState<string>('');
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const pageSize = 6;
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [alertMsg, setAlertMsg] = useState<string | null>(null);
 
@@ -221,13 +211,9 @@ export const BillingModule: React.FC = () => {
         ...items,
         {
           testId: found.id,
-          code: found.code,
           testName: found.name,
-          nameBn: (found as any).nameBn,
           category: found.category,
           price: found.price,
-          sampleType: (found as any).sampleType,
-          departmentId: (found as any).departmentId || 'pathology',
         },
       ];
       setItems(newItems);
@@ -374,141 +360,67 @@ export const BillingModule: React.FC = () => {
     setPaidAmount(newNet);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (isSubmitting) return;
-
     if (!patientName.trim()) {
-      setAlertMsg(lang === 'bn' ? 'দয়া করে রোগীর নাম লিখুন।' : 'Please enter patient name.');
+      setAlertMsg('Please enter patient name.');
       return;
     }
     if (items.length === 0) {
-      setAlertMsg(lang === 'bn' ? 'কমপক্ষে একটি পরীক্ষা বা সার্ভিস নির্বাচন করুন।' : 'Please select at least one test or service.');
+      setAlertMsg('Please select at least one test or service.');
       return;
     }
 
-    setIsSubmitting(true);
     const invoiceNo = `INV-2026-${1000 + invoices.length + 1}`;
     const status: 'Paid' | 'Partial' | 'Due' =
       dueAmount <= 0 ? 'Paid' : paidAmount > 0 ? 'Partial' : 'Due';
 
     const savedPid = pId;
-    try {
-      const res = await addInvoice({
-        invoiceNo,
-        pId: savedPid,
-        patientName: patientName.trim(),
-        age: age || '25 Y',
-        sex,
-        phone,
-        drCode,
-        drName: matchedDoctor?.name || drCode,
-        date: billDate,
-        items,
-        subtotal,
-        discountPercent: effectiveDiscountPercent,
-        discountAmount,
-        discountBy: discountBy.trim() || undefined,
-        netTotal,
-        paidAmount,
-        dueAmount,
-        paymentMethod,
-        status,
-      });
+    const newInv = addInvoice({
+      invoiceNo,
+      pId: savedPid,
+      patientName: patientName.trim(),
+      age: age || '25 Y',
+      sex,
+      phone,
+      drCode,
+      drName: matchedDoctor?.name || drCode,
+      date: billDate,
+      items,
+      subtotal,
+      discountPercent: effectiveDiscountPercent,
+      discountAmount,
+      discountBy: discountBy.trim() || undefined,
+      netTotal,
+      paidAmount,
+      dueAmount,
+      paymentMethod,
+      status,
+    });
 
-      if (!res.success || !res.invoice) {
-        setAlertMsg(
-          res.error ||
-            (lang === 'bn'
-              ? 'রসিদ ও বিল ডাটাবেজে সংরক্ষণ করা সম্ভব হয়নি। অনুগ্রহ করে পুনরায় চেষ্টা করুন।'
-              : 'Failed to finalize and save receipt to database. Please try again.')
-        );
-        setIsSubmitting(false);
-        return;
-      }
-
-      setSelectedInvoice(res.invoice);
-      const pathCount =
-        (res as any).pathologyOrdersCount ??
-        (res.invoice.items || []).filter((i: any) => i.departmentId === 'pathology').length;
-      const syncStatusText =
-        pathCount > 0
-          ? lang === 'bn'
-            ? `✓ Pathology Orders Synced Successfully (${pathCount}টি টেস্ট প্যাথলজিতে পৌঁছেছে)`
-            : `✓ Pathology Orders Synced Successfully (${pathCount} tests synced)`
-          : '';
-
-      setAlertMsg(
-        lang === 'bn'
-          ? `✓ Receipt Saved: বিল #${invoiceNo} (ক্যাশ মেমো #${res.invoice.cashMemoNo || ''}, রসিদ #${res.invoice.receiptNo || ''}) স্থায়ী ডাটাবেজে সংরক্ষিত! ${syncStatusText}`
-          : `✓ Receipt Saved: Bill #${invoiceNo} (Memo #${res.invoice.cashMemoNo || ''}, Receipt #${res.invoice.receiptNo || ''}) saved to database! ${syncStatusText}`
-      );
-      setPId(`26100${Math.floor(100 + Math.random() * 900)}`);
-      setBillDate(getTodayDateStr(true));
-      setPatientName('');
-      setAge('');
-      setItems([]);
-      setDiscountPercent(0);
-      setDiscountFlat(0);
-      setDiscountBy('');
-      setPaidAmount(0);
-      updateModuleDraft('billingFormDraft', null);
-    } catch (err: any) {
-      setAlertMsg(err?.message || 'Error occurred while saving invoice');
-    } finally {
-      setIsSubmitting(false);
-    }
+    setSelectedInvoice(newInv);
+    setAlertMsg(
+      lang === 'bn'
+        ? `ইনভয়েস ${invoiceNo} সফলভাবে তৈরি হয়েছে! পেশেন্ট আইডি ${savedPid} এবং টেস্ট ফরম্যাট প্যাথলজিতে স্বয়ংক্রিয়ভাবে পাঠানো হয়েছে।`
+        : `Invoice ${invoiceNo} created! Patient ${savedPid} and test formats are automatically ready in Pathology.`
+    );
+    setPId(`26100${Math.floor(100 + Math.random() * 900)}`);
+    setBillDate(getTodayDateStr(true));
+    setPatientName('');
+    setAge('');
+    setItems([]);
+    setDiscountPercent(0);
+    setDiscountFlat(0);
+    setDiscountBy('');
+    setPaidAmount(0);
+    updateModuleDraft('billingFormDraft', null);
   };
 
-  const filteredInvoices = invoices.filter((inv) => {
-    const q = searchQuery.trim().toLowerCase();
-    const cleanQ = q.replace(/[\s-]/g, '');
-
-    const matchesQuery =
-      !q ||
-      (inv.invoiceNo && inv.invoiceNo.toLowerCase().includes(q)) ||
-      (inv.cashMemoNo && inv.cashMemoNo.toLowerCase().includes(q)) ||
-      (inv.receiptNo && inv.receiptNo.toLowerCase().includes(q)) ||
-      (inv.pId && inv.pId.toLowerCase().includes(q)) ||
-      (inv.patientName && inv.patientName.toLowerCase().includes(q)) ||
-      (inv.phone && inv.phone.replace(/[\s-]/g, '').toLowerCase().includes(cleanQ)) ||
-      (inv.id && inv.id.toLowerCase().includes(q)) ||
-      (inv.payments &&
-        inv.payments.some(
-          (p) =>
-            (p.id && p.id.toLowerCase().includes(q)) ||
-            (p.receiptNo && p.receiptNo.toLowerCase().includes(q)) ||
-            (p.transactionReference && p.transactionReference.toLowerCase().includes(q))
-        ));
-
-    const matchesStatus =
-      searchStatus === 'ALL' || inv.status.toLowerCase() === searchStatus.toLowerCase();
-
-    const matchesMethod =
-      searchMethod === 'ALL' ||
-      (inv.paymentMethod && inv.paymentMethod.toLowerCase() === searchMethod.toLowerCase()) ||
-      (inv.payments &&
-        inv.payments.some(
-          (p) => p.paymentMethod && p.paymentMethod.toLowerCase() === searchMethod.toLowerCase()
-        ));
-
-    const matchesDate = (() => {
-      if (!searchStartDate && !searchEndDate) return true;
-      const invDateStr = inv.date ? inv.date.split(' ')[0] : '';
-      if (!invDateStr) return true;
-      if (searchStartDate && invDateStr < searchStartDate) return false;
-      if (searchEndDate && invDateStr > searchEndDate) return false;
-      return true;
-    })();
-
-    return matchesQuery && matchesStatus && matchesMethod && matchesDate;
-  });
-
-  const totalPages = Math.max(1, Math.ceil(filteredInvoices.length / pageSize));
-  const currentPageClamped = Math.min(currentPage, totalPages);
-  const paginatedInvoices = filteredInvoices.slice(
-    (currentPageClamped - 1) * pageSize,
-    currentPageClamped * pageSize
+  const filteredInvoices = invoices.filter(
+    (inv) =>
+      inv.invoiceNo.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      inv.pId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      inv.patientName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -1120,23 +1032,11 @@ export const BillingModule: React.FC = () => {
             {/* Create & Print Invoice Submit Button */}
             <button
               type="submit"
-              disabled={isSubmitting}
-              className={`w-full py-3.5 bg-gradient-to-r from-purple-800 via-indigo-900 to-purple-900 hover:from-purple-900 hover:via-indigo-950 hover:to-purple-950 text-white font-black rounded-xl text-sm flex items-center justify-center gap-2 shadow-lg cursor-pointer transition active:scale-98 border border-purple-500/30 ${
-                isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
-              }`}
+              className="w-full py-3.5 bg-gradient-to-r from-purple-800 via-indigo-900 to-purple-900 hover:from-purple-900 hover:via-indigo-950 hover:to-purple-950 text-white font-black rounded-xl text-sm flex items-center justify-center gap-2 shadow-lg cursor-pointer transition active:scale-98 border border-purple-500/30"
               title={lang === 'bn' ? 'ইনভয়েস তৈরি করুন এবং স্বয়ংক্রিয়ভাবে A4 ডাবল-কপি প্রিন্ট ভিউ খুলুন' : 'Create Invoice and Open Dual A4 Cash Memo'}
             >
-              {isSubmitting ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  <span>{lang === 'bn' ? 'ডাটাবেজে স্থায়ীভাবে সংরক্ষণ হচ্ছে...' : 'Saving Permanently to Database...'}</span>
-                </>
-              ) : (
-                <>
-                  <Printer className="w-4 h-4 text-pink-300" />
-                  <span>{lang === 'bn' ? 'ইনভয়েস তৈরি ও প্রিন্ট (A4 ডাবল কপি)' : 'Create & Print Invoice (A4 Dual Slip)'}</span>
-                </>
-              )}
+              <Printer className="w-4 h-4 text-pink-300" />
+              <span>{lang === 'bn' ? 'ইনভয়েস তৈরি ও প্রিন্ট (A4 ডাবল কপি)' : 'Create & Print Invoice (A4 Dual Slip)'}</span>
             </button>
           </form>
         </div>
@@ -1181,174 +1081,29 @@ export const BillingModule: React.FC = () => {
 
             {/* TAB 1: Invoices List */}
             {rightTab === 'invoices' && (
-              <div className="space-y-3">
-                {/* Search Bar with Multi-field support */}
-                <div className="relative">
-                  <Search className="w-4 h-4 absolute left-3 top-2.5 text-purple-600 dark:text-purple-400" />
+              <div>
+                <div className="relative mb-3">
+                  <Search className="w-4 h-4 absolute left-3 top-2.5 text-gray-400" />
                   <input
                     type="text"
                     value={searchQuery}
-                    onChange={(e) => {
-                      setSearchQuery(e.target.value);
-                      setCurrentPage(1);
-                    }}
-                    placeholder={
-                      lang === 'bn'
-                        ? 'রসিদ নং (RCP-), মেমো (CM-), বিল (INV-), আইডি, নাম, ফোন বা পেমেন্ট আইডি...'
-                        : 'Receipt No, Memo, Bill No, Patient ID, Name, Phone, Txn ID...'
-                    }
-                    className="w-full pl-9 pr-8 py-2 bg-purple-50/50 dark:bg-gray-900 border-2 border-purple-200 dark:border-purple-800 rounded-lg text-xs font-medium focus:ring-2 focus:ring-purple-600 focus:outline-none"
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder={t.searchInvoices}
+                    className="w-full pl-9 pr-3 py-1.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-xs"
                   />
-                  {searchQuery && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSearchQuery('');
-                        setCurrentPage(1);
-                      }}
-                      className="absolute right-2.5 top-2.5 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-xs font-bold"
-                    >
-                      ✕
-                    </button>
-                  )}
                 </div>
 
-                {/* Filter Controls: Status, Payment Method & Date Range */}
-                <div className="bg-gray-50 dark:bg-gray-900/60 p-2.5 rounded-lg border border-gray-200 dark:border-gray-700 space-y-2 text-xs">
-                  {/* Status Pills */}
-                  <div className="flex flex-wrap items-center gap-1.5">
-                    <span className="text-[11px] font-bold text-gray-500 mr-1">{lang === 'bn' ? 'স্ট্যাটাস:' : 'Status:'}</span>
-                    {['ALL', 'Paid', 'Partial', 'Due'].map((st) => (
-                      <button
-                        key={st}
-                        type="button"
-                        onClick={() => {
-                          setSearchStatus(st);
-                          setCurrentPage(1);
-                        }}
-                        className={`px-2 py-0.5 rounded text-[10px] font-bold transition cursor-pointer ${
-                          searchStatus === st
-                            ? 'bg-purple-900 text-white shadow-xs'
-                            : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-100'
-                        }`}
-                      >
-                        {st === 'ALL' ? (lang === 'bn' ? 'সকল' : 'All') : st}
-                      </button>
-                    ))}
-
-                    <span className="text-[11px] font-bold text-gray-500 ml-2 mr-1">{lang === 'bn' ? 'পেমেন্ট:' : 'Method:'}</span>
-                    <select
-                      value={searchMethod}
-                      onChange={(e) => {
-                        setSearchMethod(e.target.value);
-                        setCurrentPage(1);
-                      }}
-                      className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-1.5 py-0.5 text-[11px] font-semibold text-gray-700 dark:text-gray-300"
-                    >
-                      <option value="ALL">{lang === 'bn' ? 'সকল মাধ্যম' : 'All Methods'}</option>
-                      <option value="Cash">Cash</option>
-                      <option value="bKash">bKash</option>
-                      <option value="Nagad">Nagad</option>
-                      <option value="Card">Card</option>
-                    </select>
-                  </div>
-
-                  {/* Date Range Filters */}
-                  <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-gray-200 dark:border-gray-700/60 text-[11px]">
-                    <span className="font-bold text-gray-500">{lang === 'bn' ? 'তারিখ:' : 'Date:'}</span>
-                    <div className="flex items-center gap-1">
-                      <span className="text-gray-400">{lang === 'bn' ? 'হতে' : 'From'}</span>
-                      <input
-                        type="date"
-                        value={searchStartDate}
-                        onChange={(e) => {
-                          setSearchStartDate(e.target.value);
-                          setCurrentPage(1);
-                        }}
-                        className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-1.5 py-0.5 text-[11px]"
-                      />
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <span className="text-gray-400">{lang === 'bn' ? 'পর্যন্ত' : 'To'}</span>
-                      <input
-                        type="date"
-                        value={searchEndDate}
-                        onChange={(e) => {
-                          setSearchEndDate(e.target.value);
-                          setCurrentPage(1);
-                        }}
-                        className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-1.5 py-0.5 text-[11px]"
-                      />
-                    </div>
-                    {(searchStartDate || searchEndDate || searchStatus !== 'ALL' || searchMethod !== 'ALL' || searchQuery) && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSearchQuery('');
-                          setSearchStatus('ALL');
-                          setSearchMethod('ALL');
-                          setSearchStartDate('');
-                          setSearchEndDate('');
-                          setCurrentPage(1);
-                        }}
-                        className="text-[10px] text-purple-700 dark:text-purple-300 hover:underline font-bold ml-auto cursor-pointer"
-                      >
-                        {lang === 'bn' ? 'রিসেট' : 'Reset'}
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                {/* Results Count Header */}
-                <div className="flex justify-between items-center text-[11px] text-gray-500 px-1">
-                  <span>
-                    {lang === 'bn'
-                      ? `মোট ${filteredInvoices.length}টি রেকর্ড পাওয়া গেছে`
-                      : `Found ${filteredInvoices.length} receipt/invoice records`}
-                  </span>
-                  {totalPages > 1 && (
-                    <span>
-                      {lang === 'bn' ? `পৃষ্ঠা ${currentPageClamped} / ${totalPages}` : `Page ${currentPageClamped} of ${totalPages}`}
-                    </span>
-                  )}
-                </div>
-
-                {/* Invoices & Receipts List */}
-                <div className="space-y-2.5 max-h-[480px] overflow-y-auto divide-y divide-gray-100 dark:divide-gray-700">
+                <div className="space-y-2 max-h-[520px] overflow-y-auto divide-y divide-gray-100 dark:divide-gray-700">
                   {filteredInvoices.length === 0 ? (
-                    <div className="py-10 text-center text-gray-400 text-xs space-y-1">
-                      <AlertCircle className="w-8 h-8 mx-auto text-gray-300" />
-                      <p className="font-bold">{lang === 'bn' ? 'কোনো রসিদ বা ইনভয়েস পাওয়া যায়নি' : 'No receipts or invoices found'}</p>
-                      <p className="text-[11px] text-gray-400">
-                        {lang === 'bn'
-                          ? 'রসিদ নং, মেমো নং, বিল নং, পেশেন্ট আইডি বা মোবাইল নম্বর যাচাই করুন।'
-                          : 'Try checking Receipt No, Cash Memo No, Bill No, Patient ID or Mobile.'}
-                      </p>
+                    <div className="py-8 text-center text-gray-400 text-xs">
+                      {lang === 'bn' ? 'কোনো ইনভয়েস পাওয়া যায়নি' : 'No invoices found'}
                     </div>
                   ) : (
-                    paginatedInvoices.map((inv) => (
-                      <div
-                        key={inv.id}
-                        className="pt-2.5 hover:bg-purple-50/60 dark:hover:bg-gray-750 p-2.5 rounded-lg transition border border-transparent hover:border-purple-200 dark:hover:border-purple-800"
-                      >
-                        <div className="flex justify-between items-start gap-2">
-                          <div className="space-y-0.5">
-                            <div className="flex flex-wrap items-center gap-1.5">
-                              <span className="font-mono font-black text-purple-950 dark:text-purple-200 text-xs">
-                                #{inv.invoiceNo}
-                              </span>
-                              {inv.cashMemoNo && (
-                                <span className="text-[10px] px-1.5 py-0.2 rounded bg-purple-100 dark:bg-purple-900/60 text-purple-800 dark:text-purple-200 font-bold border border-purple-200 dark:border-purple-800">
-                                  Memo: {inv.cashMemoNo}
-                                </span>
-                              )}
-                              {inv.receiptNo && (
-                                <span className="text-[10px] px-1.5 py-0.2 rounded bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 font-bold border border-emerald-300 dark:border-emerald-800">
-                                  RCP: {inv.receiptNo}
-                                </span>
-                              )}
-                            </div>
-
+                    filteredInvoices.map((inv) => (
+                      <div key={inv.id} className="pt-2 hover:bg-purple-50/50 dark:hover:bg-gray-750 p-2 rounded-lg transition">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <span className="font-bold text-purple-950 dark:text-purple-300 text-xs">{inv.invoiceNo}</span>
                             <button
                               type="button"
                               onClick={() => openPatientOverviewModal(inv.pId)}
@@ -1358,68 +1113,28 @@ export const BillingModule: React.FC = () => {
                               <span>{inv.patientName}</span>
                               <ExternalLink className="w-3 h-3 text-purple-600 opacity-60 group-hover:opacity-100 transition" />
                             </button>
-
-                            <p className="text-[11px] text-gray-500 flex flex-wrap items-center gap-2">
-                              <span>PID: <strong className="text-gray-700 dark:text-gray-300">{inv.pId}</strong></span>
-                              <span>·</span>
-                              <span>{inv.date}</span>
-                              <span>·</span>
-                              <span>Ref: {inv.drCode}</span>
-                              {inv.phone && (
-                                <>
-                                  <span>·</span>
-                                  <span className="font-mono text-gray-600 dark:text-gray-300">{inv.phone}</span>
-                                </>
-                              )}
+                            <p className="text-[11px] text-gray-500">
+                              PID: {inv.pId} · {inv.date} · Ref: {inv.drCode}
                             </p>
-
-                            {/* Linked Payment Transactions if any */}
-                            {Array.isArray(inv.payments) && inv.payments.length > 0 && (
-                              <div className="flex flex-wrap items-center gap-1 pt-0.5">
-                                <span className="text-[10px] text-gray-400 font-semibold">{lang === 'bn' ? 'পেমেন্ট ট্রানজেকশন:' : 'Txns:'}</span>
-                                {inv.payments.map((p) => (
-                                  <span
-                                    key={p.id}
-                                    className="text-[9px] px-1.5 py-0.2 rounded bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-mono"
-                                    title={`Paid: ৳${p.amount} via ${p.paymentMethod} (${p.timestamp})`}
-                                  >
-                                    {p.receiptNo || p.id} (৳{p.amount})
-                                  </span>
-                                ))}
-                              </div>
-                            )}
                           </div>
-
-                          <div className="text-right shrink-0">
+                          <div className="text-right">
                             <span
-                              className={`inline-block px-2 py-0.5 rounded text-[10px] font-black uppercase ${
+                              className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
                                 inv.status === 'Paid'
-                                  ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                                  ? 'bg-emerald-100 text-emerald-800'
                                   : inv.status === 'Partial'
-                                  ? 'bg-amber-100 text-amber-800 border border-amber-300'
-                                  : 'bg-red-100 text-red-800 border border-red-300'
+                                  ? 'bg-amber-100 text-amber-800'
+                                  : 'bg-red-100 text-red-800'
                               }`}
                             >
                               {inv.status}
                             </span>
-                            <p className="font-black text-sm text-gray-900 dark:text-gray-100 mt-1">
-                              ৳{inv.netTotal}
-                            </p>
-                            {inv.paidAmount > 0 && (
-                              <p className="text-[10px] font-bold text-emerald-700">
-                                Paid: ৳{inv.paidAmount} ({inv.paymentMethod || 'Cash'})
-                              </p>
-                            )}
-                            {inv.dueAmount > 0 && (
-                              <p className="text-[10px] font-black text-red-600">
-                                Due: ৳{inv.dueAmount}
-                              </p>
-                            )}
+                            <p className="font-bold text-sm text-gray-900 dark:text-gray-100 mt-1">৳{inv.netTotal}</p>
+                            {inv.dueAmount > 0 && <p className="text-[10px] font-bold text-red-600">Due: ৳{inv.dueAmount}</p>}
                           </div>
                         </div>
 
-                        {/* Actions Footer */}
-                        <div className="mt-2.5 flex justify-between items-center pt-1.5 border-t border-gray-100 dark:border-gray-700 text-xs">
+                        <div className="mt-2 flex justify-between items-center pt-1 border-t border-gray-100 dark:border-gray-700 text-xs">
                           <span className="text-gray-500 text-[11px]">{inv.items.length} items</span>
                           <div className="flex items-center gap-2">
                             {/* Patient Overview Button */}
@@ -1446,7 +1161,7 @@ export const BillingModule: React.FC = () => {
                               <span>WhatsApp</span>
                             </button>
 
-                            {/* Print Cash Memo Button */}
+                            {/* Print Button */}
                             <button
                               type="button"
                               onClick={() => setSelectedInvoice(inv)}
@@ -1457,47 +1172,20 @@ export const BillingModule: React.FC = () => {
                             </button>
 
                             {/* Admin-Only Delete Invoice Button */}
-                            {isAdminUser && (
-                              <button
-                                type="button"
-                                onClick={() => deleteInvoice(inv.id)}
-                                className="p-1 rounded text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition cursor-pointer"
-                                title={lang === 'bn' ? 'ইনভয়েস মুছে ফেলুন (শুধুমাত্র অ্যাডমিন)' : 'Delete Invoice (Admin Only)'}
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
-                            )}
+                            <button
+                              type="button"
+                              onClick={() => deleteInvoice(inv.id)}
+                              className="p-1 rounded text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition cursor-pointer"
+                              title="Delete Invoice (Admin Only)"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
                           </div>
                         </div>
                       </div>
                     ))
                   )}
                 </div>
-
-                {/* Pagination Controls */}
-                {totalPages > 1 && (
-                  <div className="flex justify-between items-center pt-2 border-t border-gray-100 dark:border-gray-700 text-xs">
-                    <button
-                      type="button"
-                      disabled={currentPageClamped <= 1}
-                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                      className="px-2.5 py-1 rounded bg-gray-100 dark:bg-gray-750 text-gray-700 dark:text-gray-300 font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-200 cursor-pointer"
-                    >
-                      {lang === 'bn' ? 'পূর্ববর্তী' : 'Previous'}
-                    </button>
-                    <span className="font-bold text-gray-600 dark:text-gray-400">
-                      {currentPageClamped} / {totalPages}
-                    </span>
-                    <button
-                      type="button"
-                      disabled={currentPageClamped >= totalPages}
-                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                      className="px-2.5 py-1 rounded bg-gray-100 dark:bg-gray-750 text-gray-700 dark:text-gray-300 font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-200 cursor-pointer"
-                    >
-                      {lang === 'bn' ? 'পরবর্তী' : 'Next'}
-                    </button>
-                  </div>
-                )}
               </div>
             )}
 
